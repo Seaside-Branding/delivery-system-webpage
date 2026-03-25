@@ -130,7 +130,7 @@
         </button>
     </div>
 
-    <!-- Navbar -->
+    <!-- Navigation -->
     <nav class="fixed top-0 left-0 w-full p-8 z-40 flex justify-between items-center bg-black/50 backdrop-blur-md">
         <a href="https://seasidebranding.com" target="_blank" class="flex items-center gap-4 group no-underline">
             <div class="w-10 h-10 bg-[#080808] border border-white/5 rounded-xl flex items-center justify-center rotate-3 group-hover:rotate-0 transition-transform duration-500 overflow-hidden">
@@ -139,7 +139,7 @@
             <span class="text-[10px] font-black uppercase tracking-[0.5em] text-white no-underline">Seaside Branding</span>
         </a>
         <div class="flex gap-4">
-            <button onclick="openHelp()" class="p-4 glass rounded-2xl hover:bg-white/20 transition-all active:scale-90">
+            <button id="help-trigger" class="p-4 glass rounded-2xl hover:bg-white/20 transition-all active:scale-90">
                 <i data-lucide="help-circle" class="w-5 h-5 text-white pointer-events-none"></i>
             </button>
             <button id="toggle-settings" class="p-4 glass rounded-2xl hover:bg-white/20 transition-all active:scale-90">
@@ -148,7 +148,7 @@
         </div>
     </nav>
 
-    <!-- Settings Sidebar -->
+    <!-- Sidebar -->
     <aside id="settings-sidebar" class="fixed top-0 right-0 h-full w-[440px] bg-[#080808] border-l border-white/5 z-50 p-12 flex flex-col shadow-[0_0_100px_rgba(0,0,0,0.8)]">
         <div class="flex justify-between items-center mb-16">
             <h2 class="text-[10px] font-black uppercase tracking-[0.4em] text-white/30">Studio Engine</h2>
@@ -305,6 +305,36 @@
         </section>
     </main>
 
+    <!-- Help Modal -->
+    <div id="help-modal" class="help-modal fixed inset-0 z-[100] bg-black/98 backdrop-blur-3xl items-center justify-center p-8">
+        <div class="max-w-5xl w-full bg-[#0a0a0a] p-20 border border-white/5 rounded-[60px] relative shadow-2xl overflow-y-auto max-h-[90vh] custom-scrollbar">
+            <button id="help-close" class="absolute top-16 right-16 text-neutral-600 hover:text-white p-2 transition-colors"><i data-lucide="x" class="w-10 h-10 pointer-events-none"></i></button>
+            <h2 class="text-7xl font-light tracking-tighter mb-16 text-white">Studio Masterclass</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-20 leading-relaxed text-sm text-neutral-400">
+                <div class="space-y-8">
+                    <div>
+                        <h3 class="text-white font-black uppercase text-[11px] tracking-[0.4em] mb-4">Dual-Stream Workflow</h3>
+                        <p>Import your massive RAW exports. Seaside creates <strong>800px Smart Previews</strong> for fluid dashboard performance. When you "Bake," the engine compresses originals to <strong>2048px (&lt;400KB)</strong> for the perfect balance of quality and speed.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-white font-black uppercase text-[11px] tracking-[0.4em] mb-4">Typography & Design</h3>
+                        <p>Choose separate Google Fonts for Titles and Body. Use the <strong>Tracking</strong> and <strong>Line Height</strong> sliders to match your brand's editorial style. Use the <strong>Reset</strong> button next to each slider to return to the professional baseline.</p>
+                    </div>
+                </div>
+                <div class="space-y-8">
+                    <div>
+                        <h3 class="text-white font-black uppercase text-[11px] tracking-[0.4em] mb-4">Interactive Content</h3>
+                        <p>Select any text in the header to trigger the <strong>Floating Toolbar</strong>. Apply bolding, underlining, or insert live links to client websites or social media. Delete session images instantly using the trash icon on hover.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-white font-black uppercase text-[11px] tracking-[0.4em] mb-4">Baking & Deployment</h3>
+                        <p>The "Bake" process generates a structured project ZIP. Extract the contents and upload them directly to <strong>GitHub Pages</strong>, AWS, or your own hosting for a white-labeled client experience.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import PhotoSwipeLightbox from 'https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe-lightbox.esm.min.js';
 
@@ -321,101 +351,59 @@
             'Deep Ocean': { bg: '#001219', text: '#94d2bd', accent: '#ee9b00', titleFont: "Syne", bodyFont: "Inter", titleTracking: '0em', titleLH: '1.1', bodyTracking: '0.4em', bodyLH: '1.6', gap: '1.5rem' }
         };
 
-        const state = {
-            images: [],
-            favicon: null,
-            theme: { ...PRESETS['Noir'] },
-            settings: { downloadType: 'zip', externalUrl: '' }
-        };
+        const state = { images: [], favicon: null, theme: { ...PRESETS['Noir'] }, settings: { downloadType: 'zip', externalUrl: '' } };
 
         const els = {
-            toggle: document.getElementById('toggle-settings'),
-            close: document.getElementById('close-settings'),
-            sidebar: document.getElementById('settings-sidebar'),
-            dropZone: document.getElementById('drop-zone'),
-            fileInput: document.getElementById('file-input'),
-            grid: document.getElementById('gallery-grid'),
-            setup: document.getElementById('setup-view'),
-            view: document.getElementById('gallery-view'),
-            bgColor: document.getElementById('bg-color'),
-            textColor: document.getElementById('text-color'),
-            accentColor: document.getElementById('accent-color'),
-            titleFontSearch: document.getElementById('title-font-search'),
-            titleFontResults: document.getElementById('title-font-results'),
-            bodyFontSearch: document.getElementById('body-font-search'),
-            bodyFontResults: document.getElementById('body-font-results'),
-            titleTracking: document.getElementById('title-tracking'),
-            titleLH: document.getElementById('title-lh'),
-            bodyTracking: document.getElementById('body-tracking'),
-            bodyLH: document.getElementById('body-lh'),
-            gap: document.getElementById('gap-range'),
-            faviconInput: document.getElementById('favicon-input'),
-            faviconPreviewImg: document.getElementById('favicon-preview-img'),
-            bakeBtn: document.getElementById('bake-btn'),
-            downloadFull: document.getElementById('download-full'),
-            downloadType: document.getElementById('download-type'),
-            externalUrl: document.getElementById('external-url'),
-            clientName: document.getElementById('client-name'),
-            eventDate: document.getElementById('event-date'),
-            tplList: document.getElementById('template-list'),
-            saveTplBtn: document.getElementById('save-tpl-btn'),
-            toolbar: document.getElementById('text-toolbar')
+            toggle: document.getElementById('toggle-settings'), close: document.getElementById('close-settings'), sidebar: document.getElementById('settings-sidebar'),
+            dropZone: document.getElementById('drop-zone'), fileInput: document.getElementById('file-input'), grid: document.getElementById('gallery-grid'),
+            setup: document.getElementById('setup-view'), view: document.getElementById('gallery-view'), bgColor: document.getElementById('bg-color'),
+            textColor: document.getElementById('text-color'), accentColor: document.getElementById('accent-color'),
+            titleFontSearch: document.getElementById('title-font-search'), titleFontResults: document.getElementById('title-font-results'),
+            bodyFontSearch: document.getElementById('body-font-search'), bodyFontResults: document.getElementById('body-font-results'),
+            titleTracking: document.getElementById('title-tracking'), titleLH: document.getElementById('title-lh'),
+            bodyTracking: document.getElementById('body-tracking'), bodyLH: document.getElementById('body-lh'),
+            gap: document.getElementById('gap-range'), faviconInput: document.getElementById('favicon-input'),
+            faviconPreviewImg: document.getElementById('favicon-preview-img'), bakeBtn: document.getElementById('bake-btn'),
+            downloadFull: document.getElementById('download-full'), downloadType: document.getElementById('download-type'),
+            externalUrl: document.getElementById('external-url'), clientName: document.getElementById('client-name'),
+            eventDate: document.getElementById('event-date'), tplList: document.getElementById('template-list'),
+            saveTplBtn: document.getElementById('save-tpl-btn'), toolbar: document.getElementById('text-toolbar'),
+            helpTrigger: document.getElementById('help-trigger'), helpModal: document.getElementById('help-modal'), helpClose: document.getElementById('help-close')
         };
 
         const applyTheme = () => {
             const root = document.documentElement;
-            root.style.setProperty('--bg', state.theme.bg);
-            root.style.setProperty('--text', state.theme.text);
-            root.style.setProperty('--accent', state.theme.accent);
-            root.style.setProperty('--item-gap', state.theme.gap);
-            root.style.setProperty('--title-font', state.theme.titleFont);
-            root.style.setProperty('--body-font', state.theme.bodyFont);
-            root.style.setProperty('--title-tracking', state.theme.titleTracking);
-            root.style.setProperty('--title-lh', state.theme.titleLH);
-            root.style.setProperty('--body-tracking', state.theme.bodyTracking);
-            root.style.setProperty('--body-lh', state.theme.bodyLH);
-
-            [state.theme.titleFont, state.theme.bodyFont].forEach(font => {
-                if (!document.getElementById(`font-${font}`)) {
-                    const link = document.createElement('link');
-                    link.id = `font-${font}`;
-                    link.rel = 'stylesheet';
-                    link.href = `https://fonts.googleapis.com/css2?family=${font.replace(/\s+/g, '+')}:wght@300;400;700;800&display=swap`;
+            root.style.setProperty('--bg', state.theme.bg); root.style.setProperty('--text', state.theme.text);
+            root.style.setProperty('--accent', state.theme.accent); root.style.setProperty('--item-gap', state.theme.gap);
+            root.style.setProperty('--title-font', state.theme.titleFont); root.style.setProperty('--body-font', state.theme.bodyFont);
+            root.style.setProperty('--title-tracking', state.theme.titleTracking); root.style.setProperty('--title-lh', state.theme.titleLH);
+            root.style.setProperty('--body-tracking', state.theme.bodyTracking); root.style.setProperty('--body-lh', state.theme.bodyLH);
+            [state.theme.titleFont, state.theme.bodyFont].forEach(f => {
+                if (!document.getElementById(`font-${f}`)) {
+                    const link = document.createElement('link'); link.id = `font-${f}`; link.rel = 'stylesheet';
+                    link.href = `https://fonts.googleapis.com/css2?family=${f.replace(/\s+/g, '+')}:wght@300;400;700;800&display=swap`;
                     document.head.appendChild(link);
                 }
             });
         };
 
         const syncUI = () => {
-            els.bgColor.value = state.theme.bg;
-            els.textColor.value = state.theme.text;
-            els.accentColor.value = state.theme.accent;
-            els.gap.value = parseFloat(state.theme.gap);
-            els.titleTracking.value = parseFloat(state.theme.titleTracking);
-            els.titleLH.value = parseFloat(state.theme.titleLH);
-            els.bodyTracking.value = parseFloat(state.theme.bodyTracking);
-            els.bodyLH.value = parseFloat(state.theme.bodyLH);
-            els.downloadType.value = state.settings.downloadType;
-            els.externalUrl.value = state.settings.externalUrl;
+            els.bgColor.value = state.theme.bg; els.textColor.value = state.theme.text;
+            els.accentColor.value = state.theme.accent; els.gap.value = parseFloat(state.theme.gap);
+            els.titleTracking.value = parseFloat(state.theme.titleTracking); els.titleLH.value = parseFloat(state.theme.titleLH);
+            els.bodyTracking.value = parseFloat(state.theme.bodyTracking); els.bodyLH.value = parseFloat(state.theme.bodyLH);
+            els.downloadType.value = state.settings.downloadType; els.externalUrl.value = state.settings.externalUrl;
             els.externalUrl.classList.toggle('hidden', state.settings.downloadType !== 'link');
+            document.getElementById('current-font-display').innerText = `Active: ${state.theme.titleFont} / ${state.theme.bodyFont}`;
             applyTheme();
         };
 
-        window.resetField = (field) => {
-            const defaults = PRESETS['Noir'];
-            state.theme[field] = defaults[field];
-            syncUI();
-        };
+        window.resetField = (field) => { state.theme[field] = PRESETS['Noir'][field]; syncUI(); };
 
         window.formatText = (command) => {
-            if (command === 'link') {
-                const url = prompt("Enter URL:", "https://");
-                if (url) document.execCommand('createLink', false, url);
-            } else if (command === 'unlink') {
-                document.execCommand('unlink');
-            } else {
-                document.execCommand(command, false, null);
-            }
+            if (command === 'link') { const url = prompt("Enter URL:", "https://"); if (url) document.execCommand('createLink', false, url); }
+            else if (command === 'unlink') { document.execCommand('unlink'); }
+            else { document.execCommand(command, false, null); }
             updateToolbar();
         };
 
@@ -425,8 +413,7 @@
             const range = selection.getRangeAt(0);
             const rect = range.getBoundingClientRect();
             if (!els.clientName.contains(range.commonAncestorContainer) && !els.eventDate.contains(range.commonAncestorContainer)) { els.toolbar.style.display = 'none'; return; }
-            els.toolbar.style.display = 'flex';
-            els.toolbar.style.top = `${rect.top + window.scrollY - 60}px`;
+            els.toolbar.style.display = 'flex'; els.toolbar.style.top = `${rect.top + window.scrollY - 60}px`;
             els.toolbar.style.left = `${rect.left + window.scrollX + (rect.width / 2) - (els.toolbar.offsetWidth / 2)}px`;
         };
 
@@ -437,12 +424,11 @@
         };
 
         ['title', 'body'].forEach(prefix => {
-            const search = els[`${prefix}FontSearch`];
-            const results = els[`${prefix}FontResults`];
+            const search = els[`${prefix}FontSearch`]; const results = els[`${prefix}FontResults`];
             search.addEventListener('focus', () => { results.classList.remove('hidden'); renderFontOptions(prefix, results); });
             search.addEventListener('input', (e) => {
-                const term = e.target.value.toLowerCase();
-                const filtered = GOOGLE_FONTS.filter(f => f.toLowerCase().includes(term));
+                const val = e.target.value.toLowerCase();
+                const filtered = GOOGLE_FONTS.filter(f => f.toLowerCase().includes(val));
                 results.innerHTML = filtered.map(f => `<div onclick="window.setStudioFont('${prefix}', '${f}')" class="p-4 hover:bg-white/10 rounded-xl cursor-pointer text-[10px] font-bold uppercase tracking-widest flex justify-between items-center group">${f} <span style="font-family: '${f}', sans-serif" class="text-[16px] normal-case opacity-40 group-hover:opacity-100">Aa</span></div>`).join('');
             });
         });
@@ -491,6 +477,25 @@
             });
         }
 
+        async function processProduction(blob) {
+            return new Promise(resolve => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const maxDim = 2048;
+                        const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+                        canvas.width = img.width * scale; canvas.height = img.height * scale;
+                        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                        canvas.toBlob(resolve, 'image/jpeg', 0.7);
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(blob);
+            });
+        }
+
         function renderGrid() {
             els.grid.innerHTML = state.images.map(img => `<div class="item group" id="item-${img.id}"><a href="${img.display}" data-pswp-width="${img.w}" data-pswp-height="${img.h}" target="_blank"><img src="${img.display}" class="w-full h-auto block group-hover:scale-110 transition-transform duration-[2s]"></a><div class="delete-overlay absolute top-4 right-4"><button onclick="window.deleteItem('${img.id}')" class="p-3 bg-red-500/80 hover:bg-red-500 text-white rounded-xl active:scale-90 shadow-2xl transition-all"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div></div>`).join('');
             lucide.createIcons(); initLightbox();
@@ -500,6 +505,8 @@
 
         els.toggle.onclick = () => document.body.classList.add('sidebar-open');
         els.close.onclick = () => document.body.classList.remove('sidebar-open');
+        els.helpTrigger.onclick = () => els.helpModal.classList.add('open');
+        els.helpClose.onclick = () => els.helpModal.classList.remove('open');
         els.dropZone.onclick = () => els.fileInput.click();
         els.fileInput.onchange = (e) => processFiles(e.target.files);
         document.getElementById('add-more').onclick = () => els.fileInput.click();
@@ -518,11 +525,8 @@
         els.faviconInput.onchange = (e) => {
             const file = e.target.files[0];
             if (file) {
-                state.favicon = file;
-                const url = URL.createObjectURL(file);
-                els.faviconPreviewImg.src = url;
-                document.getElementById('app-favicon').href = url;
-                document.getElementById('menu-icon-img').src = url;
+                state.favicon = file; const url = URL.createObjectURL(file);
+                els.faviconPreviewImg.src = url; document.getElementById('app-favicon').href = url; document.getElementById('menu-icon-img').src = url;
             }
         };
 
@@ -538,20 +542,24 @@
 
         els.downloadFull.onclick = async () => {
             if (state.settings.downloadType === 'link' && state.settings.externalUrl) { window.open(state.settings.externalUrl, '_blank'); return; }
-            const zip = new JSZip(); state.images.forEach((img) => zip.file(img.name, img.original));
+            const zip = new JSZip(); els.downloadFull.innerText = "Processing...";
+            for (const img of state.images) { const b = await processProduction(img.original); zip.file(img.name, b); }
             const content = await zip.generateAsync({ type: "blob" });
             const link = document.createElement('a'); link.href = URL.createObjectURL(content); link.download = `${els.clientName.innerText.trim()}.zip`; link.click();
+            els.downloadFull.innerHTML = '<i data-lucide="arrow-down-to-line" class="w-5 h-5 pointer-events-none"></i> Download All';
         };
 
         els.bakeBtn.onclick = async () => {
             const zip = new JSZip(); const client = els.clientName.innerHTML; const sub = els.eventDate.innerHTML;
-            const imgFolder = zip.folder("images"); state.images.forEach((img, i) => imgFolder.file(`shot-${i+1}.jpg`, img.original));
-            let faviconData = state.favicon || await (await fetch('favicon.png')).blob(); zip.file("favicon.png", faviconData);
-            const downloadSection = state.settings.downloadType === 'link' ? `<a href="${state.settings.externalUrl}" target="_blank" class="btn px-10 py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.3em] inline-block shadow-2xl">Download Session</a>` : '';
-            const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Portfolio</title><link rel="icon" href="favicon.png"><script src="https://cdn.tailwindcss.com"><\/script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe.min.css"><style>:root { --bg: ${state.theme.bg}; --text: ${state.theme.text}; --accent: ${state.theme.accent}; } body { background: var(--bg); color: var(--text); font-family: sans-serif; overflow-x: hidden; } .masonry { column-gap: ${state.theme.gap}; columns: 1; padding: 2rem; max-width: 1600px; margin: 0 auto; } @media (min-width: 768px) { .masonry { columns: 3; padding: 8rem; } } .item { break-inside: avoid; margin-bottom: ${state.theme.gap}; border-radius: 8px; overflow: hidden; } .btn { background: var(--accent); color: var(--bg); text-decoration: none !important; font-weight:900; } a { color: inherit; text-decoration: underline; } .pswp__button--download { background: none !important; display: flex !important; align-items: center !important; justify-content: center !important; }</style></head><body><header style="padding: 12rem 2rem; max-width: 1600px; margin: 0 auto;"><h1 style="font-family: '${state.theme.titleFont}', sans-serif; font-size: clamp(4rem, 10vw, 9rem); font-weight: 300; letter-spacing: ${state.theme.titleTracking}; margin-bottom: 2rem; line-height: ${state.theme.titleLH}; text-align: left;">${client}</h1><div style="font-family: '${state.theme.bodyFont}', sans-serif; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: ${state.theme.bodyTracking}; line-height: ${state.theme.bodyLH}; opacity: 0.4; text-align: left; max-width: 800px;">${sub}</div><div style="margin-top: 5rem; text-align: left;">${downloadSection}</div></header><div class="masonry">${state.images.map((img, i) => `<div class="item"><a href="images/shot-${i+1}.jpg" data-pswp-width="${img.w}" data-pswp-height="${img.h}"><img src="images/shot-${i+1}.jpg" style="width: 100%; height: auto; display: block;"></a></div>`).join('')}</div><script type="module">import PhotoSwipeLightbox from 'https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe-lightbox.esm.min.js'; const lightbox = new PhotoSwipeLightbox({ gallery: '.masonry', children: 'a', pswpModule: () => import('https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe-lightbox.esm.min.js') }); lightbox.on('uiRegister', () => { lightbox.pswp.ui.registerElement({ name: 'download-button', order: 8, isButton: true, tagName: 'a', html: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>', onInit: (el, pswp) => { el.setAttribute('download', 'capture.jpg'); pswp.on('change', () => { el.href = pswp.currSlide.data.src; }); } }); }); lightbox.init();<\/script></body></html>`;
-            zip.file("index.html", html);
-            const content = await zip.generateAsync({ type: "blob" });
-            const link = document.createElement('a'); link.href = URL.createObjectURL(content); link.download = "Deployment.zip"; link.click();
+            els.bakeBtn.innerText = "COMPRESSING PRODUCTION IMAGES...";
+            const imgFolder = zip.folder("images");
+            for (let i = 0; i < state.images.length; i++) { const b = await processProduction(state.images[i].original); imgFolder.file(`shot-${i+1}.jpg`, b); }
+            let fav = state.favicon || await (await fetch('favicon.png')).blob(); zip.file("favicon.png", fav);
+            const dlUI = state.settings.downloadType === 'link' ? `<a href="${state.settings.externalUrl}" target="_blank" class="btn px-10 py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.3em] inline-block shadow-2xl">Download Session</a>` : '';
+            const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Gallery</title><link rel="icon" href="favicon.png"><script src="https://cdn.tailwindcss.com"><\/script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe.min.css"><style>:root { --bg: ${state.theme.bg}; --text: ${state.theme.text}; --accent: ${state.theme.accent}; } body { background: var(--bg); color: var(--text); font-family: sans-serif; overflow-x: hidden; } .masonry { column-gap: ${state.theme.gap}; columns: 1; padding: 2rem; max-width: 1600px; margin: 0 auto; } @media (min-width: 768px) { .masonry { columns: 3; padding: 8rem; } } .item { break-inside: avoid; margin-bottom: ${state.theme.gap}; border-radius: 8px; overflow: hidden; } .btn { background: var(--accent); color: var(--bg); text-decoration: none !important; font-weight:900; } a { color: inherit; text-decoration: underline; } .pswp__button--download { background: none !important; display: flex !important; align-items: center !important; justify-content: center !important; }</style></head><body><header style="padding: 12rem 2rem; max-width: 1600px; margin: 0 auto;"><h1 style="font-family: '${state.theme.titleFont}', sans-serif; font-size: clamp(4rem, 10vw, 9rem); font-weight: 300; letter-spacing: ${state.theme.titleTracking}; margin-bottom: 2rem; line-height: ${state.theme.titleLH}; text-align: left;">${client}</h1><div style="font-family: '${state.theme.bodyFont}', sans-serif; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: ${state.theme.bodyTracking}; line-height: ${state.theme.bodyLH}; opacity: 0.4; text-align: left; max-width: 800px;">${sub}</div><div style="margin-top: 5rem; text-align: left;">${dlUI}</div></header><div class="masonry">${state.images.map((img, i) => `<div class="item"><a href="images/shot-${i+1}.jpg" data-pswp-width="${img.w}" data-pswp-height="${img.h}"><img src="images/shot-${i+1}.jpg" style="width: 100%; height: auto; display: block;"></a></div>`).join('')}</div><script type="module">import PhotoSwipeLightbox from 'https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe-lightbox.esm.min.js'; const lightbox = new PhotoSwipeLightbox({ gallery: '.masonry', children: 'a', pswpModule: () => import('https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe-lightbox.esm.min.js') }); lightbox.on('uiRegister', () => { lightbox.pswp.ui.registerElement({ name: 'download-button', order: 8, isButton: true, tagName: 'a', html: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>', onInit: (el, pswp) => { el.setAttribute('download', 'capture.jpg'); pswp.on('change', () => { el.href = pswp.currSlide.data.src; }); } }); }); lightbox.init();<\/script></body></html>`;
+            zip.file("index.html", html); const content = await zip.generateAsync({ type: "blob" });
+            const link = document.createElement('a'); link.href = URL.createObjectURL(content); link.download = "Seaside-Deployment.zip"; link.click();
+            els.bakeBtn.innerText = "Bake Production ZIP";
         };
 
         let lightbox;
@@ -571,9 +579,7 @@
             lightbox.init();
         }
 
-        lucide.createIcons();
-        loadTemplates();
-        syncUI();
+        lucide.createIcons(); loadTemplates(); syncUI();
     </script>
 </body>
 </html>
