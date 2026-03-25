@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seaside Branding Motion Maker</title>
+    <link id="app-favicon" rel="icon" href="favicon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe.min.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --accent: #ffffff;
+            --bg: #050505;
+            --text: #ffffff;
+            --item-gap: 1.5rem;
+            --title-font: 'Inter';
+            --body-font: 'Inter';
+            --title-tracking: -0.05em;
+            --title-lh: 1;
+            --body-tracking: 0.5em;
+            --body-lh: 1.5;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        #client-name {
+            font-family: var(--title-font), sans-serif;
+            letter-spacing: var(--title-tracking);
+            line-height: var(--title-lh);
+        }
+
+        #event-date {
+            font-family: var(--body-font), sans-serif;
+            letter-spacing: var(--body-tracking);
+            line-height: var(--body-lh);
+        }
+
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        
+        #settings-sidebar {
+            transform: translateX(100%);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        body.sidebar-open #settings-sidebar { transform: translateX(0); }
+
+        .masonry { column-gap: var(--item-gap); columns: 1; }
+        @media (min-width: 640px) { .masonry { columns: 2; } }
+        @media (min-width: 1024px) { .masonry { columns: 3; } }
+        @media (min-width: 1280px) { .masonry { columns: 4; } }
+
+        .item { break-inside: avoid; margin-bottom: var(--item-gap); border-radius: 12px; overflow: hidden; position: relative; background: #111; }
+        
+        .btn-primary { 
+            background-color: var(--accent); 
+            color: var(--bg);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(0,0,0,0.3); }
+
+        input[type="color"] { -webkit-appearance: none; border: 2px solid rgba(255,255,255,0.1); width: 44px; height: 44px; border-radius: 12px; padding: 0; overflow: hidden; cursor: pointer; }
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border: none; }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+
+        .help-modal { display: none; }
+        .help-modal.open { display: flex; }
+
+        [contenteditable]:empty:before {
+            content: attr(data-placeholder);
+            opacity: 0.3;
+            cursor: text;
+        }
+
+        .font-search-results {
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .delete-overlay {
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .item:hover .delete-overlay { opacity: 1; }
+
+        a { text-decoration: underline; text-underline-offset: 4px; color: inherit; }
+        
+        /* Video specific styles */
+        .video-play-hint {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.2);
+            pointer-events: none;
+        }
+
+        #text-toolbar {
+            position: absolute;
+            display: none;
+            z-index: 100;
+            pointer-events: auto;
+        }
+
+        /* Lightbox Video Adjustment */
+        .pswp-video-wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .pswp-video-wrapper video {
+            max-width: 90%;
+            max-height: 90%;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body class="min-h-screen overflow-x-hidden selection:bg-white selection:text-black">
+
+    <div id="text-toolbar" class="glass rounded-xl p-1 shadow-2xl flex gap-1 animate-in fade-in zoom-in duration-200">
+        <button onclick="formatText('bold')" class="p-2 hover:bg-white/10 rounded-lg transition-colors text-white" title="Bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
+        <button onclick="formatText('underline')" class="p-2 hover:bg-white/10 rounded-lg transition-colors text-white" title="Underline"><i data-lucide="underline" class="w-4 h-4"></i></button>
+        <div class="w-[1px] bg-white/10 mx-1"></div>
+        <button onclick="formatText('link')" class="p-2 hover:bg-white/10 rounded-lg transition-colors text-white" title="Add Link"><i data-lucide="link" class="w-4 h-4"></i></button>
+        <button onclick="formatText('unlink')" class="p-2 hover:bg-white/10 rounded-lg transition-colors text-white" title="Remove Link"><i data-lucide="link-2-off" class="w-4 h-4"></i></button>
+    </div>
+
+    <nav class="fixed top-0 left-0 w-full p-8 z-40 flex justify-between items-center bg-black/50 backdrop-blur-md">
+        <a href="https://seasidebranding.com" target="_blank" class="flex items-center gap-4 group no-underline">
+            <div class="w-10 h-10 bg-[#080808] border border-white/5 rounded-xl flex items-center justify-center rotate-3 group-hover:rotate-0 transition-transform duration-500 overflow-hidden">
+                <img id="menu-icon-img" src="favicon.png" class="w-full h-full object-cover">
+            </div>
+            <span class="text-[10px] font-black uppercase tracking-[0.5em] text-white no-underline">Seaside Motion</span>
+        </a>
+        <div class="flex gap-4">
+            <button onclick="els.helpModal.classList.add('open')" class="p-4 glass rounded-2xl hover:bg-white/20 transition-all active:scale-90">
+                <i data-lucide="help-circle" class="w-5 h-5 text-white pointer-events-none"></i>
+            </button>
+            <button id="toggle-settings" class="p-4 glass rounded-2xl hover:bg-white/20 transition-all active:scale-90">
+                <i data-lucide="layout-template" class="w-5 h-5 text-white pointer-events-none"></i>
+            </button>
+        </div>
+    </nav>
+
+    <aside id="settings-sidebar" class="fixed top-0 right-0 h-full w-[440px] bg-[#080808] border-l border-white/5 z-50 p-12 flex flex-col shadow-[0_0_100px_rgba(0,0,0,0.8)]">
+        <div class="flex justify-between items-center mb-16">
+            <h2 class="text-[10px] font-black uppercase tracking-[0.4em] text-white/30">Motion Engine</h2>
+            <button id="close-settings" class="text-white/20 hover:text-white p-2 transition-colors"><i data-lucide="x" class="w-6 h-6 pointer-events-none"></i></button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto custom-scrollbar pr-6 space-y-16">
+            <section>
+                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-600 mb-8 block underline decoration-white/10 underline-offset-8">Global Visuals</label>
+                <div class="grid grid-cols-3 gap-6 mb-10">
+                    <div class="space-y-3 text-center">
+                        <span class="text-[9px] font-bold text-neutral-500 uppercase">Base</span>
+                        <input type="color" id="bg-color" value="#050505" class="mx-auto block">
+                    </div>
+                    <div class="space-y-3 text-center">
+                        <span class="text-[9px] font-bold text-neutral-500 uppercase">Text</span>
+                        <input type="color" id="text-color" value="#ffffff" class="mx-auto block">
+                    </div>
+                    <div class="space-y-3 text-center">
+                        <span class="text-[9px] font-bold text-neutral-500 uppercase">Accent</span>
+                        <input type="color" id="accent-color" value="#ffffff" class="mx-auto block">
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <span class="text-[9px] font-bold text-neutral-500 uppercase block">Masonry Gap</span>
+                    <input type="range" id="gap-range" min="0" max="6" step="0.5" value="1.5" class="w-full accent-white">
+                </div>
+            </section>
+
+            <section>
+                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-600 mb-8 block underline decoration-white/10 underline-offset-8">Title Typography</label>
+                <div class="space-y-8">
+                    <div class="relative">
+                        <span class="text-[9px] font-bold text-neutral-500 uppercase block mb-4">Font Family</span>
+                        <input type="text" id="title-font-search" placeholder="Search fonts..." class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white focus:outline-none focus:border-white/20 transition-all">
+                        <div id="title-font-results" class="font-search-results mt-2 glass rounded-xl hidden p-2 border border-white/5"></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[9px] font-bold text-neutral-500 uppercase block">Tracking</span>
+                                <button onclick="resetField('titleTracking')" class="text-white/20 hover:text-white transition-colors" title="Reset"><i data-lucide="rotate-ccw" class="w-3 h-3"></i></button>
+                            </div>
+                            <input type="range" id="title-tracking" min="-0.2" max="1" step="0.01" value="-0.05" class="w-full accent-white">
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[9px] font-bold text-neutral-500 uppercase block">Line Height</span>
+                                <button onclick="resetField('titleLH')" class="text-white/20 hover:text-white transition-colors" title="Reset"><i data-lucide="rotate-ccw" class="w-3 h-3"></i></button>
+                            </div>
+                            <input type="range" id="title-lh" min="0.5" max="2" step="0.1" value="1" class="w-full accent-white">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-600 mb-8 block underline decoration-white/10 underline-offset-8">Description Typography</label>
+                <div class="space-y-8">
+                    <div class="relative">
+                        <span class="text-[9px] font-bold text-neutral-500 uppercase block mb-4">Font Family</span>
+                        <input type="text" id="body-font-search" placeholder="Search fonts..." class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white focus:outline-none focus:border-white/20 transition-all">
+                        <div id="body-font-results" class="font-search-results mt-2 glass rounded-xl hidden p-2 border border-white/5"></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[9px] font-bold text-neutral-500 uppercase block">Tracking</span>
+                                <button onclick="resetField('bodyTracking')" class="text-white/20 hover:text-white transition-colors" title="Reset"><i data-lucide="rotate-ccw" class="w-3 h-3"></i></button>
+                            </div>
+                            <input type="range" id="body-tracking" min="-0.1" max="2" step="0.01" value="0.5" class="w-full accent-white">
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[9px] font-bold text-neutral-500 uppercase block">Line Height</span>
+                                <button onclick="resetField('bodyLH')" class="text-white/20 hover:text-white transition-colors" title="Reset"><i data-lucide="rotate-ccw" class="w-3 h-3"></i></button>
+                            </div>
+                            <input type="range" id="body-lh" min="1" max="3" step="0.1" value="1.5" class="w-full accent-white">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-600 mb-8 block underline decoration-white/10 underline-offset-8">Presets</label>
+                <div id="template-list" class="grid grid-cols-1 gap-3"></div>
+                <button id="save-tpl-btn" class="mt-6 w-full py-3 border border-white/5 rounded-lg text-[10px] font-bold uppercase tracking-widest text-white/40 hover:text-white hover:bg-white/5 transition-all">
+                    Save Session Styling
+                </button>
+            </section>
+
+            <section>
+                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-600 mb-8 block underline decoration-white/10 underline-offset-8">Delivery Gateway</label>
+                <div class="space-y-6">
+                    <select id="download-type" class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white focus:outline-none cursor-pointer appearance-none">
+                        <option value="zip">Project ZIP (Auto)</option>
+                        <option value="link">Zoho / External Link</option>
+                    </select>
+                    <input type="url" id="external-url" placeholder="https://workdrive.zoho.com/..." class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white focus:outline-none focus:border-white/20 hidden transition-all">
+                </div>
+            </section>
+
+            <section>
+                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-600 mb-8 block underline decoration-white/10 underline-offset-8">Branding</label>
+                <div class="p-8 glass rounded-2xl cursor-pointer hover:bg-white/5 relative group border-dashed border-white/10 text-center">
+                    <input type="file" id="favicon-input" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
+                    <div id="favicon-preview" class="w-16 h-16 rounded-2xl bg-[#080808] border border-white/10 mx-auto mb-4 flex items-center justify-center overflow-hidden">
+                        <img id="favicon-preview-img" src="favicon.png" class="w-full h-full object-cover">
+                    </div>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-white/40">Change Branding Icon</span>
+                </div>
+            </section>
+        </div>
+
+        <div class="pt-12 mt-8 border-t border-white/10">
+            <button id="bake-btn" class="w-full btn-primary py-7 text-[10px] font-black uppercase tracking-[0.5em] rounded-2xl shadow-2xl transition-all active:scale-95">
+                Bake Motion Package
+            </button>
+        </div>
+    </aside>
+
+    <main id="app" class="relative">
+        <section id="setup-view" class="h-screen flex items-center justify-center p-8">
+            <div id="drop-zone" class="max-w-2xl w-full aspect-square glass rounded-[60px] flex flex-col items-center justify-center cursor-pointer hover:scale-[1.02] transition-all duration-1000 group text-center">
+                <div class="z-10 scale-95 group-hover:scale-100 transition-transform duration-700">
+                    <div class="w-24 h-24 bg-[#080808] border border-white/5 rounded-3xl mx-auto mb-12 flex items-center justify-center group-hover:rotate-12 transition-transform duration-700 overflow-hidden p-4">
+                        <img src="favicon.png" class="w-full h-full object-contain">
+                    </div>
+                    <h2 class="text-6xl font-light tracking-tighter mb-6 text-white">Import Motion</h2>
+                    <p class="text-[11px] font-black uppercase tracking-[0.8em] text-neutral-500 group-hover:text-white transition-colors">Drop Video Session Folder</p>
+                </div>
+                <input type="file" id="file-input" multiple accept="video/*" class="hidden">
+            </div>
+        </section>
+
+        <section id="gallery-view" class="hidden min-h-screen pt-64 pb-64 px-12 md:px-24 lg:px-32">
+            <div class="max-w-[1600px] mx-auto text-left">
+                <header class="mb-48 flex flex-col items-start gap-12">
+                    <div class="max-w-5xl">
+                        <div id="client-name" contenteditable="true" data-placeholder="Production Title" class="text-9xl font-light focus:outline-none mb-10 leading-none"></div>
+                        <div id="event-date" contenteditable="true" data-placeholder="Add credits or descriptive links here..." class="text-[12px] font-bold uppercase focus:outline-none min-h-[1.5em] text-neutral-500"></div>
+                    </div>
+                    <div class="flex flex-wrap gap-8 items-center pt-10">
+                        <button id="download-full" class="flex items-center gap-4 text-[11px] font-black uppercase tracking-[0.3em] btn-primary px-10 py-5 rounded-2xl transition-all">
+                            <i data-lucide="arrow-down-to-line" class="w-5 h-5 pointer-events-none"></i> Download Session
+                        </button>
+                        <button id="add-more" class="p-5 glass rounded-2xl hover:bg-white/10 transition-all group">
+                            <i data-lucide="plus" class="w-6 h-6 opacity-30 group-hover:opacity-100 transition-opacity pointer-events-none"></i>
+                        </button>
+                    </div>
+                </header>
+                <div id="gallery-grid" class="masonry"></div>
+            </div>
+        </section>
+    </main>
+
+    <div id="help-modal" class="help-modal fixed inset-0 z-[100] bg-black/98 backdrop-blur-3xl items-center justify-center p-8">
+        <div class="max-w-4xl w-full bg-[#0a0a0a] p-20 border border-white/5 rounded-[60px] relative shadow-2xl overflow-y-auto max-h-[90vh] custom-scrollbar text-sm text-neutral-400">
+            <button onclick="els.helpModal.classList.remove('open')" class="absolute top-16 right-16 text-neutral-600 hover:text-white p-2 transition-colors"><i data-lucide="x" class="w-10 h-10 pointer-events-none"></i></button>
+            <h2 class="text-7xl font-light tracking-tighter mb-16 text-white text-left">Motion Protocol</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-20 leading-relaxed text-left">
+                <div class="space-y-8">
+                    <div>
+                        <h3 class="text-white font-black uppercase text-[11px] tracking-[0.4em] mb-4">Motion Previews</h3>
+                        <p>When you drop a video folder, Seaside automatically generates high-performance thumbnail frames for the masonry grid. This allows for a fast, responsive dashboard regardless of file size.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-white font-black uppercase text-[11px] tracking-[0.4em] mb-4">Typography & Design</h3>
+                        <p>Use independent Google Fonts for titles and descriptions. The <strong>Reset</strong> system allows you to return to professional baselines after experimentation.</p>
+                    </div>
+                </div>
+                <div class="space-y-8">
+                    <div>
+                        <h3 class="text-white font-black uppercase text-[11px] tracking-[0.4em] mb-4">Interactive Content</h3>
+                        <p>Select header text to add bolding or <strong>live links</strong>. Videos can be deleted from the session using the trash icon on each preview.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-white font-black uppercase text-[11px] tracking-[0.4em] mb-4">Delivery Package</h3>
+                        <p>Baking generates a full motion delivery package. Originals are preserved in their native quality within the <code>/videos</code> folder, ready for client review.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import PhotoSwipeLightbox from 'https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe-lightbox.esm.min.js';
+
+        const GOOGLE_FONTS = ["Inter", "Playfair Display", "Montserrat", "Lora", "Oswald", "Roboto", "Open Sans", "Prata", "Bodoni Moda", "Space Grotesk", "Syne", "Cormorant Garamond", "Cinzel", "Work Sans", "Quicksand", "Poppins", "Darker Grotesque", "Bebas Neue", "Fraunces", "Manrope", "Outfit", "Plus Jakarta Sans", "Archivo", "Epilogue", "Jost", "Public Sans", "Spectral", "Karla", "Unna", "Domine", "Cardo", "Crimson Pro", "Hanken Grotesk", "Lexend"];
+
+        const PRESETS = {
+            'Noir': { bg: '#050505', text: '#ffffff', accent: '#ffffff', titleFont: "Inter", bodyFont: "Inter", titleTracking: '-0.05em', titleLH: '1', bodyTracking: '0.5em', bodyLH: '1.5', gap: '1.5rem' },
+            'Nordic': { bg: '#f0f0f0', text: '#222222', accent: '#000000', titleFont: "Montserrat", bodyFont: "Montserrat", titleTracking: '0.1em', titleLH: '1.2', bodyTracking: '0.2em', bodyLH: '1.8', gap: '2.5rem' },
+            'Solaris': { bg: '#fffaf0', text: '#4a3728', accent: '#c0a080', titleFont: "Playfair Display", bodyFont: "Lora", titleTracking: '0em', titleLH: '1.1', bodyTracking: '0.1em', bodyLH: '1.6', gap: '3.5rem' },
+            'Vogue': { bg: '#ffffff', text: '#000000', accent: '#000000', titleFont: "Prata", bodyFont: "Inter", titleTracking: '0em', titleLH: '0.9', bodyTracking: '0.1em', bodyLH: '1.4', gap: '0.5rem' },
+            'Cyber': { bg: '#080c10', text: '#00ffcc', accent: '#00ffcc', titleFont: "Space Grotesk", bodyFont: "Inter", titleTracking: '-0.02em', titleLH: '1', bodyTracking: '0.3em', bodyLH: '1.5', gap: '1.5rem' },
+            'Brutalist': { bg: '#ffffff', text: '#000000', accent: '#ff3e00', titleFont: "Archivo", bodyFont: "Archivo", titleTracking: '-0.05em', titleLH: '0.8', bodyTracking: '0em', bodyLH: '1.2', gap: '0rem' },
+            'Minimalist': { bg: '#1a1a1a', text: '#a0a0a0', accent: '#ffffff', titleFont: "Inter", bodyFont: "Inter", titleTracking: '0.05em', titleLH: '1.5', bodyTracking: '0.1em', bodyLH: '2', gap: '2rem' },
+            'Deep Ocean': { bg: '#001219', text: '#94d2bd', accent: '#ee9b00', titleFont: "Syne", bodyFont: "Inter", titleTracking: '0em', titleLH: '1.1', bodyTracking: '0.4em', bodyLH: '1.6', gap: '1.5rem' }
+        };
+
+        const state = { items: [], favicon: null, theme: { ...PRESETS['Noir'] }, settings: { downloadType: 'zip', externalUrl: '' } };
+
+        const els = {
+            toggle: document.getElementById('toggle-settings'), close: document.getElementById('close-settings'), sidebar: document.getElementById('settings-sidebar'),
+            dropZone: document.getElementById('drop-zone'), fileInput: document.getElementById('file-input'), grid: document.getElementById('gallery-grid'),
+            setup: document.getElementById('setup-view'), view: document.getElementById('gallery-view'), bgColor: document.getElementById('bg-color'),
+            textColor: document.getElementById('text-color'), accentColor: document.getElementById('accent-color'),
+            titleFontSearch: document.getElementById('title-font-search'), titleFontResults: document.getElementById('title-font-results'),
+            bodyFontSearch: document.getElementById('body-font-search'), bodyFontResults: document.getElementById('body-font-results'),
+            titleTracking: document.getElementById('title-tracking'), titleLH: document.getElementById('title-lh'),
+            bodyTracking: document.getElementById('body-tracking'), bodyLH: document.getElementById('body-lh'),
+            gap: document.getElementById('gap-range'), faviconInput: document.getElementById('favicon-input'),
+            faviconPreviewImg: document.getElementById('favicon-preview-img'), bakeBtn: document.getElementById('bake-btn'),
+            downloadFull: document.getElementById('download-full'), downloadType: document.getElementById('download-type'),
+            externalUrl: document.getElementById('external-url'), clientName: document.getElementById('client-name'),
+            eventDate: document.getElementById('event-date'), tplList: document.getElementById('template-list'),
+            saveTplBtn: document.getElementById('save-tpl-btn'), toolbar: document.getElementById('text-toolbar'), helpModal: document.getElementById('help-modal')
+        };
+
+        const applyTheme = () => {
+            const root = document.documentElement;
+            root.style.setProperty('--bg', state.theme.bg); root.style.setProperty('--text', state.theme.text);
+            root.style.setProperty('--accent', state.theme.accent); root.style.setProperty('--item-gap', state.theme.gap);
+            root.style.setProperty('--title-font', state.theme.titleFont); root.style.setProperty('--body-font', state.theme.bodyFont);
+            root.style.setProperty('--title-tracking', state.theme.titleTracking); root.style.setProperty('--title-lh', state.theme.titleLH);
+            root.style.setProperty('--body-tracking', state.theme.bodyTracking); root.style.setProperty('--body-lh', state.theme.bodyLH);
+            [state.theme.titleFont, state.theme.bodyFont].forEach(f => {
+                if (!document.getElementById(`font-${f}`)) {
+                    const link = document.createElement('link'); link.id = `font-${f}`; link.rel = 'stylesheet';
+                    link.href = `https://fonts.googleapis.com/css2?family=${f.replace(/\s+/g, '+')}:wght@300;400;700;800&display=swap`;
+                    document.head.appendChild(link);
+                }
+            });
+        };
+
+        const syncUI = () => {
+            els.bgColor.value = state.theme.bg; els.textColor.value = state.theme.text;
+            els.accentColor.value = state.theme.accent; els.gap.value = parseFloat(state.theme.gap);
+            els.titleTracking.value = parseFloat(state.theme.titleTracking); els.titleLH.value = parseFloat(state.theme.titleLH);
+            els.bodyTracking.value = parseFloat(state.theme.bodyTracking); els.bodyLH.value = parseFloat(state.theme.bodyLH);
+            els.downloadType.value = state.settings.downloadType; els.externalUrl.value = state.settings.externalUrl;
+            els.externalUrl.classList.toggle('hidden', state.settings.downloadType !== 'link');
+            applyTheme();
+        };
+
+        window.resetField = (field) => { state.theme[field] = PRESETS['Noir'][field]; syncUI(); };
+
+        window.formatText = (command) => {
+            if (command === 'link') { const url = prompt("URL:", "https://"); if (url) document.execCommand('createLink', false, url); }
+            else if (command === 'unlink') { document.execCommand('unlink'); }
+            else { document.execCommand(command, false, null); }
+            updateToolbar();
+        };
+
+        const updateToolbar = () => {
+            const sel = window.getSelection();
+            if (!sel.rangeCount || sel.isCollapsed) { els.toolbar.style.display = 'none'; return; }
+            const r = sel.getRangeAt(0); const rect = r.getBoundingClientRect();
+            if (!els.clientName.contains(r.commonAncestorContainer) && !els.eventDate.contains(r.commonAncestorContainer)) { els.toolbar.style.display = 'none'; return; }
+            els.toolbar.style.display = 'flex'; els.toolbar.style.top = `${rect.top + window.scrollY - 60}px`;
+            els.toolbar.style.left = `${rect.left + window.scrollX + (rect.width / 2) - (els.toolbar.offsetWidth / 2)}px`;
+        };
+        document.addEventListener('selectionchange', updateToolbar);
+
+        const renderFontOptions = (target, container) => {
+            container.innerHTML = GOOGLE_FONTS.map(f => `<div onclick="window.setStudioFont('${target}', '${f}')" class="p-4 hover:bg-white/10 rounded-xl cursor-pointer text-[10px] font-bold uppercase tracking-widest flex justify-between items-center group">${f} <span style="font-family: '${f}', sans-serif" class="text-[16px] normal-case opacity-40 group-hover:opacity-100">Aa</span></div>`).join('');
+        };
+
+        ['title', 'body'].forEach(prefix => {
+            const search = els[`${prefix}FontSearch`]; const res = els[`${prefix}FontResults`];
+            search.addEventListener('focus', () => { res.classList.remove('hidden'); renderFontOptions(prefix, res); });
+            search.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase();
+                const filtered = GOOGLE_FONTS.filter(f => f.toLowerCase().includes(term));
+                res.innerHTML = filtered.map(f => `<div onclick="window.setStudioFont('${prefix}', '${f}')" class="p-4 hover:bg-white/10 rounded-xl cursor-pointer text-[10px] font-bold uppercase tracking-widest flex justify-between items-center group">${f} <span style="font-family: '${f}', sans-serif" class="text-[16px] normal-case opacity-40 group-hover:opacity-100">Aa</span></div>`).join('');
+            });
+        });
+
+        window.setStudioFont = (target, font) => { state.theme[`${target}Font`] = font; els[`${target}FontResults`].classList.add('hidden'); syncUI(); };
+
+        const loadTemplates = () => {
+            const custom = JSON.parse(localStorage.getItem('studio_templates_video') || '{}');
+            const all = { ...PRESETS, ...custom };
+            els.tplList.innerHTML = Object.entries(all).map(([name, t]) => `
+                <button onclick="window.applyTpl('${name}')" class="w-full p-4 glass rounded-xl text-left hover:bg-white/10 flex justify-between items-center group transition-all">
+                    <span class="text-[10px] font-black uppercase tracking-[0.2em] text-white/60 group-hover:text-white">${name}</span>
+                    <div class="flex gap-2"><div class="w-3 h-3 rounded-full" style="background:${t.bg}"></div><div class="w-3 h-3 rounded-full" style="background:${t.text}"></div></div>
+                </button>
+            `).join('');
+            window.applyTpl = (name) => { state.theme = { ...all[name] }; syncUI(); };
+        };
+
+        async function processFiles(files) {
+            const list = Array.from(files).filter(f => f.type.startsWith('video/'));
+            if (!list.length) return;
+            els.dropZone.innerHTML = `<div class="text-[11px] font-black uppercase tracking-[0.8em] animate-pulse">Scanning Motion...</div>`;
+            for (const file of list) {
+                const thumb = await generateVideoThumbnail(file);
+                state.items.push({ id: Math.random().toString(36).substr(2, 9), original: file, display: thumb.url, w: thumb.w, h: thumb.h, name: file.name });
+            }
+            renderGrid(); els.setup.classList.add('hidden'); els.view.classList.remove('hidden');
+        }
+
+        async function generateVideoThumbnail(file) {
+            return new Promise(resolve => {
+                const video = document.createElement('video');
+                video.src = URL.createObjectURL(file);
+                video.preload = 'metadata';
+                video.onloadedmetadata = () => {
+                    video.currentTime = 1;
+                    video.onseeked = () => {
+                        const canvas = document.createElement('canvas');
+                        const scale = 800 / Math.max(video.videoWidth, video.videoHeight);
+                        canvas.width = video.videoWidth * scale; canvas.height = video.videoHeight * scale;
+                        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+                        resolve({ url: canvas.toDataURL('image/jpeg', 0.5), w: video.videoWidth, h: video.videoHeight });
+                    };
+                };
+            });
+        }
+
+        function renderGrid() {
+            els.grid.innerHTML = state.items.map(i => `
+                <div class="item group" id="item-${i.id}">
+                    <a href="${URL.createObjectURL(i.original)}" data-pswp-type="video" data-pswp-width="${i.w}" data-pswp-height="${i.h}">
+                        <img src="${i.display}" class="w-full h-auto block group-hover:scale-110 transition-transform duration-[2s]">
+                        <div class="video-play-hint"><i data-lucide="play" class="w-10 h-10 text-white fill-current opacity-50"></i></div>
+                    </a>
+                    <div class="delete-overlay absolute top-4 right-4">
+                        <button onclick="window.deleteItem('${i.id}')" class="p-3 bg-red-500/80 hover:bg-red-500 text-white rounded-xl active:scale-90 shadow-2xl transition-all"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons(); initLightbox();
+        }
+
+        window.deleteItem = (id) => { if (confirm("Remove video?")) { state.items = state.items.filter(i => i.id !== id); renderGrid(); } };
+
+        els.toggle.onclick = () => document.body.classList.add('sidebar-open');
+        els.close.onclick = () => document.body.classList.remove('sidebar-open');
+        els.dropZone.onclick = () => els.fileInput.click();
+        els.fileInput.onchange = (e) => processFiles(e.target.files);
+        document.getElementById('add-more').onclick = () => els.fileInput.click();
+
+        els.bgColor.oninput = (e) => { state.theme.bg = e.target.value; applyTheme(); };
+        els.textColor.oninput = (e) => { state.theme.text = e.target.value; applyTheme(); };
+        els.accentColor.oninput = (e) => { state.theme.accent = e.target.value; applyTheme(); };
+        els.gap.oninput = (e) => { state.theme.gap = e.target.value + 'rem'; applyTheme(); };
+        els.titleTracking.oninput = (e) => { state.theme.titleTracking = e.target.value + 'em'; applyTheme(); };
+        els.titleLH.oninput = (e) => { state.theme.titleLH = e.target.value; applyTheme(); };
+        els.bodyTracking.oninput = (e) => { state.theme.bodyTracking = e.target.value + 'em'; applyTheme(); };
+        els.bodyLH.oninput = (e) => { state.theme.bodyLH = e.target.value; applyTheme(); };
+        els.downloadType.onchange = (e) => { state.settings.downloadType = e.target.value; syncUI(); };
+        els.externalUrl.oninput = (e) => { state.settings.externalUrl = e.target.value; };
+
+        els.faviconInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                state.favicon = file; const url = URL.createObjectURL(file);
+                els.faviconPreviewImg.src = url; document.getElementById('app-favicon').href = url; document.getElementById('menu-icon-img').src = url;
+            }
+        };
+
+        els.downloadFull.onclick = async () => {
+            if (state.settings.downloadType === 'link' && state.settings.externalUrl) { window.open(state.settings.externalUrl, '_blank'); return; }
+            const zip = new JSZip(); els.downloadFull.innerText = "Packing...";
+            state.items.forEach((i) => zip.file(i.name, i.original));
+            const c = await zip.generateAsync({ type: "blob" });
+            const l = document.createElement('a'); l.href = URL.createObjectURL(c); l.download = "Motion-Session.zip"; l.click();
+            els.downloadFull.innerHTML = '<i data-lucide="arrow-down-to-line" class="w-5 h-5 pointer-events-none"></i> Download Session';
+        };
+
+        els.bakeBtn.onclick = async () => {
+            const zip = new JSZip(); const client = els.clientName.innerHTML; const sub = els.eventDate.innerHTML;
+            els.bakeBtn.innerText = "PACKING MOTION...";
+            const vidFolder = zip.folder("videos");
+            state.items.forEach((i, idx) => vidFolder.file(`shot-${idx+1}.mp4`, i.original));
+            let fav = state.favicon || await (await fetch('favicon.png')).blob(); zip.file("favicon.png", fav);
+            const dlUI = state.settings.downloadType === 'link' ? `<a href="${state.settings.externalUrl}" target="_blank" class="btn px-10 py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.3em] inline-block shadow-2xl">Download Session</a>` : '';
+            const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Production</title><link rel="icon" href="favicon.png"><script src="https://cdn.tailwindcss.com"><\/script><style>:root { --bg: ${state.theme.bg}; --text: ${state.theme.text}; --accent: ${state.theme.accent}; } body { background: var(--bg); color: var(--text); font-family: sans-serif; overflow-x: hidden; } .masonry { column-gap: ${state.theme.gap}; columns: 1; padding: 2rem; max-width: 1600px; margin: 0 auto; } @media (min-width: 768px) { .masonry { columns: 3; padding: 8rem; } } .item { break-inside: avoid; margin-bottom: ${state.theme.gap}; border-radius: 12px; overflow: hidden; position: relative; background: #111; } .btn { background: var(--accent); color: var(--bg); text-decoration: none !important; font-weight:900; } a { color: inherit; text-decoration: underline; } .video-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; display: none; align-items: center; justify-content: center; } .video-overlay.active { display: flex; }</style></head><body><div id="v-player" class="video-overlay" onclick="this.classList.remove('active'); document.querySelector('video').pause();"><video controls style="max-width: 90%; max-height: 90%;"></video></div><header style="padding: 12rem 2rem; max-width: 1600px; margin: 0 auto;"><h1 style="font-family: '${state.theme.titleFont}', sans-serif; font-size: clamp(4rem, 10vw, 9rem); font-weight: 300; letter-spacing: ${state.theme.titleTracking}; margin-bottom: 2rem; line-height: ${state.theme.titleLH};">${client}</h1><div style="font-family: '${state.theme.bodyFont}', sans-serif; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: ${state.theme.bodyTracking}; line-height: ${state.theme.bodyLH}; opacity: 0.4;">${sub}</div><div style="margin-top: 5rem;">${dlUI}</div></header><div class="masonry">${state.items.map((i, idx) => `<div class="item" onclick="const p = document.getElementById('v-player'); p.querySelector('video').src = 'videos/shot-${idx+1}.mp4'; p.classList.add('active'); p.querySelector('video').play();"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" style="width: 100%; aspect-ratio: ${i.w}/${i.h}; display: block;"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.2);"><svg width="40" height="40" viewBox="0 0 24 24" fill="white"><path d="M5 3l14 9-14 9V3z"/></svg></div></div>`).join('')}</div></body></html>`;
+            zip.file("index.html", html); const c = await zip.generateAsync({ type: "blob" });
+            const l = document.createElement('a'); l.href = URL.createObjectURL(c); l.download = "Deployment.zip"; l.click();
+            els.bakeBtn.innerText = "Bake Motion Package";
+        };
+
+        let lightbox;
+        function initLightbox() {
+            if (lightbox) lightbox.destroy();
+            lightbox = new PhotoSwipeLightbox({ gallery: '#gallery-grid', children: 'a', pswpModule: () => import('https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe.esm.min.js') });
+            lightbox.on('uiRegister', () => {
+                lightbox.pswp.ui.registerElement({
+                    name: 'download-button', order: 8, isButton: true, tagName: 'a', html: '<i data-lucide="download" class="w-5 h-5"></i>',
+                    onInit: (el, pswp) => {
+                        el.setAttribute('download', 'seaside-motion.mp4');
+                        pswp.on('change', () => { el.href = pswp.currSlide.data.src; });
+                        setTimeout(() => lucide.createIcons(), 10);
+                    }
+                });
+            });
+            lightbox.on('contentLoad', (e) => {
+                const { content } = e;
+                if (content.data.type === 'video') {
+                    e.preventDefault();
+                    content.element = document.createElement('div');
+                    content.element.className = 'pswp-video-wrapper';
+                    const video = document.createElement('video');
+                    video.src = content.data.src; video.controls = true; video.autoplay = true;
+                    content.element.appendChild(video);
+                }
+            });
+            lightbox.init();
+        }
+
+        lucide.createIcons(); loadTemplates(); syncUI();
+    </script>
+</body>
+</html>
