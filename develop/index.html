@@ -11,19 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        :root {
-            --accent: #ffffff;
-            --bg: #050505;
-            --text: #ffffff;
-            --item-gap: 1rem;
-            --title-font: 'Inter';
-            --body-font: 'Inter';
-            --title-tracking: -0.05em;
-            --title-lh: 1;
-            --body-tracking: 0.2em;
-            --body-lh: 1.5;
-        }
-        @media (min-width: 768px) { :root { --item-gap: 1.5rem; --body-tracking: 0.5em; } }
+        :root { --accent: #ffffff; --bg: #050505; --text: #ffffff; --item-gap: 1.5rem; --title-font: 'Inter'; --body-font: 'Inter'; --title-tracking: -0.05em; --title-lh: 1; --body-tracking: 0.2em; --body-lh: 1.5; }
         body { background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; transition: background-color 0.4s ease, color 0.4s ease; text-align: center; }
         #client-name { font-family: var(--title-font), sans-serif; letter-spacing: var(--title-tracking); line-height: var(--title-lh); font-size: clamp(3rem, 12vw, 9rem); text-align: center; width: 100%; }
         #event-date { font-family: var(--body-font), sans-serif; letter-spacing: var(--body-tracking); line-height: var(--body-lh); text-align: center; width: 100%; }
@@ -38,8 +26,7 @@
         @media (min-width: 1024px) { .masonry { columns: 3; } }
         .item { break-inside: avoid; margin-bottom: var(--item-gap); border-radius: 12px; overflow: hidden; position: relative; background: #111; cursor: pointer; }
         .btn-primary { background-color: var(--accent); color: var(--bg); transition: all 0.3s ease; border-radius: 12px; font-weight: 900; }
-        .btn-primary:active { transform: scale(0.95); }
-        input[type="color"] { -webkit-appearance: none; border: 2px solid rgba(255,255,255,0.1); width: 44px; height: 44px; border-radius: 12px; padding: 0; cursor: pointer; }
+        input[type="color"] { -webkit-appearance: none; border: 2px solid rgba(255,255,255,0.1); width: 44px; height: 44px; border-radius: 12px; padding: 0; cursor: pointer; background: none; }
         .custom-scrollbar::-webkit-scrollbar { width: 5px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
         .help-modal { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.95); align-items: center; justify-content: center; padding: 2rem; }
@@ -57,9 +44,9 @@
     <div id="sidebar-overlay" onclick="document.body.classList.remove('sidebar-open')"></div>
 
     <div id="text-toolbar" class="glass rounded-xl p-1 shadow-2xl flex gap-1 animate-in fade-in zoom-in duration-200">
-        <button onclick="formatText('bold')" class="p-2 hover:bg-white/10 rounded-lg text-white" title="Bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
-        <button onclick="formatText('underline')" class="p-2 hover:bg-white/10 rounded-lg text-white" title="Underline"><i data-lucide="underline" class="w-4 h-4"></i></button>
-        <button onclick="formatText('link')" class="p-2 hover:bg-white/10 rounded-lg text-white" title="Add Link"><i data-lucide="link" class="w-4 h-4"></i></button>
+        <button onclick="formatText('bold')" class="p-2 hover:bg-white/10 rounded-lg text-white"><i data-lucide="bold" class="w-4 h-4"></i></button>
+        <button onclick="formatText('underline')" class="p-2 hover:bg-white/10 rounded-lg text-white"><i data-lucide="underline" class="w-4 h-4"></i></button>
+        <button onclick="formatText('link')" class="p-2 hover:bg-white/10 rounded-lg text-white"><i data-lucide="link" class="w-4 h-4"></i></button>
     </div>
 
     <nav class="fixed top-0 left-0 w-full p-4 md:p-8 z-40 flex justify-between items-center bg-black/50 backdrop-blur-md">
@@ -100,11 +87,6 @@
                 <label class="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-600 mb-8 block underline underline-offset-8">Presets</label>
                 <div id="template-list" class="grid grid-cols-1 gap-3"></div>
                 <button id="save-tpl-btn" class="mt-6 w-full py-4 border border-white/5 rounded-xl text-[10px] font-bold uppercase tracking-widest text-white/40 hover:text-white hover:bg-white/5 transition-all">Save Session Style</button>
-            </section>
-            <section>
-                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-600 mb-8 block underline underline-offset-8">Delivery</label>
-                <select id="download-type" class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white focus:outline-none appearance-none cursor-pointer"><option value="zip">ZIP (Auto)</option><option value="link">Zoho Link</option></select>
-                <input type="url" id="external-url" placeholder="https://..." class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white mt-4 hidden">
             </section>
             <section>
                 <label class="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-600 mb-8 block underline underline-offset-8">Branding</label>
@@ -156,8 +138,8 @@
 
     <div id="help-modal" class="help-modal" onclick="this.classList.remove('open')">
         <div class="glass p-12 rounded-[40px] max-w-2xl text-center" onclick="event.stopPropagation()">
-            <h2 class="text-4xl font-light mb-8 text-white">Studio Masterclass</h2>
-            <p class="text-sm text-neutral-400 leading-relaxed mb-8">Baking generates high-performance 2048px production assets (&lt;400KB). The final client package includes a built-in PhotoSwipe 5 lightbox with touch-gestures and individual download buttons.</p>
+            <h2 class="text-4xl font-light mb-8 text-white">Studio Protocol</h2>
+            <p class="text-sm text-neutral-400 leading-relaxed mb-8">Baking generates high-performance 2048px production assets. Every baked gallery includes a built-in PhotoSwipe 5 lightbox with touch-gestures and individual download buttons.</p>
             <button onclick="document.getElementById('help-modal').classList.remove('open')" class="btn-primary px-10 py-4 text-[10px] font-black uppercase tracking-widest">Close Guide</button>
         </div>
     </div>
@@ -187,8 +169,6 @@
             clientName: document.getElementById('client-name'), eventDate: document.getElementById('event-date'),
             tSearch: document.getElementById('title-font-search'), tRes: document.getElementById('title-font-results'),
             bSearch: document.getElementById('body-font-search'), bRes: document.getElementById('body-font-results'),
-            tTracking: document.getElementById('title-tracking'), tLH: document.getElementById('title-lh'),
-            bTracking: document.getElementById('body-tracking'), bLH: document.getElementById('body-lh'),
             faviconInput: document.getElementById('favicon-input'), favPreview: document.getElementById('favicon-preview-img'), 
             tplList: document.getElementById('template-list'), saveTpl: document.getElementById('save-tpl-btn'), toolbar: document.getElementById('text-toolbar')
         };
@@ -198,31 +178,21 @@
             r.style.setProperty('--bg', state.theme.bg); r.style.setProperty('--text', state.theme.text);
             r.style.setProperty('--accent', state.theme.accent); r.style.setProperty('--item-gap', state.theme.gap);
             r.style.setProperty('--title-font', state.theme.titleFont); r.style.setProperty('--body-font', state.theme.bodyFont);
-            r.style.setProperty('--title-tracking', state.theme.titleTracking); r.style.setProperty('--title-lh', state.theme.titleLH);
-            r.style.setProperty('--body-tracking', state.theme.bodyTracking); r.style.setProperty('--body-lh', state.theme.bodyLH);
-            
-            [state.theme.titleFont, state.theme.bodyFont].forEach(font => {
-                if (!document.getElementById(`f-${font}`)) {
-                    const l = document.createElement('link'); l.id=`f-${font}`; l.rel='stylesheet';
-                    l.href=`https://fonts.googleapis.com/css2?family=${font.replace(/\s+/g,'+')}:wght@300;400;700;800&display=swap`;
+            [state.theme.titleFont, state.theme.bodyFont].forEach(f => {
+                if (!document.getElementById(`f-${f}`)) {
+                    const l = document.createElement('link'); l.id=`f-${f}`; l.rel='stylesheet';
+                    l.href=`https://fonts.googleapis.com/css2?family=${f.replace(/\s+/g,'+')}:wght@300;400;700;800&display=swap`;
                     document.head.appendChild(l);
                 }
             });
         };
 
-        const syncUI = () => {
-            els.dlType.value = state.settings.downloadType; applyTheme();
-        };
+        const syncUI = () => { applyTheme(); };
 
         const loadTpls = () => {
             const custom = JSON.parse(localStorage.getItem('studio_templates_final_v2') || '{}');
             const all = { ...PRESETS, ...custom };
-            els.tplList.innerHTML = Object.entries(all).map(([name, t]) => `
-                <button onclick="window.applyTpl('${name}')" class="w-full p-4 glass rounded-xl text-left hover:bg-white/10 flex justify-between items-center group transition-all">
-                    <span class="text-[10px] font-black uppercase tracking-[0.2em] text-white/60 group-hover:text-white">${name}</span>
-                    <div class="flex gap-2"><div class="w-3 h-3 rounded-full" style="background:${t.bg}"></div><div class="w-3 h-3 rounded-full" style="background:${t.text}"></div></div>
-                </button>
-            `).join('');
+            els.tplList.innerHTML = Object.entries(all).map(([name, t]) => `<button onclick="window.applyTpl('${name}')" class="w-full p-4 glass rounded-xl text-left hover:bg-white/10 flex justify-between items-center group transition-all"><span class="text-[10px] font-black uppercase tracking-[0.2em] text-white/60 group-hover:text-white">${name}</span><div class="flex gap-2"><div class="w-3 h-3 rounded-full" style="background:${t.bg}"></div><div class="w-3 h-3 rounded-full" style="background:${t.text}"></div></div></button>`).join('');
             window.applyTpl = (name) => { state.theme = { ...all[name] }; syncUI(); };
         };
 
@@ -303,12 +273,12 @@
                 }
                 let favData; try { favData = state.favicon || await (await fetch('favicon.png')).blob(); } catch(e) { favData = new Blob([], {type:'image/png'}); }
                 zip.file("favicon.png", favData);
-                const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="favicon.png"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe.min.css"><script src="https://cdn.tailwindcss.com"><\/script><style>:root { --bg: ${state.theme.bg}; --text: ${state.theme.text}; --accent: ${state.theme.accent}; } body { background: var(--bg); color: var(--text); font-family: sans-serif; overflow-x: hidden; text-align: center; } .masonry { column-gap: ${state.theme.gap}; columns: 1; padding: 2rem; max-width: 1600px; margin: 0 auto; } @media (min-width: 768px) { .masonry { columns: 3; padding: 8rem; } } .item { break-inside: avoid; margin-bottom: ${state.theme.gap}; border-radius: 8px; overflow: hidden; } .btn { background: var(--accent); color: var(--bg); text-decoration: none !important; font-weight:900; } .pswp__button--download { background: none !important; display: flex !important; align-items: center !important; justify-content: center !important; }</style></head><body><header style="padding: 12rem 2rem; max-width: 1600px; margin: 0 auto; text-align: center;"><h1 style="font-family: '${state.theme.titleFont}', sans-serif; font-size: clamp(3rem, 10vw, 9rem); font-weight: 300; letter-spacing: ${state.theme.titleTracking}; margin-bottom: 2rem; line-height: ${state.theme.titleLH}; text-align: center;">${client}</h1><div style="font-family: '${state.theme.bodyFont}', sans-serif; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: ${state.theme.bodyTracking}; line-height: ${state.theme.bodyLH}; opacity: 0.4;">${sub}</div></header><div id="gallery" class="masonry">${state.items.map((it, i) => `<div class="item"><a href="images/shot-${i+1}.jpg" data-pswp-width="${it.w}" data-pswp-height="${it.h}"><img src="images/shot-${i+1}.jpg" style="width: 100%; height: auto; display: block;" loading="lazy"></a></div>`).join('')}</div><script type="module">import PhotoSwipeLightbox from 'https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe-lightbox.esm.min.js'; const lb = new PhotoSwipeLightbox({ gallery: '#gallery', children: 'a', pswpModule: () => import('https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe-lightbox.esm.min.js') }); lb.on('uiRegister', () => { lb.pswp.ui.registerElement({ name: 'download-button', order: 8, isButton: true, tagName: 'a', html: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>', onInit: (el, pswp) => { el.setAttribute('download', 'capture.jpg'); pswp.on('change', () => { el.href = pswp.currSlide.data.src; }); } }); }); lb.init();<\/script></body></html>`;
+                const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="favicon.png"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe.min.css"><script src="https://cdn.tailwindcss.com"><\/script><style>:root { --bg: ${state.theme.bg}; --text: ${state.theme.text}; --accent: ${state.theme.accent}; } body { background: var(--bg); color: var(--text); font-family: sans-serif; overflow-x: hidden; text-align: center; } .masonry { column-gap: ${state.theme.gap}; columns: 1; padding: 2rem; max-width: 1600px; margin: 0 auto; } @media (min-width: 768px) { .masonry { columns: 3; padding: 8rem; } } .item { break-inside: avoid; margin-bottom: ${state.theme.gap}; border-radius: 8px; overflow: hidden; } .btn { background: var(--accent); color: var(--bg); text-decoration: none !important; font-weight:900; } .pswp__button--download { background: none !important; display: flex !important; align-items: center !important; justify-content: center !important; }</style></head><body><header style="padding: 12rem 2rem; max-width: 1600px; margin: 0 auto; text-align: center;"><h1 style="font-family: '${state.theme.titleFont}', sans-serif; font-size: clamp(3rem, 10vw, 9rem); font-weight: 300; letter-spacing: ${state.theme.titleTracking}; margin-bottom: 2rem; line-height: ${state.theme.titleLH}; text-align: center;">${client}</h1><div style="font-family: '${state.theme.bodyFont}', sans-serif; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: ${state.theme.bodyTracking}; line-height: ${state.theme.bodyLH}; opacity: 0.4;">${sub}</div></header><div id="gallery" class="masonry">${state.items.map((it, i) => `<div class="item"><a href="images/shot-${i+1}.jpg" data-pswp-width="${it.w}" data-pswp-height="${it.h}"><img src="images/shot-${i+1}.jpg" style="width: 100%; height: auto; display: block;" loading="lazy"></a></div>`).join('')}</div><script type="module">import PhotoSwipeLightbox from 'https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe-lightbox.esm.min.js'; const lb = new PhotoSwipeLightbox({ gallery: '#gallery', children: 'a', pswpModule: () => import('https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe.esm.min.js') }); lb.on('uiRegister', () => { lb.pswp.ui.registerElement({ name: 'download-button', order: 8, isButton: true, tagName: 'a', html: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>', onInit: (el, pswp) => { el.setAttribute('download', 'capture.jpg'); pswp.on('change', () => { el.href = pswp.currSlide.data.src; }); } }); }); lb.init();<\/script></body></html>`;
                 zip.file("index.html", html); const c = await zip.generateAsync({ type: "blob" }); const l = document.createElement('a'); l.href = URL.createObjectURL(c); l.download = "Seaside-Branding-Session.zip"; l.click();
-            } catch(e) { console.error(e); } finally { els.bake.innerText = "Bake Production Package"; }
+            } catch(e) {} finally { els.bake.innerText = "Bake Production Package"; }
         };
 
-        function initPS() { const lb = new PhotoSwipeLightbox({ gallery: '#gallery-grid', children: 'a', pswpModule: () => import('https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe-lightbox.esm.min.js') }); lb.init(); }
+        function initPS() { const lb = new PhotoSwipeLightbox({ gallery: '#gallery-grid', children: 'a', pswpModule: () => import('https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe.esm.min.js') }); lb.init(); }
         lucide.createIcons(); loadTpls(); syncUI();
     </script>
 </body>
