@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seaside Branding Gallery Maker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe.min.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --accent: #ffffff;
+            --bg: #050505;
+            --text: #ffffff;
+            --item-gap: 1.5rem;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        
+        #settings-sidebar {
+            transform: translateX(100%);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        body.sidebar-open #settings-sidebar { transform: translateX(0); }
+
+        .masonry { column-gap: var(--item-gap); columns: 1; }
+        @media (min-width: 640px) { .masonry { columns: 2; } }
+        @media (min-width: 1024px) { .masonry { columns: 3; } }
+        @media (min-width: 1280px) { .masonry { columns: 4; } }
+
+        .item { break-inside: avoid; margin-bottom: var(--item-gap); border-radius: 8px; overflow: hidden; position: relative; }
+        
+        .btn-primary { 
+            background-color: var(--accent); 
+            color: var(--bg);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 10px 20px -5px rgba(0,0,0,0.3); }
+
+        input[type="color"] { -webkit-appearance: none; border: 2px solid rgba(255,255,255,0.1); width: 44px; height: 44px; border-radius: 12px; padding: 0; overflow: hidden; cursor: pointer; }
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border: none; }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+
+        .help-modal { display: none; }
+        .help-modal.open { display: flex; }
+
+        /* Rich Text placeholders */
+        [contenteditable]:empty:before {
+            content: attr(data-placeholder);
+            opacity: 0.3;
+            cursor: text;
+        }
+
+        .font-search-results {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .delete-overlay {
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .item:hover .delete-overlay { opacity: 1; }
+
+        a { text-decoration: underline; text-underline-offset: 4px; }
+    </style>
+</head>
+<body class="min-h-screen overflow-x-hidden selection:bg-white selection:text-black">
+
+    <!-- Navbar -->
+    <nav class="fixed top-0 left-0 w-full p-8 z-40 flex justify-between items-center mix-blend-difference">
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center rotate-3 hover:rotate-0 transition-transform duration-500">
+                <i data-lucide="waves" class="w-6 h-6 text-black"></i>
+            </div>
+            <span class="text-[10px] font-black uppercase tracking-[0.5em] text-white">Seaside Branding</span>
+        </div>
+        <div class="flex gap-4">
+            <button onclick="openHelp()" class="p-4 glass rounded-2xl hover:bg-white/20 transition-all active:scale-90">
+                <i data-lucide="help-circle" class="w-5 h-5 text-white pointer-events-none"></i>
+            </button>
+            <button id="toggle-settings" class="p-4 glass rounded-2xl hover:bg-white/20 transition-all active:scale-90">
+                <i data-lucide="layout-template" class="w-5 h-5 text-white pointer-events-none"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <aside id="settings-sidebar" class="fixed top-0 right-0 h-full w-[420px] bg-[#080808] border-l border-white/5 z-50 p-12 flex flex-col shadow-[0_0_100px_rgba(0,0,0,0.8)]">
+        <div class="flex justify-between items-center mb-16">
+            <h2 class="text-[10px] font-black uppercase tracking-[0.4em] text-white/30">Studio Engine</h2>
+            <button id="close-settings" class="text-white/20 hover:text-white p-2 transition-colors"><i data-lucide="x" class="w-6 h-6 pointer-events-none"></i></button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto custom-scrollbar pr-6 space-y-16">
+            <!-- Theme -->
+            <section>
+                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-600 mb-8 block underline decoration-white/10 underline-offset-8">Visual Identity</label>
+                <div class="grid grid-cols-3 gap-6 mb-10">
+                    <div class="space-y-3">
+                        <span class="text-[9px] font-bold text-neutral-500 uppercase">Background</span>
+                        <input type="color" id="bg-color" value="#050505">
+                    </div>
+                    <div class="space-y-3">
+                        <span class="text-[9px] font-bold text-neutral-500 uppercase">Typography</span>
+                        <input type="color" id="text-color" value="#ffffff">
+                    </div>
+                    <div class="space-y-3">
+                        <span class="text-[9px] font-bold text-neutral-500 uppercase">Interaction</span>
+                        <input type="color" id="accent-color" value="#ffffff">
+                    </div>
+                </div>
+                
+                <div class="space-y-8">
+                    <div>
+                        <span class="text-[9px] font-bold text-neutral-500 uppercase block mb-4">Search Google Fonts</span>
+                        <div class="relative group">
+                            <input type="text" id="font-search" placeholder="Type to filter fonts..." class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white focus:outline-none focus:border-white/20 transition-all">
+                            <div id="font-results" class="font-search-results mt-2 space-y-1 glass rounded-xl hidden p-2">
+                                <!-- Fonts list -->
+                            </div>
+                        </div>
+                        <p id="current-font-display" class="mt-3 text-[10px] text-white/40 italic">Active: Inter</p>
+                    </div>
+                    <div>
+                        <span class="text-[9px] font-bold text-neutral-500 uppercase block mb-4">Masonry Gap</span>
+                        <input type="range" id="gap-range" min="0" max="6" step="0.5" value="1.5" class="w-full accent-white">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Delivery -->
+            <section>
+                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-600 mb-8 block underline decoration-white/10 underline-offset-8">Delivery Gateway</label>
+                <div class="space-y-6">
+                    <select id="download-type" class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white focus:outline-none appearance-none">
+                        <option value="zip">In-Browser ZIP (Auto)</option>
+                        <option value="link">Zoho / Drive / Cloud Link</option>
+                    </select>
+                    <input type="url" id="external-url" placeholder="https://workdrive.zoho.com/..." class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white focus:outline-none focus:border-white/20 hidden">
+                </div>
+            </section>
+
+            <!-- Branding -->
+            <section>
+                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-600 mb-8 block underline decoration-white/10 underline-offset-8">Gallery Branding</label>
+                <div class="p-8 glass rounded-2xl cursor-pointer hover:bg-white/5 relative group border-dashed border-white/10 text-center">
+                    <input type="file" id="favicon-input" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
+                    <div id="favicon-preview" class="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 mx-auto mb-4 flex items-center justify-center overflow-hidden">
+                        <i data-lucide="image" class="w-6 h-6 text-white/10"></i>
+                    </div>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-white/40">Upload Gallery Icon</span>
+                </section>
+            </div>
+        </div>
+
+        <div class="pt-12 mt-8 border-t border-white/10">
+            <button id="bake-btn" class="w-full btn-primary py-7 text-[10px] font-black uppercase tracking-[0.5em] rounded-2xl shadow-2xl">
+                Bake Production Package
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <main id="app" class="relative">
+        <!-- Intro -->
+        <section id="setup-view" class="h-screen flex items-center justify-center p-8">
+            <div id="drop-zone" class="max-w-2xl w-full aspect-square glass rounded-[60px] flex flex-col items-center justify-center cursor-pointer hover:scale-[1.02] transition-all duration-1000 group relative text-center">
+                <div class="z-10 scale-95 group-hover:scale-100 transition-transform duration-700">
+                    <div class="w-24 h-24 bg-white rounded-3xl mx-auto mb-12 flex items-center justify-center group-hover:rotate-12 transition-transform duration-700">
+                        <i data-lucide="upload" class="w-10 h-10 text-black"></i>
+                    </div>
+                    <h2 class="text-6xl font-light tracking-tighter mb-6 text-white">Import Session</h2>
+                    <p class="text-[11px] font-black uppercase tracking-[0.8em] text-neutral-500 group-hover:text-white transition-colors">Drop High-Res Originals</p>
+                </div>
+                <input type="file" id="file-input" multiple accept="image/*" class="hidden">
+            </div>
+        </section>
+
+        <!-- Gallery -->
+        <section id="gallery-view" class="hidden min-h-screen pt-64 pb-64 px-12 md:px-24 lg:px-32">
+            <div class="max-w-[1600px] mx-auto">
+                <header class="mb-48 flex flex-col md:flex-row md:items-end justify-between gap-16">
+                    <div class="max-w-4xl">
+                        <div id="client-name" contenteditable="true" data-placeholder="Client Name" class="text-9xl font-light tracking-tighter mb-10 focus:outline-none leading-none"></div>
+                        <div id="event-date" contenteditable="true" data-placeholder="Event Details & Links" class="text-[12px] font-bold uppercase tracking-[0.6em] text-neutral-500 focus:outline-none min-h-[1em]"></div>
+                    </div>
+                    <div class="flex flex-wrap gap-8 items-center">
+                        <button id="download-full" class="flex items-center gap-4 text-[11px] font-black uppercase tracking-[0.3em] btn-primary px-10 py-5 rounded-2xl">
+                            <i data-lucide="arrow-down-to-line" class="w-5 h-5 pointer-events-none"></i> Download All
+                        </button>
+                        <button id="add-more" class="p-5 glass rounded-2xl hover:bg-white/10 transition-all group">
+                            <i data-lucide="plus" class="w-6 h-6 opacity-30 group-hover:opacity-100 transition-opacity pointer-events-none"></i>
+                        </button>
+                    </div>
+                </header>
+                <div id="gallery-grid" class="masonry"></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Help -->
+    <div id="help-modal" class="help-modal fixed inset-0 z-[100] bg-black/98 backdrop-blur-3xl items-center justify-center p-8">
+        <div class="max-w-4xl w-full bg-[#0a0a0a] p-20 border border-white/5 rounded-[60px] relative">
+            <button onclick="closeHelp()" class="absolute top-16 right-16 text-neutral-600 hover:text-white p-2 transition-colors"><i data-lucide="x" class="w-10 h-10 pointer-events-none"></i></button>
+            <h2 class="text-7xl font-light tracking-tighter mb-16 text-white">Seaside Protocol</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-20 text-sm text-neutral-400 font-light leading-relaxed">
+                <div class="space-y-6">
+                    <h3 class="text-white font-black uppercase text-[11px] tracking-[0.4em]">Smart Previews</h3>
+                    <p>Import your 50MB RAW files? No problem. Seaside generates <strong>ultra-compressed 800px previews</strong> for instant web browsing while locking your <strong>uncompressed originals</strong> in the vault for the final delivery.</p>
+                </div>
+                <div class="space-y-6">
+                    <h3 class="text-white font-black uppercase text-[11px] tracking-[0.4em]">Rich Branding</h3>
+                    <p>The Header supports <strong>Links</strong> and formatting. Use <code>Cmd+K</code> or standard HTML to link your Instagram or Client Website directly in the Hero text.</p>
+                </div>
+                <div class="space-y-6">
+                    <h3 class="text-white font-black uppercase text-[11px] tracking-[0.4em]">Searchable Typography</h3>
+                    <p>Choose from over 100 professional Google Fonts. Just type "Serif" or "Modern" in the font search to filter the collection instantly.</p>
+                </div>
+                <div class="space-y-6">
+                    <h3 class="text-white font-black uppercase text-[11px] tracking-[0.4em]">Seamless Popup</h3>
+                    <p>Click any image for a full-screen, high-performance view. Use the <strong>individual download button</strong> in the popup to grab the web-ready version of that specific shot.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import PhotoSwipeLightbox from 'https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe-lightbox.esm.min.js';
+
+        // --- Data ---
+        const GOOGLE_FONTS = ["Inter", "Playfair Display", "Montserrat", "Lora", "Oswald", "Roboto", "Open Sans", "Prata", "Bodoni Moda", "Space Grotesk", "Syne", "Cormorant Garamond", "Cinzel", "Work Sans", "Quicksand", "Poppins", "Darker Grotesque", "Bebas Neue", "Fraunces", "Manrope", "Outfit", "Plus Jakarta Sans"];
+
+        const state = {
+            images: [], // { id, original, display, w, h, name }
+            favicon: null,
+            theme: { bg: '#050505', text: '#ffffff', accent: '#ffffff', font: "Inter", gap: '1.5rem' },
+            settings: { downloadType: 'zip', externalUrl: '' }
+        };
+
+        const els = {
+            toggle: document.getElementById('toggle-settings'),
+            close: document.getElementById('close-settings'),
+            sidebar: document.getElementById('settings-sidebar'),
+            dropZone: document.getElementById('drop-zone'),
+            fileInput: document.getElementById('file-input'),
+            grid: document.getElementById('gallery-grid'),
+            setup: document.getElementById('setup-view'),
+            view: document.getElementById('gallery-view'),
+            bgColor: document.getElementById('bg-color'),
+            textColor: document.getElementById('text-color'),
+            accentColor: document.getElementById('accent-color'),
+            fontSearch: document.getElementById('font-search'),
+            fontResults: document.getElementById('font-results'),
+            gap: document.getElementById('gap-range'),
+            faviconInput: document.getElementById('favicon-input'),
+            faviconPreview: document.getElementById('favicon-preview'),
+            bakeBtn: document.getElementById('bake-btn'),
+            downloadFull: document.getElementById('download-full'),
+            downloadType: document.getElementById('download-type'),
+            externalUrl: document.getElementById('external-url'),
+            clientName: document.getElementById('client-name'),
+            eventDate: document.getElementById('event-date')
+        };
+
+        // --- Engine ---
+        const applyTheme = () => {
+            const root = document.documentElement;
+            root.style.setProperty('--bg', state.theme.bg);
+            root.style.setProperty('--text', state.theme.text);
+            root.style.setProperty('--accent', state.theme.accent);
+            root.style.setProperty('--item-gap', state.theme.gap);
+            document.body.style.fontFamily = `'${state.theme.font}', sans-serif`;
+            
+            // Load Font Dynamically
+            if (!document.getElementById(`font-${state.theme.font}`)) {
+                const link = document.createElement('link');
+                link.id = `font-${state.theme.font}`;
+                link.rel = 'stylesheet';
+                link.href = `https://fonts.googleapis.com/css2?family=${state.theme.font.replace(/\s+/g, '+')}:wght@300;400;700;800&display=swap`;
+                document.head.appendChild(link);
+            }
+        };
+
+        const syncUI = () => {
+            els.bgColor.value = state.theme.bg;
+            els.textColor.value = state.theme.text;
+            els.accentColor.value = state.theme.accent;
+            els.gap.value = parseFloat(state.theme.gap);
+            document.getElementById('current-font-display').innerText = `Active: ${state.theme.font}`;
+            els.downloadType.value = state.settings.downloadType;
+            els.externalUrl.value = state.settings.externalUrl;
+            els.externalUrl.classList.toggle('hidden', state.settings.downloadType !== 'link');
+            applyTheme();
+        };
+
+        // --- Font Search ---
+        els.fontSearch.onfocus = () => els.fontResults.classList.remove('hidden');
+        els.fontSearch.oninput = (e) => {
+            const val = e.target.value.toLowerCase();
+            const filtered = GOOGLE_FONTS.filter(f => f.toLowerCase().includes(val));
+            els.fontResults.innerHTML = filtered.map(f => `<div onclick="window.setStudioFont('${f}')" class="p-3 hover:bg-white/10 rounded-lg cursor-pointer text-xs uppercase tracking-widest transition-colors">${f}</div>`).join('');
+        };
+        window.setStudioFont = (font) => {
+            state.theme.font = font;
+            els.fontResults.classList.add('hidden');
+            syncUI();
+        };
+
+        // --- Images ---
+        async function handleFiles(files) {
+            const list = Array.from(files).filter(f => f.type.startsWith('image/'));
+            if (!list.length) return;
+            
+            els.dropZone.innerHTML = `<div class="text-[11px] font-black uppercase tracking-[0.8em] animate-pulse">Encoding Branding...</div>`;
+
+            for (const file of list) {
+                const previewUrl = await createFastPreview(file);
+                const img = new Image();
+                img.src = previewUrl;
+                await img.decode();
+                state.images.push({ 
+                    id: Math.random().toString(36).substr(2, 9),
+                    original: file, 
+                    display: previewUrl, 
+                    w: img.width, h: img.height, name: file.name 
+                });
+            }
+
+            renderGrid();
+            els.setup.classList.add('hidden');
+            els.view.classList.remove('hidden');
+        }
+
+        async function createFastPreview(file) {
+            return new Promise(resolve => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const scale = 800 / Math.max(img.width, img.height);
+                        canvas.width = img.width * scale;
+                        canvas.height = img.height * scale;
+                        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                        resolve(canvas.toDataURL('image/jpeg', 0.45)); // High compression
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function renderGrid() {
+            els.grid.innerHTML = state.images.map(img => `
+                <div class="item group" id="item-${img.id}">
+                    <a href="${img.display}" data-pswp-width="${img.w}" data-pswp-height="${img.h}" target="_blank">
+                        <img src="${img.display}" class="w-full h-auto block group-hover:scale-110 transition-transform duration-[2s]">
+                    </a>
+                    <div class="delete-overlay absolute top-4 right-4 flex gap-2">
+                        <button onclick="window.deleteItem('${img.id}')" class="p-3 bg-red-500/80 hover:bg-red-500 text-white rounded-xl backdrop-blur-md transition-all shadow-xl">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+            initLightbox();
+        }
+
+        window.deleteItem = (id) => {
+            if (!confirm("Remove this image?")) return;
+            state.images = state.images.filter(img => img.id !== id);
+            renderGrid();
+        };
+
+        // --- Interactions ---
+        els.toggle.onclick = () => document.body.classList.add('sidebar-open');
+        els.close.onclick = () => document.body.classList.remove('sidebar-open');
+        els.dropZone.onclick = () => els.fileInput.click();
+        els.fileInput.onchange = (e) => handleFiles(e.target.files);
+        document.getElementById('add-more').onclick = () => els.fileInput.click();
+
+        els.bgColor.oninput = (e) => { state.theme.bg = e.target.value; applyTheme(); };
+        els.textColor.oninput = (e) => { state.theme.text = e.target.value; applyTheme(); };
+        els.accentColor.oninput = (e) => { state.theme.accent = e.target.value; applyTheme(); };
+        els.gap.oninput = (e) => { state.theme.gap = e.target.value + 'rem'; applyTheme(); };
+        els.downloadType.onchange = (e) => { state.settings.downloadType = e.target.value; syncUI(); };
+        els.externalUrl.oninput = (e) => { state.settings.externalUrl = e.target.value; };
+
+        els.faviconInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                state.favicon = file;
+                els.faviconPreview.innerHTML = `<img src="${URL.createObjectURL(file)}" class="w-full h-full object-cover">`;
+            }
+        };
+
+        els.downloadFull.onclick = async () => {
+            if (state.settings.downloadType === 'link' && state.settings.externalUrl) {
+                window.open(state.settings.externalUrl, '_blank');
+                return;
+            }
+            const zip = new JSZip();
+            els.downloadFull.innerText = "PACKING ORIGINALS...";
+            state.images.forEach((img) => zip.file(img.name, img.original));
+            const content = await zip.generateAsync({ type: "blob" });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(content);
+            link.download = `${els.clientName.innerText || 'Gallery'}-FullRes.zip`;
+            link.click();
+            els.downloadFull.innerHTML = '<i data-lucide="arrow-down-to-line" class="w-5 h-5 pointer-events-none"></i> Download All';
+        };
+
+        els.bakeBtn.onclick = async () => {
+            const zip = new JSZip();
+            const client = els.clientName.innerHTML;
+            const sub = els.eventDate.innerHTML;
+            els.bakeBtn.innerText = "Baking Deployment...";
+            
+            const imgFolder = zip.folder("images");
+            state.images.forEach((img, i) => imgFolder.file(`shot-${i+1}.jpg`, img.original));
+            if (state.favicon) zip.file("favicon.ico", state.favicon);
+
+            const downloadUI = state.settings.downloadType === 'link' 
+                ? `<a href="${state.settings.externalUrl}" target="_blank" class="btn px-10 py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.3em] inline-block shadow-2xl">Download All</a>`
+                : '';
+
+            const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Gallery</title><link rel="icon" href="favicon.ico"><script src="https://cdn.tailwindcss.com"><\/script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe.min.css"><style>:root { --bg: ${state.theme.bg}; --text: ${state.theme.text}; --accent: ${state.theme.accent}; } body { background: var(--bg); color: var(--text); font-family: '${state.theme.font}', sans-serif; } .masonry { column-gap: ${state.theme.gap}; columns: 1; } @media (min-width: 768px) { .masonry { columns: 3; } } .item { break-inside: avoid; margin-bottom: ${state.theme.gap}; overflow: hidden; border-radius: 8px; } .btn { background: var(--accent); color: var(--bg); }</style></head><body class="p-12 md:p-32"><header class="max-w-[1600px] mx-auto mb-48 flex flex-col md:flex-row justify-between items-end gap-16"><div><h1 class="text-9xl font-light tracking-tighter mb-10 leading-none">${client}</h1><div class="text-[12px] font-bold uppercase tracking-[0.6em] opacity-40">${sub}</div></div>${downloadUI}</header><div id="gallery" class="masonry max-w-[1600px] mx-auto">${state.images.map((img, i) => `<div class="item"><a href="images/shot-${i+1}.jpg" data-pswp-width="${img.w}" data-pswp-height="${img.h}"><img src="images/shot-${i+1}.jpg" class="w-full h-auto block hover:scale-105 transition-transform duration-[2s]"></a></div>`).join('')}</div><script type="module">import PhotoSwipeLightbox from 'https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe-lightbox.esm.min.js'; const lightbox = new PhotoSwipeLightbox({ gallery: '#gallery', children: 'a', pswpModule: () => import('https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe.esm.min.js') }); lightbox.init();<\/script></body></html>`;
+            
+            zip.file("index.html", html);
+            const content = await zip.generateAsync({ type: "blob" });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(content);
+            link.download = "Production-Package.zip";
+            link.click();
+            els.bakeBtn.innerText = "Bake Production Package";
+        };
+
+        // --- Lightbox with Individual Download ---
+        let lightbox;
+        function initLightbox() {
+            if (lightbox) lightbox.destroy();
+            lightbox = new PhotoSwipeLightbox({
+                gallery: '#gallery-grid',
+                children: 'a',
+                pswpModule: () => import('https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe.esm.min.js')
+            });
+
+            lightbox.on('uiRegister', () => {
+                lightbox.pswp.ui.registerElement({
+                    name: 'download-button',
+                    order: 8,
+                    isButton: true,
+                    tagName: 'a',
+                    html: '<i data-lucide="download" class="w-5 h-5"></i>',
+                    onInit: (el, pswp) => {
+                        el.setAttribute('download', 'seaside-image.jpg');
+                        el.style.display = 'flex';
+                        el.style.alignItems = 'center';
+                        el.style.justifyContent = 'center';
+                        pswp.on('change', () => {
+                            el.href = pswp.currSlide.data.src;
+                        });
+                    }
+                });
+            });
+
+            lightbox.init();
+        }
+
+        window.openHelp = () => document.getElementById('help-modal').classList.add('open');
+        window.closeHelp = () => document.getElementById('help-modal').classList.remove('open');
+
+        lucide.createIcons();
+        window.setStudioFont('Inter');
+        syncUI();
+    </script>
+</body>
+</html>
