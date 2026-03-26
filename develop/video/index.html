@@ -11,39 +11,76 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        :root { --accent: #ffffff; --bg: #050505; --text: #ffffff; --item-gap: 1rem; --title-font: 'Inter'; --body-font: 'Inter'; --title-tracking: -0.05em; --title-lh: 1; --body-tracking: 0.2em; --body-lh: 1.5; }
-        @media (min-width: 768px) { :root { --item-gap: 1.5rem; --body-tracking: 0.5em; } }
-        body { background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; transition: background-color 0.4s ease, color 0.4s ease; }
-        #client-name { font-family: var(--title-font), sans-serif; letter-spacing: var(--title-tracking); line-height: var(--title-lh); font-size: clamp(3rem, 12vw, 9rem); }
-        #event-date { font-family: var(--body-font), sans-serif; letter-spacing: var(--body-tracking); line-height: var(--body-lh); }
+        :root { 
+            --accent: #ffffff; 
+            --bg: #050505; 
+            --text: #ffffff; 
+            --item-gap: 1.5rem; 
+            --title-font: 'Inter'; 
+            --body-font: 'Inter'; 
+            --button-font: 'Inter';
+            --title-tracking: -0.05em; 
+            --title-lh: 1; 
+            --title-size: 1;
+            --body-tracking: 0.2em; 
+            --body-lh: 1.5; 
+            --body-size: 1;
+            --button-tracking: 0.3em;
+            --button-lh: 1;
+            --button-size: 1;
+        }
+        body { background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; transition: background-color 0.4s ease, color 0.4s ease; text-align: center; }
+        #client-name { 
+            font-family: var(--title-font), sans-serif; 
+            letter-spacing: var(--title-tracking); 
+            line-height: var(--title-lh); 
+            font-size: calc(clamp(3rem, 12vw, 9rem) * var(--title-size)); 
+            text-align: center; 
+            width: 100%; 
+        }
+        #event-date { 
+            font-family: var(--body-font), sans-serif; 
+            letter-spacing: var(--body-tracking); 
+            line-height: var(--body-lh); 
+            font-size: calc(clamp(0.8rem, 1.5vw, 1.2rem) * var(--body-size));
+            text-align: center; 
+            width: 100%; 
+            color: var(--subtitle);
+        }
+        #download-full { 
+            font-family: var(--button-font), sans-serif; 
+            letter-spacing: var(--button-tracking);
+            line-height: var(--button-lh);
+            font-size: calc(11px * var(--button-size));
+        }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
-        #settings-sidebar { transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; z-index: 50; }
-        @media (min-width: 640px) { #settings-sidebar { width: 440px; } }
+        #settings-sidebar, #nav-menu { transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; position: fixed; top: 0; right: 0; height: 100%; z-index: 60; background: #080808; }
+        @media (min-width: 640px) { #settings-sidebar, #nav-menu { width: 440px; } }
         body.sidebar-open #settings-sidebar { transform: translateX(0); }
-        #sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 45; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
-        body.sidebar-open #sidebar-overlay { opacity: 1; pointer-events: auto; }
-        .masonry { column-gap: var(--item-gap); columns: 1; }
+        body.nav-open #nav-menu { transform: translateX(0); }
+        #sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 55; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
+        body.sidebar-open #sidebar-overlay, body.nav-open #sidebar-overlay { opacity: 1; pointer-events: auto; }
+        .masonry { column-gap: var(--item-gap); columns: 1; padding: 1.5rem; }
         @media (min-width: 640px) { .masonry { columns: 2; } }
         @media (min-width: 1024px) { .masonry { columns: 3; } }
         .item { break-inside: avoid; margin-bottom: var(--item-gap); border-radius: 12px; overflow: hidden; position: relative; background: #111; cursor: pointer; }
-        .btn-primary { background-color: var(--accent); color: var(--bg); transition: all 0.3s ease; }
-        .btn-primary:active { transform: scale(0.95); }
-        input[type="color"] { -webkit-appearance: none; border: 2px solid rgba(255,255,255,0.1); width: 44px; height: 44px; border-radius: 12px; padding: 0; overflow: hidden; cursor: pointer; }
-        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
-        input[type="color"]::-webkit-color-swatch { border: none; }
+        .btn-primary { background-color: var(--accent); color: var(--bg); transition: all 0.3s ease; border-radius: 12px; font-weight: 900; }
+        input[type="color"] { -webkit-appearance: none; border: 2px solid rgba(255,255,255,0.1); width: 44px; height: 44px; border-radius: 12px; padding: 0; cursor: pointer; background: none; }
         .custom-scrollbar::-webkit-scrollbar { width: 5px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
         .help-modal { display: none; }
         .help-modal.open { display: flex; }
         [contenteditable]:empty:before { content: attr(data-placeholder); opacity: 0.3; cursor: text; }
         .font-search-results { max-height: 250px; overflow-y: auto; }
-        .delete-overlay { opacity: 0; transition: opacity 0.2s ease; }
-        @media (max-width: 1024px) { .delete-overlay { opacity: 1; } }
+        .delete-overlay { opacity: 0; transition: opacity 0.2s ease; position: absolute; top: 1rem; right: 1rem; }
         .item:hover .delete-overlay { opacity: 1; }
         a { text-decoration: underline; text-underline-offset: 4px; color: inherit; }
         .video-play-hint { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); pointer-events: none; }
         #text-toolbar { position: absolute; display: none; z-index: 100; pointer-events: auto; }
+        .range-input { width: 100%; height: 4px; background: #222; border-radius: 2px; -webkit-appearance: none; }
+        .range-input::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: var(--accent); border-radius: 50%; cursor: pointer; }
+        .reset-btn { font-size: 8px; font-weight: 900; color: #444; text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.2s; }
+        .reset-btn:hover { color: #888; }
         .pswp__video-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; padding: 20px; }
         @media (min-width: 768px) { .pswp__video-container { padding: 50px; } }
         .pswp__video-container video { max-width: 100%; max-height: 100%; outline: none; border-radius: 8px; }
@@ -51,354 +88,631 @@
 </head>
 <body class="min-h-screen overflow-x-hidden selection:bg-white selection:text-black">
 
-    <div id="sidebar-overlay" onclick="document.body.classList.remove('sidebar-open')"></div>
+    <div id="sidebar-overlay" onclick="document.body.classList.remove('sidebar-open'); document.body.classList.remove('nav-open')"></div>
 
     <div id="text-toolbar" class="glass rounded-xl p-1 shadow-2xl flex gap-1 animate-in fade-in zoom-in duration-200">
-        <button onclick="formatText('bold')" class="p-2 hover:bg-white/10 rounded-lg transition-colors text-white" title="Bold"><i data-lucide="bold" class="w-4 h-4"></i></button>
-        <button onclick="formatText('underline')" class="p-2 hover:bg-white/10 rounded-lg transition-colors text-white" title="Underline"><i data-lucide="underline" class="w-4 h-4"></i></button>
-        <div class="w-[1px] bg-white/10 mx-1"></div>
-        <button onclick="formatText('link')" class="p-2 hover:bg-white/10 rounded-lg transition-colors text-white" title="Add Link"><i data-lucide="link" class="w-4 h-4"></i></button>
-        <button onclick="formatText('unlink')" class="p-2 hover:bg-white/10 rounded-lg transition-colors text-white" title="Remove Link"><i data-lucide="link-2-off" class="w-4 h-4"></i></button>
+        <button onclick="formatText('bold')" class="p-2 hover:bg-white/10 rounded-lg text-white"><i data-lucide="bold" class="w-4 h-4"></i></button>
+        <button onclick="formatText('underline')" class="p-2 hover:bg-white/10 rounded-lg text-white"><i data-lucide="underline" class="w-4 h-4"></i></button>
+        <button onclick="formatText('link')" class="p-2 hover:bg-white/10 rounded-lg text-white"><i data-lucide="link" class="w-4 h-4"></i></button>
     </div>
 
-    <nav class="fixed top-0 left-0 w-full p-4 md:p-8 z-40 flex justify-between items-center bg-black/50 backdrop-blur-md border-b border-white/5 md:border-none">
-        <a href="https://seasidebranding.com" target="_blank" class="flex items-center gap-3 md:gap-4 group no-underline">
-            <div class="w-8 h-8 md:w-10 md:h-10 bg-[#080808] border border-white/5 rounded-xl flex items-center justify-center rotate-3 group-hover:rotate-0 transition-transform duration-500 overflow-hidden">
-                <img id="menu-icon-img" src="favicon.png" class="w-full h-full object-cover">
-            </div>
-            <span class="text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] md:tracking-[0.5em] text-white no-underline truncate max-w-[120px] md:max-w-none text-left">Seaside Studio Pro</span>
-        </a>
-        <div class="flex gap-2 md:gap-4">
-            <button id="help-btn" class="p-3 md:p-4 glass rounded-xl md:rounded-2xl hover:bg-white/20 transition-all active:scale-90"><i data-lucide="help-circle" class="w-4 h-4 md:w-5 md:h-5 text-white pointer-events-none"></i></button>
-            <button id="toggle-settings" class="p-3 md:p-4 glass rounded-xl md:rounded-2xl hover:bg-white/20 transition-all active:scale-90"><i data-lucide="layout-template" class="w-4 h-4 md:w-5 md:h-5 text-white pointer-events-none"></i></button>
+    <nav class="fixed top-0 left-0 w-full p-4 md:p-8 z-40 flex justify-between items-center bg-black/50 backdrop-blur-md">
+        <div class="flex items-center gap-8">
+            <button onclick="document.body.classList.add('nav-open')" class="flex items-center gap-3 group no-underline">
+                <div class="w-10 h-10 bg-[#080808] border border-white/5 rounded-xl flex items-center justify-center overflow-hidden rotate-3 group-hover:rotate-0 transition-transform">
+                    <i data-lucide="menu" class="w-5 h-5 text-white"></i>
+                </div>
+                <span class="text-[10px] font-black uppercase tracking-[0.5em] text-white no-underline">Menu</span>
+            </button>
+            <a href="https://seasidebranding.com" target="_blank" class="text-[10px] font-black uppercase tracking-[0.5em] text-white/40 hover:text-white transition-colors no-underline hidden md:block">seasidebranding</a>
+        </div>
+        <div class="flex gap-4">
+            <a href="https://seasidebranding.com" target="_blank" class="text-[10px] font-black uppercase tracking-[0.5em] text-white/40 hover:text-white transition-colors no-underline md:hidden flex items-center mr-2">seasidebranding</a>
+            <button id="help-btn" class="p-3 md:p-4 glass rounded-xl hover:bg-white/20 active:scale-90"><i data-lucide="help-circle" class="w-5 h-5 text-white"></i></button>
+            <button id="toggle-settings" class="p-3 md:p-4 glass rounded-xl hover:bg-white/20 active:scale-90"><i data-lucide="layout-template" class="w-5 h-5 text-white"></i></button>
         </div>
     </nav>
 
-    <aside id="settings-sidebar" class="fixed top-0 right-0 h-full z-50 p-6 md:p-12 flex flex-col bg-[#080808] border-l border-white/5 shadow-2xl overflow-hidden">
-        <div class="flex justify-between items-center mb-10 md:mb-16">
-            <h2 class="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 text-left">Studio Engine</h2>
-            <button id="close-settings" class="text-white/20 hover:text-white p-2 transition-colors"><i data-lucide="x" class="w-6 h-6 pointer-events-none"></i></button>
+    <aside id="nav-menu" class="p-6 md:p-12 flex flex-col shadow-2xl overflow-hidden">
+        <div class="flex justify-between items-center mb-16">
+            <h2 class="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 text-left">Navigation</h2>
+            <button onclick="document.body.classList.remove('nav-open')" class="text-white/20 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
         </div>
-        <div class="flex-1 overflow-y-auto custom-scrollbar pr-2 md:pr-6 space-y-12 md:space-y-16 text-left">
+        <div class="flex-1 space-y-4">
+            <a href="../index.html" class="block p-6 glass rounded-2xl text-left no-underline group hover:bg-white/5 transition-all border-l-4 border-transparent hover:border-white/20">
+                <span class="text-[10px] font-black uppercase tracking-[0.4em] text-white/60 group-hover:text-white block mb-1">Gallery Studio</span>
+                <span class="text-[9px] text-white/20 uppercase tracking-widest">Image Delivery Engine</span>
+            </a>
+            <a href="index.html" class="block p-6 glass rounded-2xl text-left no-underline group hover:bg-white/5 transition-all border-l-4 border-white">
+                <span class="text-[10px] font-black uppercase tracking-[0.4em] text-white block mb-1">Video Studio</span>
+                <span class="text-[9px] text-white/30 uppercase tracking-widest">Motion & Mixed Media</span>
+            </a>
+            <div class="pt-8 border-t border-white/5 mt-8">
+                <a href="https://seasidebranding.com" target="_blank" class="flex items-center gap-4 p-4 no-underline group">
+                    <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors">
+                        <i data-lucide="external-link" class="w-4 h-4 text-white/40"></i>
+                    </div>
+                    <span class="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 group-hover:text-white transition-colors">Visit Seaside Branding</span>
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <aside id="settings-sidebar" class="p-6 md:p-12 flex flex-col shadow-2xl overflow-hidden">
+        <div class="flex justify-between items-center mb-16">
+            <h2 class="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 text-left">Studio Engine</h2>
+            <button onclick="document.body.classList.remove('sidebar-open')" class="text-white/20 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
+        </div>
+        <div class="flex-1 overflow-y-auto custom-scrollbar space-y-12 text-left pb-20">
             <section>
-                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-600 mb-6 block underline underline-offset-8">Visual Identity</label>
-                <div class="grid grid-cols-3 gap-4 mb-8">
+                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-600 mb-8 block underline underline-offset-8">Typography</label>
+                <div class="space-y-8">
+                    <div>
+                        <span class="text-[9px] font-bold text-neutral-500 uppercase block mb-4">Title Font</span>
+                        <input type="text" id="title-font-search" placeholder="Search..." class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white focus:outline-none">
+                        <div id="title-font-results" class="font-search-results mt-2 glass rounded-xl hidden p-2 border border-white/5"></div>
+                        <div class="grid grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-[8px] text-neutral-600 uppercase block">Tracking</span>
+                                    <button onclick="resetFontAdj('titleTracking')" class="reset-btn">Reset</button>
+                                </div>
+                                <input type="range" id="title-tracking" min="-0.2" max="0.5" step="0.01" value="-0.05" class="range-input">
+                            </div>
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-[8px] text-neutral-600 uppercase block">Line Height</span>
+                                    <button onclick="resetFontAdj('titleLH')" class="reset-btn">Reset</button>
+                                </div>
+                                <input type="range" id="title-lh" min="0.5" max="2" step="0.1" value="1" class="range-input">
+                            </div>
+                            <div class="col-span-2">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-[8px] text-neutral-600 uppercase block">Size Scale</span>
+                                    <button onclick="resetFontAdj('titleSize')" class="reset-btn">Reset</button>
+                                </div>
+                                <input type="range" id="title-size" min="0.5" max="2" step="0.05" value="1" class="range-input">
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="text-[9px] font-bold text-neutral-500 uppercase block mb-4">Body Font</span>
+                        <input type="text" id="body-font-search" placeholder="Search..." class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white focus:outline-none">
+                        <div id="body-font-results" class="font-search-results mt-2 glass rounded-xl hidden p-2 border border-white/5"></div>
+                        <div class="grid grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-[8px] text-neutral-600 uppercase block">Tracking</span>
+                                    <button onclick="resetFontAdj('bodyTracking')" class="reset-btn">Reset</button>
+                                </div>
+                                <input type="range" id="body-tracking" min="0" max="1" step="0.01" value="0.2" class="range-input">
+                            </div>
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-[8px] text-neutral-600 uppercase block">Line Height</span>
+                                    <button onclick="resetFontAdj('bodyLH')" class="reset-btn">Reset</button>
+                                </div>
+                                <input type="range" id="body-lh" min="1" max="3" step="0.1" value="1.5" class="range-input">
+                            </div>
+                            <div class="col-span-2">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-[8px] text-neutral-600 uppercase block">Size Scale</span>
+                                    <button onclick="resetFontAdj('bodySize')" class="reset-btn">Reset</button>
+                                </div>
+                                <input type="range" id="body-size" min="0.5" max="2" step="0.05" value="1" class="range-input">
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="text-[9px] font-bold text-neutral-500 uppercase block mb-4">Button Font</span>
+                        <input type="text" id="button-font-search" placeholder="Search..." class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white focus:outline-none">
+                        <div id="button-font-results" class="font-search-results mt-2 glass rounded-xl hidden p-2 border border-white/5"></div>
+                        <div class="grid grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-[8px] text-neutral-600 uppercase block">Tracking</span>
+                                    <button onclick="resetFontAdj('buttonTracking')" class="reset-btn">Reset</button>
+                                </div>
+                                <input type="range" id="button-tracking" min="0" max="1" step="0.01" value="0.3" class="range-input">
+                            </div>
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-[8px] text-neutral-600 uppercase block">Line Height</span>
+                                    <button onclick="resetFontAdj('buttonLH')" class="reset-btn">Reset</button>
+                                </div>
+                                <input type="range" id="button-lh" min="0.5" max="2" step="0.1" value="1" class="range-input">
+                            </div>
+                            <div class="col-span-2">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-[8px] text-neutral-600 uppercase block">Size Scale</span>
+                                    <button onclick="resetFontAdj('buttonSize')" class="reset-btn">Reset</button>
+                                </div>
+                                <input type="range" id="button-size" min="0.5" max="2" step="0.05" value="1" class="range-input">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section>
+                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-600 mb-8 block underline underline-offset-8">Presets</label>
+                <div id="template-list" class="grid grid-cols-1 gap-3"></div>
+                <button id="save-tpl-btn" class="mt-6 w-full py-4 border border-white/5 rounded-xl text-[10px] font-bold uppercase tracking-widest text-white/40 hover:text-white hover:bg-white/5 transition-all">Save Session Style</button>
+            </section>
+
+            <section>
+                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-600 mb-8 block underline underline-offset-8">Branding</label>
+                <div class="grid grid-cols-2 gap-4 mb-8">
                     <div class="space-y-3 text-center"><span class="text-[9px] font-bold text-neutral-500 uppercase">Base</span><input type="color" id="bg-color" value="#050505" class="mx-auto block"></div>
                     <div class="space-y-3 text-center"><span class="text-[9px] font-bold text-neutral-500 uppercase">Text</span><input type="color" id="text-color" value="#ffffff" class="mx-auto block"></div>
                     <div class="space-y-3 text-center"><span class="text-[9px] font-bold text-neutral-500 uppercase">Accent</span><input type="color" id="accent-color" value="#ffffff" class="mx-auto block"></div>
+                    <div class="space-y-3 text-center"><span class="text-[9px] font-bold text-neutral-500 uppercase">Subtitle</span><input type="color" id="subtitle-color" value="#888888" class="mx-auto block"></div>
                 </div>
-                <div class="space-y-4"><span class="text-[9px] font-bold text-neutral-500 uppercase block">Masonry Gap</span><input type="range" id="gap-range" min="0" max="6" step="0.5" value="1.5" class="w-full accent-white"></div>
-            </section>
-            <section>
-                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-600 mb-6 block underline underline-offset-8">Typography</label>
-                <div class="space-y-10">
-                    <div class="space-y-4">
-                        <span class="text-[9px] font-bold text-neutral-500 uppercase block">Title Font</span>
-                        <input type="text" id="title-font-search" placeholder="Search..." class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white focus:outline-none">
-                        <div id="title-font-results" class="font-search-results mt-2 glass rounded-xl hidden p-2"></div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div class="space-y-2"><span class="text-[8px] uppercase opacity-50 block">Tracking</span><div class="flex gap-2"><input type="range" id="title-tracking" min="-0.2" max="1" step="0.01" class="w-full accent-white"><button onclick="resetField('titleTracking')"><i data-lucide="rotate-ccw" class="w-3 h-3 opacity-30"></i></button></div></div>
-                            <div class="space-y-2"><span class="text-[8px] uppercase opacity-50 block">Height</span><div class="flex gap-2"><input type="range" id="title-lh" min="0.5" max="2" step="0.1" class="w-full accent-white"><button onclick="resetField('titleLH')"><i data-lucide="rotate-ccw" class="w-3 h-3 opacity-30"></i></button></div></div>
-                        </div>
+                <div class="mb-8">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-[9px] font-bold text-neutral-500 uppercase block">Media Gap</span>
+                        <button onclick="resetFontAdj('gap')" class="reset-btn">Reset</button>
                     </div>
-                    <div class="space-y-4">
-                        <span class="text-[9px] font-bold text-neutral-500 uppercase block">Body Font</span>
-                        <input type="text" id="body-font-search" placeholder="Search..." class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white focus:outline-none">
-                        <div id="body-font-results" class="font-search-results mt-2 glass rounded-xl hidden p-2"></div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div class="space-y-2"><span class="text-[8px] uppercase opacity-50 block">Tracking</span><div class="flex gap-2"><input type="range" id="body-tracking" min="-0.1" max="2" step="0.01" class="w-full accent-white"><button onclick="resetField('bodyTracking')"><i data-lucide="rotate-ccw" class="w-3 h-3 opacity-30"></i></button></div></div>
-                            <div class="space-y-2"><span class="text-[8px] uppercase opacity-50 block">Height</span><div class="flex gap-2"><input type="range" id="body-lh" min="1" max="3" step="0.1" class="w-full accent-white"><button onclick="resetField('bodyLH')"><i data-lucide="rotate-ccw" class="w-3 h-3 opacity-30"></i></button></div></div>
-                        </div>
-                    </div>
+                    <input type="range" id="gallery-gap" min="0" max="5" step="0.5" value="1.5" class="range-input">
                 </div>
-            </section>
-            <section>
-                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-600 mb-8 block underline underline-offset-8">Delivery Gateway</label>
-                <div class="space-y-6">
-                    <select id="download-type" class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white focus:outline-none cursor-pointer appearance-none"><option value="zip">Project ZIP (Auto)</option><option value="link">Zoho / External Link</option></select>
-                    <input type="url" id="external-url" placeholder="https://workdrive.zoho.com/..." class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white focus:outline-none focus:border-white/20 hidden transition-all">
-                </div>
-            </section>
-            <section>
-                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-600 mb-8 block underline underline-offset-8 text-left">Branding</label>
                 <div class="p-8 glass rounded-2xl cursor-pointer hover:bg-white/5 relative group border-dashed border-white/10 text-center">
                     <input type="file" id="favicon-input" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
-                    <div id="favicon-preview" class="w-16 h-16 rounded-2xl bg-[#080808] border border-white/10 mx-auto mb-4 flex items-center justify-center overflow-hidden"><img id="favicon-preview-img" src="favicon.png" class="w-full h-full object-cover"></div>
-                    <span class="text-[10px] font-bold uppercase tracking-widest text-white/40 text-center block">Change Branding Icon</span>
+                    <div class="w-16 h-16 rounded-2xl bg-[#080808] border border-white/10 mx-auto mb-4 flex items-center justify-center overflow-hidden">
+                        <img id="favicon-preview-img" src="favicon.png" class="w-full h-full object-cover">
+                    </div>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-white/40 block">Change Favicon</span>
+                </div>
+            </section>
+
+            <section>
+                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-600 mb-8 block underline underline-offset-8">Delivery</label>
+                <div class="space-y-8">
+                    <select id="download-type" class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white focus:outline-none cursor-pointer appearance-none"><option value="zip">Project ZIP (Auto)</option><option value="link">External Link</option></select>
+                    <input type="text" id="external-url" placeholder="https://..." class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white focus:outline-none hidden">
                 </div>
             </section>
         </div>
-        <div class="pt-8 md:pt-12 mt-8 border-t border-white/10"><button id="bake-btn" class="w-full btn-primary py-6 md:py-7 text-[10px] font-black uppercase tracking-[0.5em] rounded-2xl shadow-2xl transition-all active:scale-95">Bake Studio Package</button></div>
+        <div class="pt-8 border-t border-white/10"><button id="bake-btn" class="w-full btn-primary py-6 text-[10px] font-black uppercase tracking-[0.5em]">Bake Production Package</button></div>
     </aside>
 
-    <main id="app" class="relative">
-        <section id="setup-view" class="h-screen flex items-center justify-center p-6 md:p-8 text-center">
-            <div id="drop-zone" class="max-w-xl md:max-w-2xl w-full aspect-square glass rounded-[40px] md:rounded-[60px] flex flex-col items-center justify-center cursor-pointer hover:scale-[1.02] transition-all duration-1000 group px-6">
-                <div class="z-10 scale-95 group-hover:scale-100 transition-transform duration-700">
-                    <div class="w-16 h-16 md:w-24 md:h-24 bg-[#080808] border border-white/5 rounded-2xl md:rounded-3xl mx-auto mb-8 md:mb-12 flex items-center justify-center group-hover:rotate-12 transition-transform duration-700 overflow-hidden p-3 md:p-4"><img src="favicon.png" class="w-full h-full object-contain"></div>
-                    <h2 class="text-4xl md:text-6xl font-light tracking-tighter mb-4 md:mb-6 text-white">Import Session</h2>
-                    <p class="text-[9px] md:text-[11px] font-black uppercase tracking-[0.5em] md:tracking-[0.8em] text-neutral-500 group-hover:text-white transition-colors">Drop Video & Image Assets</p>
+    <main id="app">
+        <section id="setup-view" class="h-screen flex items-center justify-center p-8 text-center">
+            <div id="drop-zone" class="max-w-2xl w-full aspect-square glass rounded-[60px] flex flex-col items-center justify-center cursor-pointer hover:scale-[1.02] transition-all group px-6 text-center relative overflow-hidden">
+                <div class="w-20 h-20 bg-white rounded-3xl mb-8 flex items-center justify-center group-hover:rotate-12 transition-transform overflow-hidden p-4">
+                    <img src="favicon.png" class="w-full h-full object-contain">
                 </div>
+                <h2 class="text-5xl font-light text-white mb-4 tracking-tighter">Import Session</h2>
+                <p class="text-[10px] font-black uppercase tracking-[0.5em] text-neutral-500">Drop Video & Image Assets</p>
                 <input type="file" id="file-input" multiple accept="video/*,image/*" class="hidden">
             </div>
         </section>
-        <section id="gallery-view" class="hidden min-h-screen pt-32 md:pt-64 pb-32 md:pb-64 px-6 md:px-24 lg:px-32">
+
+        <section id="gallery-view" class="hidden min-h-screen pt-48 pb-32">
             <div class="max-w-[1600px] mx-auto">
-                <header class="mb-24 md:mb-48 flex flex-col items-start gap-8 md:gap-12">
-                    <div class="max-w-5xl w-full text-left">
-                        <div id="client-name" contenteditable="true" data-placeholder="Production Title" class="font-light focus:outline-none mb-6 md:mb-10 leading-[0.9] md:leading-none break-words"></div>
-                        <div id="event-date" contenteditable="true" data-placeholder="Add links or descriptive text here..." class="text-[10px] md:text-[12px] font-bold uppercase focus:outline-none min-h-[1.5em] text-neutral-500 break-words"></div>
-                    </div>
-                    <div class="flex flex-wrap gap-4 md:gap-8 items-center pt-6 md:pt-10 w-full sm:w-auto">
-                        <button id="download-full" class="w-full sm:w-auto flex items-center justify-center gap-4 text-[10px] md:text-[11px] font-black uppercase tracking-[0.3em] btn-primary px-8 md:px-10 py-4 md:py-5 rounded-xl md:rounded-2xl transition-all"><i data-lucide="arrow-down-to-line" class="w-4 h-4 md:w-5 md:h-5 pointer-events-none"></i> Download Session</button>
-                        <button id="add-more" class="p-4 md:p-5 glass rounded-xl md:rounded-2xl hover:bg-white/10 transition-all group"><i data-lucide="plus" class="w-5 h-5 md:w-6 md:h-6 opacity-30 group-hover:opacity-100 transition-opacity pointer-events-none"></i></button>
+                <header class="mb-48 flex flex-col items-center px-8 text-center">
+                    <div id="client-name" contenteditable="true" data-placeholder="Production Title" class="focus:outline-none mb-10 w-full text-center"></div>
+                    <div id="event-date" contenteditable="true" data-placeholder="Links & Details" class="text-[12px] font-bold uppercase focus:outline-none text-neutral-500 w-full text-center"></div>
+                    <div class="mt-16 flex flex-wrap gap-6 justify-center">
+                        <button id="download-full" class="btn-primary px-12 py-5 text-[11px] font-black uppercase tracking-[0.3em] shadow-2xl active:scale-95 transition-all">Download Session</button>
+                        <button id="add-more-btn" class="p-5 glass rounded-2xl hover:bg-white/10 active:scale-90 transition-all">
+                            <i data-lucide="plus" class="w-6 h-6 opacity-40"></i>
+                        </button>
                     </div>
                 </header>
                 <div id="gallery-grid" class="masonry"></div>
+                
+                <!-- Hidden source for baked footer icon -->
+                <img id="footer-logo-preview" src="../icon.png" class="hidden">
+
+                <footer class="mt-64 pb-32 flex flex-col items-center gap-12 transition-all duration-500">
+                    <a href="https://seasidebranding.com" target="_blank" class="flex flex-col items-center gap-4 no-underline group">
+                        <div class="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center overflow-hidden rotate-3 group-hover:rotate-0 transition-transform">
+                            <img src="favicon.png" class="w-full h-full object-cover">
+                        </div>
+                        <span class="text-[10px] font-black uppercase tracking-[0.5em]" style="color: var(--text)">Seaside Branding</span>
+                    </a>
+                    <div class="flex gap-12 text-[9px] font-black uppercase tracking-[0.3em]" style="color: var(--text); opacity: 0.6">
+                        <a href="https://seasidebranding.com/terms" target="_blank" class="hover:opacity-100 transition-opacity no-underline">Terms</a>
+                        <a href="https://seasidebranding.com/privacy" target="_blank" class="hover:opacity-100 transition-opacity no-underline">Privacy</a>
+                    </div>
+                    <a href="https://seasidebranding.com/contact" target="_blank" class="btn-primary px-10 py-4 text-[9px] font-black uppercase tracking-[0.2em] no-underline">Contact Us</a>
+                </footer>
             </div>
         </section>
     </main>
 
-    <div id="help-modal" class="help-modal fixed inset-0 z-[100] bg-black/98 backdrop-blur-3xl items-center justify-center p-4 md:p-8 text-left">
-        <div class="max-w-4xl w-full bg-[#0a0a0a] p-8 md:p-20 border border-white/5 rounded-[40px] md:rounded-[60px] relative shadow-2xl overflow-y-auto max-h-[90vh] custom-scrollbar text-xs md:text-sm text-neutral-400 text-left">
-            <button id="help-close" class="absolute top-8 right-8 md:top-16 md:right-16 text-neutral-600 hover:text-white p-2 transition-colors"><i data-lucide="x" class="w-10 h-10 pointer-events-none"></i></button>
-            <h2 class="text-4xl md:text-7xl font-light tracking-tighter mb-8 md:mb-16 text-white text-left">Mixed Media Protocol</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-20 leading-relaxed text-left">
-                <div class="space-y-8 text-left">
-                    <div><h3 class="text-white font-black uppercase text-[10px] md:text-[11px] tracking-[0.4em] mb-3 md:mb-4">Dual Media</h3><p>Import Videos and Images together. The engine handles high-res motion scanning and smart still compression for an ultra-fast client dashboard on any device.</p></div>
-                    <div><h3 class="text-white font-black uppercase text-[10px] md:text-[11px] tracking-[0.4em] mb-3 md:mb-4">Typography</h3><p>Adjust Tracking and Line Height independently. If the layout breaks, use the Reset icon to return to professional baselines.</p></div>
-                </div>
-                <div class="space-y-8 text-left">
-                    <div><h3 class="text-white font-black uppercase text-[10px] md:text-[11px] tracking-[0.4em] mb-3 md:mb-4">Rich Text</h3><p>Select any header text to format it with Bold, Underline, or Live Links for your client's socials or portfolio.</p></div>
-                    <div><h3 class="text-white font-black uppercase text-[10px] md:text-[11px] tracking-[0.4em] mb-3 md:mb-4">Bake & Deploy</h3><p>Baking generates a full motion package ZIP. Images are capped at 2048px (&lt;400KB) and videos are kept at original bitrate. Perfect for GitHub Pages.</p></div>
-                </div>
-            </div>
+    <div id="help-modal" class="help-modal fixed inset-0 z-[100] bg-black/95 backdrop-blur-3xl items-center justify-center p-8 text-center" onclick="this.classList.remove('open')">
+        <div class="glass p-12 rounded-[40px] max-w-2xl" onclick="event.stopPropagation()">
+            <h2 class="text-4xl font-light mb-8 text-white">Mixed Media Protocol</h2>
+            <p class="text-sm text-neutral-400 leading-relaxed mb-8">Baking generates a high-res motion package. Images are capped at 2048px, and videos are kept at original bitrate. Perfect for professional delivery.</p>
+            <button onclick="document.getElementById('help-modal').classList.remove('open')" class="btn-primary px-10 py-4 text-[10px] font-black uppercase tracking-widest">Close Guide</button>
         </div>
     </div>
 
     <script type="module">
         import PhotoSwipeLightbox from 'https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe-lightbox.esm.min.js';
+
         const GOOGLE_FONTS = ["Inter", "Playfair Display", "Montserrat", "Lora", "Oswald", "Roboto", "Open Sans", "Prata", "Bodoni Moda", "Space Grotesk", "Syne", "Cormorant Garamond", "Cinzel", "Work Sans", "Quicksand", "Poppins", "Darker Grotesque", "Bebas Neue", "Fraunces", "Manrope", "Outfit", "Plus Jakarta Sans", "Archivo", "Epilogue", "Jost", "Public Sans", "Spectral", "Karla", "Unna", "Domine", "Cardo", "Crimson Pro", "Hanken Grotesk", "Lexend"];
+        
         const PRESETS = {
-            'Noir': { bg: '#050505', text: '#ffffff', accent: '#ffffff', titleFont: "Inter", bodyFont: "Inter", titleTracking: '-0.05em', titleLH: '1', bodyTracking: '0.2em', bodyLH: '1.5', gap: '1rem' },
-            'Nordic': { bg: '#f0f0f0', text: '#222222', accent: '#000000', titleFont: "Montserrat", bodyFont: "Montserrat", titleTracking: '0.1em', titleLH: '1.2', bodyTracking: '0.15em', bodyLH: '1.8', gap: '2rem' },
-            'Solaris': { bg: '#fffaf0', text: '#4a3728', accent: '#c0a080', titleFont: "Playfair Display", bodyFont: "Lora", titleTracking: '0em', titleLH: '1.1', bodyTracking: '0.1em', bodyLH: '1.6', gap: '2.5rem' },
-            'Vogue': { bg: '#ffffff', text: '#000000', accent: '#000000', titleFont: "Prata", bodyFont: "Inter", titleTracking: '0em', titleLH: '0.9', bodyTracking: '0.1em', bodyLH: '1.4', gap: '0.5rem' },
-            'Cyber': { bg: '#080c10', text: '#00ffcc', accent: '#00ffcc', titleFont: "Space Grotesk", bodyFont: "Inter", titleTracking: '-0.02em', titleLH: '1', bodyTracking: '0.25em', bodyLH: '1.5', gap: '1.5rem' },
-            'Brutalist': { bg: '#ffffff', text: '#000000', accent: '#ff3e00', titleFont: "Archivo", bodyFont: "Archivo", titleTracking: '-0.05em', titleLH: '0.8', bodyTracking: '0em', bodyLH: '1.2', gap: '0rem' }
+            'Noir': { bg: '#050505', text: '#ffffff', subtitle: '#888888', accent: '#ffffff', titleFont: "Inter", bodyFont: "Inter", buttonFont: "Inter", titleTracking: '-0.05em', titleLH: '1', titleSize: '1', bodyTracking: '0.2em', bodyLH: '1.5', bodySize: '1', buttonTracking: '0.3em', buttonLH: '1', buttonSize: '1', gap: '1.5rem' },
+            'Nordic': { bg: '#f0f0f0', text: '#222222', subtitle: '#666666', accent: '#000000', titleFont: "Montserrat", bodyFont: "Montserrat", buttonFont: "Montserrat", titleTracking: '0.1em', titleLH: '1.2', titleSize: '1', bodyTracking: '0.15em', bodyLH: '1.8', bodySize: '1', buttonTracking: '0.3em', buttonLH: '1', buttonSize: '1', gap: '2rem' },
+            'Solaris': { bg: '#fffaf0', text: '#4a3728', subtitle: '#c0a080', accent: '#c0a080', titleFont: "Playfair Display", bodyFont: "Lora", buttonFont: "Lora", titleTracking: '0em', titleLH: '1.1', titleSize: '1', bodyTracking: '0.1em', bodyLH: '1.6', bodySize: '1', buttonTracking: '0.1em', bodyLH: '1', buttonSize: '1', gap: '3rem' },
+            'Cyber': { bg: '#0a0a0f', text: '#e0e0ff', subtitle: '#7070a0', accent: '#00f2ff', titleFont: "Space Grotesk", bodyFont: "Space Mono", buttonFont: "Space Grotesk", titleTracking: '-0.02em', titleLH: '0.9', titleSize: '1.1', bodyTracking: '0.05em', bodyLH: '1.4', bodySize: '0.9', buttonTracking: '0.4em', buttonLH: '1', buttonSize: '1', gap: '1rem' },
+            'Earth': { bg: '#1c1917', text: '#f5f5f4', subtitle: '#a8a29e', accent: '#d97706', titleFont: "Prata", bodyFont: "Inter", buttonFont: "Inter", titleTracking: '0.02em', titleLH: '1.3', titleSize: '1', bodyTracking: '0.1em', bodyLH: '1.7', bodySize: '1', buttonTracking: '0.2em', bodyLH: '1', buttonSize: '1', gap: '2.5rem' },
+            'Mono': { bg: '#ffffff', text: '#000000', subtitle: '#666666', accent: '#000000', titleFont: "Archivo", bodyFont: "Archivo", buttonFont: "Archivo", titleTracking: '-0.04em', titleLH: '1', titleSize: '1.2', bodyTracking: '0em', bodyLH: '1.5', bodySize: '1', buttonTracking: '0em', bodyLH: '1', buttonSize: '1.1', gap: '0rem' },
+            'Royal': { bg: '#0f172a', text: '#f8fafc', subtitle: '#94a3b8', accent: '#facc15', titleFont: "Cinzel", bodyFont: "Lora", buttonFont: "Lora", titleTracking: '0.05em', titleLH: '1.2', titleSize: '0.9', bodyTracking: '0.2em', bodyLH: '1.6', bodySize: '1', buttonTracking: '0.3em', buttonLH: '1', buttonSize: '1', gap: '2rem' },
+            'Minimal': { bg: '#fafafa', text: '#171717', subtitle: '#737373', accent: '#171717', titleFont: "Outfit", bodyFont: "Outfit", buttonFont: "Outfit", titleTracking: '-0.03em', titleLH: '1.1', titleSize: '0.8', bodyTracking: '0.1em', bodyLH: '1.5', bodySize: '1', buttonTracking: '0.2em', bodyLH: '1', buttonSize: '0.9', gap: '4rem' },
+            'Vogue': { bg: '#ffffff', text: '#111111', subtitle: '#999999', accent: '#000000', titleFont: "Bodoni Moda", bodyFont: "Playfair Display", buttonFont: "Bodoni Moda", titleTracking: '-0.01em', titleLH: '1', titleSize: '1.3', bodyTracking: '0.05em', bodyLH: '1.4', bodySize: '1', buttonTracking: '0.1em', buttonLH: '1', buttonSize: '1', gap: '2rem' },
+            'Brutal': { bg: '#000000', text: '#ffffff', subtitle: '#888888', accent: '#ef4444', titleFont: "Syne", bodyFont: "Syne", buttonFont: "Syne", titleTracking: '-0.07em', titleLH: '0.8', titleSize: '1.5', bodyTracking: '0.1em', bodyLH: '1.2', bodySize: '1.1', buttonTracking: '0.4em', buttonLH: '1', buttonSize: '1.2', gap: '0.5rem' }
         };
-        const state = { items: [], favicon: null, theme: { ...PRESETS['Noir'] }, settings: { downloadType: 'zip', externalUrl: '' } };
+
+        const state = { 
+            items: [], 
+            favicon: null, 
+            theme: { ...PRESETS['Noir'] }, 
+            settings: { downloadType: 'zip', externalUrl: '' }
+        };
+
         const els = {
-            toggle: document.getElementById('toggle-settings'), close: document.getElementById('close-settings'), sidebar: document.getElementById('settings-sidebar'),
-            dropZone: document.getElementById('drop-zone'), fileInput: document.getElementById('file-input'), grid: document.getElementById('gallery-grid'),
-            setup: document.getElementById('setup-view'), view: document.getElementById('gallery-view'), bgColor: document.getElementById('bg-color'),
-            textColor: document.getElementById('text-color'), accentColor: document.getElementById('accent-color'),
-            titleFontSearch: document.getElementById('title-font-search'), titleFontResults: document.getElementById('title-font-results'),
-            bodyFontSearch: document.getElementById('body-font-search'), bodyFontResults: document.getElementById('body-font-results'),
-            titleTracking: document.getElementById('title-tracking'), titleLH: document.getElementById('title-lh'),
-            bodyTracking: document.getElementById('body-tracking'), bodyLH: document.getElementById('body-lh'),
-            gap: document.getElementById('gap-range'), faviconInput: document.getElementById('favicon-input'),
-            faviconPreviewImg: document.getElementById('favicon-preview-img'), bakeBtn: document.getElementById('bake-btn'),
-            downloadFull: document.getElementById('download-full'), downloadType: document.getElementById('download-type'),
-            externalUrl: document.getElementById('external-url'), clientName: document.getElementById('client-name'),
-            eventDate: document.getElementById('event-date'), tplList: document.getElementById('template-list'),
-            saveTplBtn: document.getElementById('save-tpl-btn'), toolbar: document.getElementById('text-toolbar'),
-            helpTrigger: document.getElementById('help-btn'), helpModal: document.getElementById('help-modal'), helpClose: document.getElementById('help-close')
+            toggle: document.getElementById('toggle-settings'), sidebar: document.getElementById('settings-sidebar'), grid: document.getElementById('gallery-grid'),
+            drop: document.getElementById('drop-zone'), input: document.getElementById('file-input'), bake: document.getElementById('bake-btn'),
+            dlFull: document.getElementById('download-full'), addMore: document.getElementById('add-more-btn'),
+            clientName: document.getElementById('client-name'), eventDate: document.getElementById('event-date'),
+            tSearch: document.getElementById('title-font-search'), tRes: document.getElementById('title-font-results'),
+            bSearch: document.getElementById('body-font-search'), bRes: document.getElementById('body-font-results'),
+            btnSearch: document.getElementById('button-font-search'), btnRes: document.getElementById('button-font-results'),
+            faviconInput: document.getElementById('favicon-input'), favPreview: document.getElementById('favicon-preview-img'), 
+            bgColor: document.getElementById('bg-color'), textColor: document.getElementById('text-color'), 
+            subtitleColor: document.getElementById('subtitle-color'), accentColor: document.getElementById('accent-color'),
+            tTracking: document.getElementById('title-tracking'), tLH: document.getElementById('title-lh'), tSize: document.getElementById('title-size'),
+            bTracking: document.getElementById('body-tracking'), bLH: document.getElementById('body-lh'), bSize: document.getElementById('body-size'),
+            btnTracking: document.getElementById('button-tracking'), btnLH: document.getElementById('button-lh'), btnSize: document.getElementById('button-size'),
+            galleryGap: document.getElementById('gallery-gap'), externalUrl: document.getElementById('external-url'),
+            downloadType: document.getElementById('download-type'),
+            toolbar: document.getElementById('text-toolbar'), helpTrigger: document.getElementById('help-btn'),
+            helpModal: document.getElementById('help-modal'),
+            tplList: document.getElementById('template-list'),
+            saveTpl: document.getElementById('save-tpl-btn')
         };
 
         const applyTheme = () => {
             const r = document.documentElement;
-            r.style.setProperty('--bg', state.theme.bg); r.style.setProperty('--text', state.theme.text);
-            r.style.setProperty('--accent', state.theme.accent); r.style.setProperty('--item-gap', state.theme.gap);
-            r.style.setProperty('--title-font', state.theme.titleFont); r.style.setProperty('--body-font', state.theme.bodyFont);
-            r.style.setProperty('--title-tracking', state.theme.titleTracking); r.style.setProperty('--title-lh', state.theme.titleLH);
-            r.style.setProperty('--body-tracking', state.theme.bodyTracking); r.style.setProperty('--body-lh', state.theme.bodyLH);
-            [state.theme.titleFont, state.theme.bodyFont].forEach(f => {
-                if (!document.getElementById(`font-${f}`)) {
-                    const l = document.createElement('link'); l.id = `font-${f}`; l.rel = 'stylesheet';
-                    l.href = `https://fonts.googleapis.com/css2?family=${f.replace(/\s+/g, '+')}:wght@300;400;700;800&display=swap`;
+            r.style.setProperty('--bg', state.theme.bg); 
+            r.style.setProperty('--text', state.theme.text);
+            r.style.setProperty('--subtitle', state.theme.subtitle);
+            r.style.setProperty('--accent', state.theme.accent); 
+            r.style.setProperty('--item-gap', state.theme.gap);
+            r.style.setProperty('--title-font', state.theme.titleFont); 
+            r.style.setProperty('--body-font', state.theme.bodyFont);
+            r.style.setProperty('--button-font', state.theme.buttonFont || state.theme.bodyFont);
+            r.style.setProperty('--title-tracking', state.theme.titleTracking);
+            r.style.setProperty('--title-lh', state.theme.titleLH);
+            r.style.setProperty('--title-size', state.theme.titleSize);
+            r.style.setProperty('--body-tracking', state.theme.bodyTracking);
+            r.style.setProperty('--body-lh', state.theme.bodyLH);
+            r.style.setProperty('--body-size', state.theme.bodySize);
+            r.style.setProperty('--button-tracking', state.theme.buttonTracking);
+            r.style.setProperty('--button-lh', state.theme.buttonLH);
+            r.style.setProperty('--button-size', state.theme.buttonSize);
+
+            [state.theme.titleFont, state.theme.bodyFont, state.theme.buttonFont].filter(Boolean).forEach(f => {
+                if (!document.getElementById(`f-${f}`)) {
+                    const l = document.createElement('link'); l.id = `f-${f}`; l.rel = 'stylesheet';
+                    l.href = `https://fonts.googleapis.com/css2?family=${f.replace(/\s+/g,'+')}:wght@300;400;500;600;700;800&display=swap`;
                     document.head.appendChild(l);
                 }
             });
         };
 
-        const syncUI = () => {
-            els.bgColor.value = state.theme.bg; els.textColor.value = state.theme.text;
-            els.accentColor.value = state.theme.accent; els.gap.value = parseFloat(state.theme.gap);
-            els.titleTracking.value = parseFloat(state.theme.titleTracking); els.titleLH.value = parseFloat(state.theme.titleLH);
-            els.bodyTracking.value = parseFloat(state.theme.bodyTracking); els.bodyLH.value = parseFloat(state.theme.bodyLH);
-            els.downloadType.value = state.settings.downloadType; els.externalUrl.value = state.settings.externalUrl;
+        const syncUI = () => { 
+            els.bgColor.value = state.theme.bg;
+            els.textColor.value = state.theme.text;
+            els.subtitleColor.value = state.theme.subtitle;
+            els.accentColor.value = state.theme.accent;
+            els.tTracking.value = parseFloat(state.theme.titleTracking);
+            els.tLH.value = state.theme.titleLH;
+            els.tSize.value = state.theme.titleSize;
+            els.bTracking.value = parseFloat(state.theme.bodyTracking);
+            els.bLH.value = state.theme.bodyLH;
+            els.bSize.value = state.theme.bodySize;
+            els.btnTracking.value = parseFloat(state.theme.buttonTracking);
+            els.btnLH.value = state.theme.buttonLH;
+            els.btnSize.value = state.theme.buttonSize;
+            els.galleryGap.value = parseFloat(state.theme.gap);
+            els.downloadType.value = state.settings.downloadType;
+            els.externalUrl.value = state.settings.externalUrl;
             els.externalUrl.classList.toggle('hidden', state.settings.downloadType !== 'link');
-            applyTheme();
+            els.tSearch.value = state.theme.titleFont;
+            els.bSearch.value = state.theme.bodyFont;
+            els.btnSearch.value = state.theme.buttonFont || state.theme.bodyFont;
+            applyTheme(); 
         };
 
-        window.resetField = (f) => { state.theme[f] = PRESETS['Noir'][f]; syncUI(); };
-        window.formatText = (cmd) => {
-            if (cmd === 'link') { const u = prompt("URL:", "https://"); if (u) document.execCommand('createLink', false, u); }
-            else if (cmd === 'unlink') { document.execCommand('unlink'); }
-            else { document.execCommand(cmd, false, null); }
-            updateToolbar();
+        els.bgColor.oninput = (e) => { state.theme.bg = e.target.value; syncUI(); };
+        els.textColor.oninput = (e) => { state.theme.text = e.target.value; syncUI(); };
+        els.subtitleColor.oninput = (e) => { state.theme.subtitle = e.target.value; syncUI(); };
+        els.accentColor.oninput = (e) => { state.theme.accent = e.target.value; syncUI(); };
+        els.tTracking.oninput = (e) => { state.theme.titleTracking = e.target.value + 'em'; syncUI(); };
+        els.tLH.oninput = (e) => { state.theme.titleLH = e.target.value; syncUI(); };
+        els.tSize.oninput = (e) => { state.theme.titleSize = e.target.value; syncUI(); };
+        els.bTracking.oninput = (e) => { state.theme.bodyTracking = e.target.value + 'em'; syncUI(); };
+        els.bLH.oninput = (e) => { state.theme.bodyLH = e.target.value; syncUI(); };
+        els.bSize.oninput = (e) => { state.theme.bodySize = e.target.value; syncUI(); };
+        els.btnTracking.oninput = (e) => { state.theme.buttonTracking = e.target.value + 'em'; syncUI(); };
+        els.btnLH.oninput = (e) => { state.theme.buttonLH = e.target.value; syncUI(); };
+        els.btnSize.oninput = (e) => { state.theme.buttonSize = e.target.value; syncUI(); };
+        els.galleryGap.oninput = (e) => { state.theme.gap = e.target.value + 'rem'; syncUI(); };
+        els.externalUrl.oninput = (e) => { state.settings.externalUrl = e.target.value; };
+        els.downloadType.onchange = (e) => { state.settings.downloadType = e.target.value; syncUI(); };
+
+        window.resetFontAdj = (prop) => {
+            const defaults = PRESETS['Noir'];
+            state.theme[prop] = defaults[prop] || (prop.includes('Size') ? '1' : '0');
+            syncUI();
+        };
+
+        const loadTpls = () => {
+            const custom = JSON.parse(localStorage.getItem('video_studio_templates_v1') || '{}');
+            const all = { ...PRESETS, ...custom };
+            if (els.tplList) {
+                els.tplList.innerHTML = Object.entries(all).map(([name, t]) => `<button onclick="window.applyTpl('${name}')" class="w-full p-4 glass rounded-xl text-left hover:bg-white/10 flex justify-between items-center group transition-all"><span class="text-[10px] font-black uppercase tracking-[0.2em] text-white/60 group-hover:text-white">${name}</span><div class="flex gap-2"><div class="w-3 h-3 rounded-full" style="background:${t.bg}"></div><div class="w-3 h-3 rounded-full" style="background:${t.text}"></div></div></button>`).join('');
+            }
+            window.applyTpl = (name) => { state.theme = { ...all[name] }; syncUI(); };
+        };
+
+        const renderFontItem = (type, font) => `<div onclick="window.setFont('${type}','${font}')" class="p-4 hover:bg-white/10 rounded-xl cursor-pointer text-[10px] font-bold uppercase tracking-widest flex justify-between items-center group">${font} <span style="font-family:'${font}'" class="normal-case opacity-40 group-hover:opacity-100 text-[16px]">Aa</span></div>`;
+
+        const updateFontSearch = (type, term) => {
+            const res = els[type === 'button' ? 'btnRes' : type[0]+'Res'];
+            const filtered = GOOGLE_FONTS.filter(f => f.toLowerCase().includes(term.toLowerCase())).slice(0, 15);
+            res.innerHTML = filtered.map(f => renderFontItem(type, f)).join('') || `<p class="p-4 text-[9px] uppercase tracking-widest opacity-20">No matching fonts...</p>`;
+            lucide.createIcons();
+        };
+
+        ['title', 'body', 'button'].forEach(p => {
+            const s = els[p === 'button' ? 'btnSearch' : p[0]+'Search']; 
+            const r = els[p === 'button' ? 'btnRes' : p[0]+'Res'];
+            s.onfocus = () => { r.classList.remove('hidden'); updateFontSearch(p, s.value); };
+            s.oninput = (e) => updateFontSearch(p, e.target.value);
+            document.addEventListener('click', (e) => { if (!s.contains(e.target) && !r.contains(e.target)) r.classList.add('hidden'); });
+        });
+
+        window.setFont = (t, f) => { 
+            state.theme[t+'Font'] = f; 
+            els[t === 'button' ? 'btnRes' : t[0]+'Res'].classList.add('hidden'); 
+            els[t === 'button' ? 'btnSearch' : t[0]+'Search'].value = f;
+            syncUI(); 
+        };
+
+        window.formatText = (cmd) => { 
+            if (cmd === 'link') { 
+                const u = prompt("URL:"); if (u) document.execCommand('createLink', false, u); 
+            } else {
+                document.execCommand(cmd, false, null); 
+            }
         };
 
         const updateToolbar = () => {
             const sel = window.getSelection(); if (!sel.rangeCount || sel.isCollapsed) { els.toolbar.style.display = 'none'; return; }
             const r = sel.getRangeAt(0); const rect = r.getBoundingClientRect();
-            if (!els.clientName.contains(r.commonAncestorContainer) && !els.eventDate.contains(r.commonAncestorContainer)) { els.toolbar.style.display = 'none'; return; }
+            if (!els.clientName.contains(r.commonAncestorContainer) && !els.eventDate.contains(r.commonAncestorContainer)) { els.toolbar.style.display='none'; return; }
             els.toolbar.style.display = 'flex'; els.toolbar.style.top = `${rect.top + window.scrollY - 60}px`;
             els.toolbar.style.left = `${Math.max(10, Math.min(window.innerWidth - els.toolbar.offsetWidth - 10, rect.left + window.scrollX + (rect.width / 2) - (els.toolbar.offsetWidth / 2)))}px`;
         };
         document.addEventListener('selectionchange', updateToolbar);
 
-        const renderFontOptions = (target, container) => {
-            container.innerHTML = GOOGLE_FONTS.map(f => `<div onclick="window.setStudioFont('${target}', '${f}')" class="p-4 hover:bg-white/10 rounded-xl cursor-pointer text-[10px] font-bold uppercase tracking-widest flex justify-between items-center group text-left">${f} <span style="font-family: '${f}', sans-serif" class="text-[16px] normal-case opacity-40 group-hover:opacity-100">Aa</span></div>`).join('');
-        };
-
-        ['title', 'body'].forEach(prefix => {
-            const search = els[`${prefix}FontSearch`]; const results = els[`${prefix}FontResults`];
-            search.addEventListener('focus', () => { results.classList.remove('hidden'); renderFontOptions(prefix, results); });
-            search.addEventListener('input', (e) => {
-                const term = e.target.value.toLowerCase(); const filtered = GOOGLE_FONTS.filter(f => f.toLowerCase().includes(term));
-                results.innerHTML = filtered.map(f => `<div onclick="window.setStudioFont('${prefix}', '${f}')" class="p-4 hover:bg-white/10 rounded-xl cursor-pointer text-[10px] font-bold uppercase tracking-widest flex justify-between items-center group text-left">${f} <span style="font-family: '${f}', sans-serif" class="text-[16px] normal-case opacity-40 group-hover:opacity-100">Aa</span></div>`).join('');
-            });
-        });
-
-        window.setStudioFont = (target, font) => { state.theme[`${target}Font`] = font; els[`${target}FontResults`].classList.add('hidden'); syncUI(); };
-
-        const loadTemplates = () => {
-            const custom = JSON.parse(localStorage.getItem('studio_templates_v5') || '{}'); const all = { ...PRESETS, ...custom };
-            els.tplList.innerHTML = Object.entries(all).map(([name, t]) => `<button onclick="window.applyTpl('${name}')" class="w-full p-4 glass rounded-xl text-left hover:bg-white/10 flex justify-between items-center group transition-all"><span class="text-[10px] font-black uppercase tracking-[0.2em] text-white/60 group-hover:text-white">${name}</span><div class="flex gap-2"><div class="w-3 h-3 rounded-full" style="background:${t.bg}"></div><div class="w-3 h-3 rounded-full" style="background:${t.text}"></div></div></button>`).join('');
-            window.applyTpl = (name) => { state.theme = { ...all[name] }; syncUI(); };
-        };
-
         async function processFiles(files) {
             const list = Array.from(files).filter(f => f.type.startsWith('video/') || f.type.startsWith('image/')); if (!list.length) return;
-            els.dropZone.innerHTML = `<div class="text-[10px] font-black uppercase tracking-[0.5em] animate-pulse">Scanning Session Assets...</div>`;
             for (const file of list) {
                 if (file.type.startsWith('video/')) {
                     const thumb = await generateVideoThumbnail(file);
-                    state.items.push({ id: Math.random().toString(36).substr(2, 9), type: 'video', original: file, playbackUrl: URL.createObjectURL(file), display: thumb.url, w: thumb.w, h: thumb.h, name: file.name });
+                    state.items.push({ id: Math.random().toString(36).substr(2,9), type: 'video', original: file, playbackUrl: URL.createObjectURL(file), display: thumb.url, w: thumb.w, h: thumb.h, name: file.name });
                 } else {
                     const preview = await createFastPreview(file);
                     const img = new Image(); img.src = preview; await img.decode();
-                    state.items.push({ id: Math.random().toString(36).substr(2, 9), type: 'image', original: file, display: preview, w: img.width, h: img.height, name: file.name });
+                    state.items.push({ id: Math.random().toString(36).substr(2,9), type: 'image', original: file, display: preview, w: img.width, h: img.height, name: file.name });
                 }
             }
-            renderGrid(); els.setup.classList.add('hidden'); els.view.classList.remove('hidden');
+            renderGrid(); document.getElementById('setup-view').classList.add('hidden'); document.getElementById('gallery-view').classList.remove('hidden');
         }
 
         async function generateVideoThumbnail(file) {
             return new Promise((resolve, reject) => {
                 const video = document.createElement('video'); video.src = URL.createObjectURL(file); video.preload = 'metadata';
                 video.onloadedmetadata = () => { video.currentTime = 1; video.onseeked = () => {
-                    try {
-                        const canvas = document.createElement('canvas'); const scale = 800 / Math.max(video.videoWidth, video.videoHeight);
-                        canvas.width = video.videoWidth * scale; canvas.height = video.videoHeight * scale;
-                        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-                        resolve({ url: canvas.toDataURL('image/jpeg', 0.5), w: video.videoWidth, h: video.videoHeight });
-                    } catch(err) { reject(err); }
+                    const canvas = document.createElement('canvas'); const scale = 800 / Math.max(video.videoWidth, video.videoHeight);
+                    canvas.width = video.videoWidth * scale; canvas.height = video.videoHeight * scale;
+                    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+                    resolve({ url: canvas.toDataURL('image/jpeg', 0.5), w: video.videoWidth, h: video.videoHeight });
                 };};
-                video.onerror = (e) => reject(e);
             });
         }
 
         async function createFastPreview(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.onload = () => {
+            return new Promise((resolve) => {
+                const reader = new FileReader(); reader.onload = (e) => {
+                    const img = new Image(); img.onload = () => {
                         const canvas = document.createElement('canvas'); const scale = 800 / Math.max(img.width, img.height);
                         canvas.width = img.width * scale; canvas.height = img.height * scale;
                         canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
                         resolve(canvas.toDataURL('image/jpeg', 0.45));
-                    };
-                    img.onerror = (e) => reject(e);
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        async function processProduction(blob) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas'); const maxDim = 2048; const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
-                        canvas.width = img.width * scale; canvas.height = img.height * scale;
-                        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-                        canvas.toBlob((b) => b ? resolve(b) : reject('Blob failed'), 'image/jpeg', 0.7);
-                    };
-                    img.onerror = (e) => reject(e);
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(blob);
+                    }; img.src = e.target.result;
+                }; reader.readAsDataURL(file);
             });
         }
 
         function renderGrid() {
-            els.grid.innerHTML = state.items.map(i => `<div class="item group" id="item-${i.id}"><a href="${i.type === 'image' ? i.display : i.playbackUrl}" data-pswp-type="${i.type}" data-pswp-width="${i.w}" data-pswp-height="${i.h}"><img src="${i.display}" class="w-full h-auto block group-hover:scale-110 transition-transform duration-[2s]">${i.type === 'video' ? '<div class="video-play-hint"><i data-lucide="play" class="w-10 h-10 text-white fill-current opacity-50"></i></div>' : ''}</a><div class="delete-overlay absolute top-2 right-2 md:top-4 md:right-4"><button onclick="window.deleteItem('${i.id}')" class="p-3 bg-red-500/80 hover:bg-red-500 text-white rounded-xl active:scale-90 shadow-2xl transition-all"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div></div>`).join('');
+            els.grid.innerHTML = state.items.map(i => `<div class="item group"><a href="${i.type === 'image' ? i.display : i.playbackUrl}" data-pswp-type="${i.type}" data-pswp-width="${i.w}" data-pswp-height="${i.h}"><img src="${i.display}" class="w-full h-auto block transition-transform duration-[2s] group-hover:scale-110">${i.type === 'video' ? '<div class="video-play-hint"><i data-lucide="play" class="w-10 h-10 text-white fill-current opacity-50"></i></div>' : ''}</a><button onclick="window.del('${i.id}')" class="delete-overlay glass p-3 rounded-xl text-white shadow-2xl active:scale-90 transition-all"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`).join('');
             lucide.createIcons(); initLightbox();
         }
 
-        window.deleteItem = (id) => { if (confirm("Remove asset?")) { state.items = state.items.filter(i => i.id !== id); renderGrid(); } };
-
-        els.toggle.onclick = () => document.body.classList.add('sidebar-open');
-        els.close.onclick = () => document.body.classList.remove('sidebar-open');
+        window.del = (id) => { if (confirm("Remove asset?")) { state.items = state.items.filter(i => i.id !== id); renderGrid(); } };
+        els.toggle.onclick = () => document.body.classList.toggle('sidebar-open');
+        els.drop.onclick = () => els.input.click();
+        els.addMore.onclick = () => els.input.click();
+        els.input.onchange = (e) => processFiles(e.target.files);
         els.helpTrigger.onclick = () => els.helpModal.classList.add('open');
-        els.helpClose.onclick = () => els.helpModal.classList.remove('open');
-        els.dropZone.onclick = () => els.fileInput.click();
-        els.fileInput.onchange = (e) => processFiles(e.target.files);
-        document.getElementById('add-more').onclick = () => els.fileInput.click();
-
-        els.bgColor.oninput = (e) => { state.theme.bg = e.target.value; applyTheme(); };
-        els.textColor.oninput = (e) => { state.theme.text = e.target.value; applyTheme(); };
-        els.accentColor.oninput = (e) => { state.theme.accent = e.target.value; applyTheme(); };
-        els.gap.oninput = (e) => { state.theme.gap = e.target.value + 'rem'; applyTheme(); };
-        els.titleTracking.oninput = (e) => { state.theme.titleTracking = e.target.value + 'em'; applyTheme(); };
-        els.titleLH.oninput = (e) => { state.theme.titleLH = e.target.value; applyTheme(); };
-        els.bodyTracking.oninput = (e) => { state.theme.bodyTracking = e.target.value + 'em'; applyTheme(); };
-        els.bodyLH.oninput = (e) => { state.theme.bodyLH = e.target.value; applyTheme(); };
-        els.downloadType.onchange = (e) => { state.settings.downloadType = e.target.value; syncUI(); };
-        els.externalUrl.oninput = (e) => { state.settings.externalUrl = e.target.value; };
 
         els.faviconInput.onchange = (e) => {
-            const f = e.target.files[0]; if (f) { state.favicon = f; const u = URL.createObjectURL(f); els.faviconPreviewImg.src = u; document.getElementById('app-favicon').href = u; document.getElementById('menu-icon-img').src = u; }
+            const f = e.target.files[0]; if (f) { state.favicon = f; const u = URL.createObjectURL(f); els.favPreview.src = u; document.getElementById('app-favicon').href = u; }
         };
 
-        els.downloadFull.onclick = async () => {
-            if (state.settings.downloadType === 'link' && state.settings.externalUrl) { window.open(state.settings.externalUrl, '_blank'); return; }
-            const zip = new JSZip(); els.downloadFull.innerText = "Processing originals...";
-            for (const i of state.items) { try { const d = i.type === 'image' ? await processProduction(i.original) : i.original; zip.file(i.name, d); } catch(e) { console.error(e); } }
-            const c = await zip.generateAsync({ type: "blob" }); const link = document.createElement('a'); link.href = URL.createObjectURL(c); link.download = `${els.clientName.innerText.trim() || 'Gallery'}.zip`; link.click();
-            els.downloadFull.innerHTML = '<i data-lucide="arrow-down-to-line" class="w-5 h-5 pointer-events-none"></i> Download Session';
+        els.saveTpl.onclick = () => {
+            const n = prompt("Name:"); if (n) { const s = JSON.parse(localStorage.getItem('video_studio_templates_v1') || '{}'); s[n] = { ...state.theme }; localStorage.setItem('video_studio_templates_v1', JSON.stringify(s)); loadTpls(); }
         };
 
-        els.bakeBtn.onclick = async () => {
+        async function processProduction(blob) {
+            return new Promise((resolve) => {
+                const reader = new FileReader(); reader.onload = (e) => {
+                    const img = new Image(); img.onload = () => {
+                        const canvas = document.createElement('canvas'); const max = 2048; const s = Math.min(1, max / Math.max(img.width, img.height));
+                        canvas.width = img.width * s; canvas.height = img.height * s; canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                        canvas.toBlob(b => resolve(b), 'image/jpeg', 0.7);
+                    }; img.src = e.target.result;
+                }; reader.readAsDataURL(blob);
+            });
+        }
+
+        els.bake.onclick = async () => {
             const zip = new JSZip(); const client = els.clientName.innerHTML; const sub = els.eventDate.innerHTML;
-            els.bakeBtn.innerText = "BAKING..."; const mediaFolder = zip.folder("media");
+            els.bake.innerText = "Processing Assets..."; const mediaFolder = zip.folder("media");
             for (let i = 0; i < state.items.length; i++) {
-                try {
-                    const item = state.items[i];
-                    const data = item.type === 'image' ? await processProduction(item.original) : item.original;
-                    mediaFolder.file(`asset-${i+1}.${item.type === 'image' ? 'jpg' : 'mp4'}`, data);
-                    if (item.type === 'video') { const tBlob = await (await fetch(item.display)).blob(); mediaFolder.file(`asset-${i+1}-thumb.jpg`, tBlob); }
-                } catch(e) { console.warn("Failed asset, skipping", e); }
+                const item = state.items[i];
+                const data = item.type === 'image' ? await processProduction(item.original) : item.original;
+                mediaFolder.file(`asset-${i+1}.${item.type === 'image' ? 'jpg' : 'mp4'}`, data);
+                if (item.type === 'video') {
+                    const tBlob = await (await fetch(item.display)).blob();
+                    mediaFolder.file(`asset-${i+1}-thumb.jpg`, tBlob);
+                }
             }
-            let fav = state.favicon || await (await fetch('favicon.png')).blob(); zip.file("favicon.png", fav);
-            const dlUI = state.settings.downloadType === 'link' ? `<a href="${state.settings.externalUrl}" target="_blank" class="btn px-10 py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.3em] inline-block shadow-2xl">Download Session</a>` : '';
-            const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><title>Portfolio</title><link rel="icon" href="favicon.png"><script src="https://cdn.tailwindcss.com"><\/script><style>:root { --bg: ${state.theme.bg}; --text: ${state.theme.text}; --accent: ${state.theme.accent}; } body { background: var(--bg); color: var(--text); font-family: sans-serif; overflow-x: hidden; } .masonry { column-gap: ${state.theme.gap}; columns: 1; padding: 2rem; max-width: 1600px; margin: 0 auto; } @media (min-width: 640px) { .masonry { columns: 2; } } @media (min-width: 1024px) { .masonry { columns: 3; } } @media (min-width: 1536px) { .masonry { columns: 4; } } .item { break-inside: avoid; margin-bottom: ${state.theme.gap}; border-radius: 12px; overflow: hidden; background: #111; position: relative; cursor: pointer; } .btn { background: var(--accent); color: var(--bg); text-decoration: none !important; font-weight:900; } a { color: inherit; text-decoration: underline; } .v-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; display: none; align-items: center; justify-content: center; } .v-overlay.active { display: flex; }</style></head><body><div id="v-player" class="v-overlay" onclick="this.classList.remove('active'); document.querySelector('video').pause();"><video controls style="max-width: 90%; max-height: 90%;"></video></div><div id="i-player" class="v-overlay" onclick="this.classList.remove('active');"><img style="max-width: 90%; max-height: 90%;"></div><header style="padding: 8rem 2rem; max-width: 1600px; margin: 0 auto; text-align: left;"><h1 style="font-family: '${state.theme.titleFont}', sans-serif; font-size: clamp(3rem, 10vw, 9rem); font-weight: 300; letter-spacing: ${state.theme.titleTracking}; margin-bottom: 2rem; line-height: ${state.theme.titleLH}; text-align: left;">${client}</h1><div style="font-family: '${state.theme.bodyFont}', sans-serif; font-size: clamp(10px, 2vw, 13px); font-weight: 800; text-transform: uppercase; letter-spacing: ${state.theme.bodyTracking}; line-height: ${state.theme.bodyLH}; opacity: 0.4; text-align: left; max-width: 800px;">${sub}</div><div style="margin-top: 5rem; text-align: left;">${dlUI}</div></header><div class="masonry">${state.items.map((it, i) => { const p = `media/asset-${i+1}.${it.type === 'image' ? 'jpg' : 'mp4'}`; const t = it.type === 'video' ? `media/asset-${i+1}-thumb.jpg` : p; return `<div class="item" onclick="if('${it.type}'==='image'){const pl=document.getElementById('i-player');pl.querySelector('img').src='${p}';pl.classList.add('active');}else{const pl=document.getElementById('v-player');pl.querySelector('video').src='${p}';pl.classList.add('active');pl.querySelector('video').play();}">${it.type === 'video' ? '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.2);z-index:10;"><svg width="40" height="40" viewBox="0 0 24 24" fill="white"><path d="M5 3l14 9-14 9V3z"/></svg></div>' : ''}<img src="${t}" style="width: 100%; height: auto; display: block;" loading="lazy"></div>`; }).join('')}</div></body></html>`;
+            // Robust Icon Extraction from Base64 or Blob
+            const getSafeBlob = async (source, imgId) => {
+                if (source instanceof Blob || source instanceof File) return source;
+                
+                const b64toBlob = (b64Data, contentType='', sliceSize=512) => {
+                    const byteCharacters = atob(b64Data);
+                    const byteArrays = [];
+                    for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+                        const slice = byteCharacters.slice(offset, offset + sliceSize);
+                        const byteNumbers = new Array(slice.length);
+                        for (let i = 0; i < slice.length; i++) { byteNumbers[i] = slice.charCodeAt(i); }
+                        const byteArray = new Uint8Array(byteNumbers);
+                        byteArrays.push(byteArray);
+                    }
+                    return new Blob(byteArrays, {type: contentType});
+                };
+
+                try {
+                    const img = document.getElementById(imgId);
+                    if (img && img.naturalWidth > 0) {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.naturalWidth;
+                        canvas.height = img.naturalHeight;
+                        canvas.getContext('2d').drawImage(img, 0, 0);
+                        const dataUrl = canvas.toDataURL('image/png');
+                        if (dataUrl.length > 100) return b64toBlob(dataUrl.split(',')[1], 'image/png');
+                    }
+                } catch (e) {}
+
+                try {
+                    const resp = await fetch(source);
+                    if (resp.ok) return await resp.blob();
+                } catch (e) {}
+
+                return new Blob([new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0, 1, 0, 0, 0, 1, 8, 6, 0, 0, 0, 31, 21, 196, 137, 0, 0, 0, 10, 73, 68, 65, 84, 120, 156, 99, 0, 1, 0, 0, 5, 0, 1, 13, 10, 45, 180, 0, 0, 0, 0, 73, 69, 78, 68, 174, 66, 96, 130])], {type:'image/png'});
+            };
+
+            const userFavicon = await getSafeBlob(state.favicon || 'favicon.png', 'favicon-preview-img');
+            zip.file("favicon.png", userFavicon);
+            
+            const seasideLogo = await getSafeBlob('../icon.png', 'footer-logo-preview');
+            zip.file("icon.png", seasideLogo);
+
+            const dlUI = state.settings.downloadType === 'link' ? `<a href="${state.settings.externalUrl}" target="_blank" class="btn-primary px-12 py-5 text-[11px] uppercase tracking-[0.3em] inline-block shadow-2xl">Download Session</a>` : '';
+
+            const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${els.clientName.innerText || 'Portfolio'}</title>
+    <link rel="icon" href="favicon.png">
+    <script src="https://cdn.tailwindcss.com"><\/script>
+    <style>
+        :root { 
+            --bg: ${state.theme.bg}; 
+            --text: ${state.theme.text}; 
+            --subtitle: ${state.theme.subtitle};
+            --accent: ${state.theme.accent}; 
+            --item-gap: ${state.theme.gap};
+        }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; overflow-x: hidden; text-align: center; }
+        .masonry { column-gap: var(--item-gap); columns: 1; padding: 1.5rem; max-width: 1600px; margin: 0 auto; }
+        @media (min-width: 768px) { .masonry { columns: 3; padding: 4rem; } }
+        .item { break-inside: avoid; margin-bottom: var(--item-gap); border-radius: 12px; overflow: hidden; background: #111; position: relative; cursor: pointer; }
+        .btn-primary { 
+            background: var(--accent); color: var(--bg); text-decoration: none !important; font-weight: 900; border-radius: 12px; 
+            letter-spacing: ${state.theme.buttonTracking}; line-height: ${state.theme.buttonLH}; font-size: calc(11px * ${state.theme.buttonSize});
+        }
+        .v-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; display: none; align-items: center; justify-content: center; }
+        .v-overlay.active { display: flex; }
+        header { padding: 10rem 2rem 6rem 2rem; max-width: 1400px; margin: 0 auto; }
+        .title-heading { 
+            font-family: '${state.theme.titleFont}', sans-serif; font-size: calc(clamp(3rem, 10vw, 9rem) * ${state.theme.titleSize}); 
+            letter-spacing: ${state.theme.titleTracking}; line-height: ${state.theme.titleLH}; margin-bottom: 2rem; 
+        }
+        .details { 
+            font-family: '${state.theme.bodyFont}', sans-serif; font-size: calc(clamp(10px, 2vw, 13px) * ${state.theme.bodySize}); 
+            letter-spacing: ${state.theme.bodyTracking}; line-height: ${state.theme.bodyLH}; color: var(--subtitle) !important;
+        }
+        footer a { text-decoration: none; color: inherit; }
+        footer a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div id="v-player" class="v-overlay" onclick="this.classList.remove('active'); document.querySelector('video').pause();"><video controls style="max-width: 90%; max-height: 90%;"></video></div>
+    <div id="i-player" class="v-overlay" onclick="this.classList.remove('active');"><img style="max-width: 90%; max-height: 90%;"></div>
+    
+    <header>
+        <h1 class="title-heading">${client}</h1>
+        <div class="details">${sub}</div>
+        <div style="margin-top: 5rem;">${dlUI}</div>
+    </header>
+
+    <div class="masonry">
+        ${state.items.map((it, i) => {
+            const p = `media/asset-${i+1}.${it.type === 'image' ? 'jpg' : 'mp4'}`;
+            const t = it.type === 'video' ? `media/asset-${i+1}-thumb.jpg` : p;
+            return `<div class="item" onclick="if('${it.type}'==='image'){const pl=document.getElementById('i-player');pl.querySelector('img').src='${p}';pl.classList.add('active');}else{const pl=document.getElementById('v-player');pl.querySelector('video').src='${p}';pl.classList.add('active');pl.querySelector('video').play();}">${it.type === 'video' ? '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.2);z-index:10;"><svg width="40" height="40" viewBox="0 0 24 24" fill="white"><path d="M5 3l14 9-14 9V3z"/></svg></div>' : ''}<img src="${t}" style="width: 100%; height: auto; display: block;" loading="lazy"></div>`;
+        }).join('')}
+    </div>
+
+    <footer style="margin-top: 10rem; padding-bottom: 5rem; display: flex; flex-direction: column; align-items: center; gap: 3rem; opacity: 0.5;">
+        <a href="https://seasidebranding.com" target="_blank" style="display: flex; flex-direction: column; align-items: center; gap: 1rem; color: var(--text); text-decoration: none;">
+            <div style="width: 3rem; height: 3rem; background: rgba(255,255,255,0.05); border-radius: 1rem; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                <img src="icon.png" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <span style="font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5em;">Seaside Branding</span>
+        </a>
+        <div style="display: flex; gap: 2rem; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.2em; color: var(--text);">
+            <a href="https://seasidebranding.com/terms" target="_blank" style="opacity: 0.6; color: inherit;">Terms</a>
+            <a href="https://seasidebranding.com/privacy" target="_blank" style="opacity: 0.6; color: inherit;">Privacy</a>
+        </div>
+        <a href="https://seasidebranding.com/contact" target="_blank" class="btn-primary" style="padding: 1rem 2.5rem; font-size: 9px; letter-spacing: 0.1em;">Contact Us</a>
+    </footer>
+</body>
+</html>`;
+
             zip.file("index.html", html); const c = await zip.generateAsync({ type: "blob" });
-            const link = document.createElement('a'); link.href = URL.createObjectURL(c); link.download = "Seaside-Deployment.zip"; link.click();
-            els.bakeBtn.innerText = "Bake Studio Package";
+            const link = document.createElement('a'); link.href = URL.createObjectURL(c); link.download = "Seaside-Video-Session.zip"; link.click();
+            els.bake.innerText = "Bake Production Package";
         };
 
         let lightbox;
         function initLightbox() {
             if (lightbox) lightbox.destroy();
             lightbox = new PhotoSwipeLightbox({ gallery: '#gallery-grid', children: 'a', pswpModule: () => import('https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe-lightbox.esm.min.js') });
-            lightbox.addFilter('itemData', (itemData) => { return itemData; });
             lightbox.on('contentLoad', (e) => {
                 const { content } = e; if (content.data.type === 'video') {
                     e.preventDefault(); content.element = document.createElement('div'); content.element.className = 'pswp__video-container';
@@ -406,18 +720,9 @@
                     content.element.appendChild(video);
                 }
             });
-            lightbox.on('uiRegister', () => {
-                lightbox.pswp.ui.registerElement({
-                    name: 'download-button', order: 8, isButton: true, tagName: 'a', html: '<i data-lucide="download" class="w-5 h-5"></i>',
-                    onInit: (el, pswp) => {
-                        el.setAttribute('download', 'seaside-asset'); pswp.on('change', () => { el.href = pswp.currSlide.data.src; });
-                        setTimeout(() => lucide.createIcons(), 10);
-                    }
-                });
-            });
             lightbox.init();
         }
-        lucide.createIcons(); loadTemplates(); syncUI();
+        lucide.createIcons(); loadTpls(); syncUI();
     </script>
 </body>
 </html>
