@@ -11,10 +11,23 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        :root { --accent: #ffffff; --bg: #050505; --text: #ffffff; --item-gap: 1.5rem; --title-font: 'Inter'; --body-font: 'Inter'; --title-tracking: -0.05em; --title-lh: 1; --body-tracking: 0.2em; --body-lh: 1.5; }
+        :root { 
+            --accent: #ffffff; 
+            --bg: #050505; 
+            --text: #ffffff; 
+            --item-gap: 1.5rem; 
+            --title-font: 'Inter'; 
+            --body-font: 'Inter'; 
+            --button-font: 'Inter';
+            --title-tracking: -0.05em; 
+            --title-lh: 1; 
+            --body-tracking: 0.2em; 
+            --body-lh: 1.5; 
+        }
         body { background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; transition: background-color 0.4s ease, color 0.4s ease; text-align: center; }
         #client-name { font-family: var(--title-font), sans-serif; letter-spacing: var(--title-tracking); line-height: var(--title-lh); font-size: clamp(3rem, 12vw, 9rem); text-align: center; width: 100%; }
         #event-date { font-family: var(--body-font), sans-serif; letter-spacing: var(--body-tracking); line-height: var(--body-lh); text-align: center; width: 100%; }
+        #download-full { font-family: var(--button-font), sans-serif; }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
         #settings-sidebar { transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; position: fixed; top: 0; right: 0; height: 100%; z-index: 60; background: #080808; }
         @media (min-width: 640px) { #settings-sidebar { width: 440px; } }
@@ -37,6 +50,16 @@
         .item:hover .delete-overlay { opacity: 1; }
         a { text-decoration: underline; text-underline-offset: 4px; color: inherit; }
         #text-toolbar { position: absolute; display: none; z-index: 100; pointer-events: auto; }
+        .range-input { width: 100%; height: 4px; background: #222; border-radius: 2px; -webkit-appearance: none; }
+        .range-input::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: var(--accent); border-radius: 50%; cursor: pointer; }
+        .reset-btn { font-size: 8px; font-weight: 900; color: #444; text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.2s; }
+        .reset-btn:hover { color: #888; }
+        .toggle-switch { position: relative; display: inline-block; width: 34px; height: 20px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #222; transition: .4s; border-radius: 20px; }
+        .toggle-slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .toggle-slider { background-color: var(--accent); }
+        input:checked + .toggle-slider:before { transform: translateX(14px); background-color: var(--bg); }
     </style>
 </head>
 <body class="min-h-screen overflow-x-hidden selection:bg-white selection:text-black">
@@ -67,33 +90,79 @@
             <h2 class="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 text-left">Studio Engine</h2>
             <button onclick="document.body.classList.remove('sidebar-open')" class="text-white/20 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
         </div>
-        <div class="flex-1 overflow-y-auto custom-scrollbar space-y-12 text-left">
+        <div class="flex-1 overflow-y-auto custom-scrollbar space-y-12 text-left pb-20">
             <section>
                 <label class="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-600 mb-8 block underline underline-offset-8">Typography</label>
                 <div class="space-y-8">
                     <div>
                         <span class="text-[9px] font-bold text-neutral-500 uppercase block mb-4">Title Font</span>
-                        <input type="text" id="title-font-search" placeholder="Search..." class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white focus:outline-none">
+                        <input type="text" id="title-font-search" placeholder="Search Google Fonts..." class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white focus:outline-none">
                         <div id="title-font-results" class="font-search-results mt-2 glass rounded-xl hidden p-2 border border-white/5"></div>
+                        <div class="grid grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-[8px] text-neutral-600 uppercase block">Tracking</span>
+                                    <button onclick="resetFontAdj('titleTracking')" class="reset-btn">Reset</button>
+                                </div>
+                                <input type="range" id="title-tracking" min="-0.2" max="0.5" step="0.01" value="-0.05" class="range-input">
+                            </div>
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-[8px] text-neutral-600 uppercase block">Line Height</span>
+                                    <button onclick="resetFontAdj('titleLH')" class="reset-btn">Reset</button>
+                                </div>
+                                <input type="range" id="title-lh" min="0.5" max="2" step="0.1" value="1" class="range-input">
+                            </div>
+                        </div>
                     </div>
                     <div>
                         <span class="text-[9px] font-bold text-neutral-500 uppercase block mb-4">Body Font</span>
-                        <input type="text" id="body-font-search" placeholder="Search..." class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white focus:outline-none">
+                        <input type="text" id="body-font-search" placeholder="Search Google Fonts..." class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white focus:outline-none">
                         <div id="body-font-results" class="font-search-results mt-2 glass rounded-xl hidden p-2 border border-white/5"></div>
+                        <div class="grid grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-[8px] text-neutral-600 uppercase block">Tracking</span>
+                                    <button onclick="resetFontAdj('bodyTracking')" class="reset-btn">Reset</button>
+                                </div>
+                                <input type="range" id="body-tracking" min="0" max="1" step="0.01" value="0.2" class="range-input">
+                            </div>
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-[8px] text-neutral-600 uppercase block">Line Height</span>
+                                    <button onclick="resetFontAdj('bodyLH')" class="reset-btn">Reset</button>
+                                </div>
+                                <input type="range" id="body-lh" min="1" max="3" step="0.1" value="1.5" class="range-input">
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="text-[9px] font-bold text-neutral-500 uppercase block mb-4">Button Font</span>
+                        <input type="text" id="button-font-search" placeholder="Search Google Fonts..." class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white focus:outline-none">
+                        <div id="button-font-results" class="font-search-results mt-2 glass rounded-xl hidden p-2 border border-white/5"></div>
                     </div>
                 </div>
             </section>
+            
             <section>
                 <label class="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-600 mb-8 block underline underline-offset-8">Presets</label>
                 <div id="template-list" class="grid grid-cols-1 gap-3"></div>
                 <button id="save-tpl-btn" class="mt-6 w-full py-4 border border-white/5 rounded-xl text-[10px] font-bold uppercase tracking-widest text-white/40 hover:text-white hover:bg-white/5 transition-all">Save Session Style</button>
             </section>
+
             <section>
                 <label class="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-600 mb-8 block underline underline-offset-8">Branding</label>
                 <div class="grid grid-cols-3 gap-4 mb-8">
                     <div class="space-y-3 text-center"><span class="text-[9px] font-bold text-neutral-500 uppercase">Base</span><input type="color" id="bg-color" value="#050505" class="mx-auto block"></div>
                     <div class="space-y-3 text-center"><span class="text-[9px] font-bold text-neutral-500 uppercase">Text</span><input type="color" id="text-color" value="#ffffff" class="mx-auto block"></div>
                     <div class="space-y-3 text-center"><span class="text-[9px] font-bold text-neutral-500 uppercase">Accent</span><input type="color" id="accent-color" value="#ffffff" class="mx-auto block"></div>
+                </div>
+                <div class="mb-8">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-[9px] font-bold text-neutral-500 uppercase block">Gallery Gap</span>
+                        <button onclick="resetFontAdj('gap')" class="reset-btn">Reset</button>
+                    </div>
+                    <input type="range" id="gallery-gap" min="0" max="5" step="0.5" value="1.5" class="range-input">
                 </div>
                 <div class="p-8 glass rounded-2xl cursor-pointer hover:bg-white/5 relative group border-dashed border-white/10 text-center">
                     <input type="file" id="favicon-input" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
@@ -103,13 +172,36 @@
                     <span class="text-[10px] font-bold uppercase tracking-widest text-white/40 block">Change Favicon</span>
                 </div>
             </section>
+
+            <section>
+                <label class="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-600 mb-8 block underline underline-offset-8">Delivery</label>
+                <div class="space-y-8">
+                    <div>
+                        <span class="text-[9px] font-bold text-neutral-500 uppercase block mb-4">External Download URL</span>
+                        <input type="text" id="external-url" placeholder="https://..." class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white focus:outline-none">
+                        <p class="text-[8px] text-neutral-600 uppercase mt-2">The "Download All" button will link here in production.</p>
+                    </div>
+                    <div class="flex justify-between items-center glass p-5 rounded-2xl">
+                        <span class="text-[10px] font-bold text-white/60 uppercase tracking-widest">Show Download All Button</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="show-download-toggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </section>
         </div>
         <div class="pt-8 border-t border-white/10"><button id="bake-btn" class="w-full btn-primary py-6 text-[10px] font-black uppercase tracking-[0.5em]">Bake Production Package</button></div>
     </aside>
 
     <main id="app">
         <section id="setup-view" class="h-screen flex items-center justify-center p-8">
-            <div id="drop-zone" class="max-w-2xl w-full aspect-square glass rounded-[60px] flex flex-col items-center justify-center cursor-pointer hover:scale-[1.02] transition-all group px-6 text-center">
+            <div id="drop-zone" class="max-w-2xl w-full aspect-square glass rounded-[60px] flex flex-col items-center justify-center cursor-pointer hover:scale-[1.02] transition-all group px-6 text-center relative overflow-hidden">
+                <div id="import-status" class="absolute inset-0 bg-black/90 flex flex-col items-center justify-center z-10 hidden animate-in fade-in duration-300">
+                    <div class="w-16 h-16 border-4 border-white/10 border-t-white rounded-full animate-spin mb-8"></div>
+                    <h3 class="text-2xl font-light text-white mb-2 tracking-tighter">Processing Session</h3>
+                    <p id="import-progress-text" class="text-[10px] font-black uppercase tracking-[0.5em] text-neutral-500">Preparing Assets (0/0)</p>
+                </div>
                 <div class="w-20 h-20 bg-white rounded-3xl mb-8 flex items-center justify-center group-hover:rotate-12 transition-transform overflow-hidden p-4">
                     <img src="favicon.png" class="w-full h-full object-contain">
                 </div>
@@ -147,20 +239,26 @@
     <script type="module">
         import PhotoSwipeLightbox from 'https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe-lightbox.esm.min.js';
 
-        const GOOGLE_FONTS = ["Inter", "Playfair Display", "Montserrat", "Lora", "Oswald", "Roboto", "Prata", "Space Grotesk", "Syne", "Poppins", "Outfit", "Archivo"];
+        const POPULAR_FONTS = ["Inter", "Playfair Display", "Montserrat", "Lora", "Oswald", "Roboto", "Prata", "Space Grotesk", "Syne", "Poppins", "Outfit", "Archivo", "Cormorant Garamond", "Cinzel", "Bodoni Moda", "Quicksand", "Work Sans", "Bebas Neue", "Fira Sans", "Spectral", "Arvo", "Cardo", "Chivo", "Crimson Text", "DM Sans", "Domine", "Eczar", "Fraunces", "Heebo", "IBM Plex Sans", "Inconsolata", "Josefin Sans", "Kanit", "Karla", "Libre Baskerville", "Libre Franklin", "Manrope", "Merriweather", "Mukta", "Nanum Myeongjo", "Newsreader", "Noto Sans", "Nunito", "Open Sans", "PT Sans", "PT Serif", "Public Sans", "Raleway", "Rubik", "Sarabun", "Source Sans Pro", "Source Serif Pro", "Space Mono", "Ubuntu", "Vollkorn", "Zilla Slab"];
         
         const PRESETS = {
-            'Noir': { bg: '#050505', text: '#ffffff', accent: '#ffffff', titleFont: "Inter", bodyFont: "Inter", titleTracking: '-0.05em', titleLH: '1', bodyTracking: '0.2em', bodyLH: '1.5', gap: '1.5rem' },
-            'Nordic': { bg: '#f0f0f0', text: '#222222', accent: '#000000', titleFont: "Montserrat", bodyFont: "Montserrat", titleTracking: '0.1em', titleLH: '1.2', bodyTracking: '0.15em', bodyLH: '1.8', gap: '2rem' },
-            'Solaris': { bg: '#fffaf0', text: '#4a3728', accent: '#c0a080', titleFont: "Playfair Display", bodyFont: "Lora", titleTracking: '0em', titleLH: '1.1', bodyTracking: '0.1em', bodyLH: '1.6', gap: '3rem' },
-            'Vogue': { bg: '#ffffff', text: '#000000', accent: '#000000', titleFont: "Prata", bodyFont: "Inter", titleTracking: '0em', titleLH: '0.9', bodyTracking: '0.1em', bodyLH: '1.4', gap: '0.5rem' },
-            'Cyber': { bg: '#080c10', text: '#00ffcc', accent: '#00ffcc', titleFont: "Space Grotesk", bodyFont: "Inter", titleTracking: '-0.02em', titleLH: '1', bodyTracking: '0.25em', bodyLH: '1.5', gap: '1.5rem' },
-            'Brutalist': { bg: '#ffffff', text: '#000000', accent: '#ff3e00', titleFont: "Archivo", bodyFont: "Archivo", titleTracking: '-0.05em', titleLH: '0.8', bodyTracking: '0em', bodyLH: '1.2', gap: '0rem' },
-            'Minimalist': { bg: '#1a1a1a', text: '#a0a0a0', accent: '#ffffff', titleFont: "Inter", bodyFont: "Inter", titleTracking: '0.05em', titleLH: '1.5', bodyTracking: '0.1em', bodyLH: '2', gap: '2rem' },
-            'Deep Ocean': { bg: '#001219', text: '#94d2bd', accent: '#ee9b00', titleFont: "Syne", bodyFont: "Inter", titleTracking: '0em', titleLH: '1.1', bodyTracking: '0.4em', bodyLH: '1.6', gap: '1.5rem' }
+            'Noir': { bg: '#050505', text: '#ffffff', accent: '#ffffff', titleFont: "Inter", bodyFont: "Inter", buttonFont: "Inter", titleTracking: '-0.05em', titleLH: '1', bodyTracking: '0.2em', bodyLH: '1.5', gap: '1.5rem' },
+            'Nordic': { bg: '#f0f0f0', text: '#222222', accent: '#000000', titleFont: "Montserrat", bodyFont: "Montserrat", buttonFont: "Montserrat", titleTracking: '0.1em', titleLH: '1.2', bodyTracking: '0.15em', bodyLH: '1.8', gap: '2rem' },
+            'Solaris': { bg: '#fffaf0', text: '#4a3728', accent: '#c0a080', titleFont: "Playfair Display", bodyFont: "Lora", buttonFont: "Lora", titleTracking: '0em', titleLH: '1.1', bodyTracking: '0.1em', bodyLH: '1.6', gap: '3rem' },
+            'Vogue': { bg: '#ffffff', text: '#000000', accent: '#000000', titleFont: "Prata", bodyFont: "Inter", buttonFont: "Inter", titleTracking: '0em', titleLH: '0.9', bodyTracking: '0.1em', bodyLH: '1.4', gap: '0.5rem' },
+            'Cyber': { bg: '#080c10', text: '#00ffcc', accent: '#00ffcc', titleFont: "Space Grotesk", bodyFont: "Inter", buttonFont: "Space Grotesk", titleTracking: '-0.02em', titleLH: '1', bodyTracking: '0.25em', bodyLH: '1.5', gap: '1.5rem' },
+            'Brutalist': { bg: '#ffffff', text: '#000000', accent: '#ff3e00', titleFont: "Archivo", bodyFont: "Archivo", buttonFont: "Archivo", titleTracking: '-0.05em', titleLH: '0.8', bodyTracking: '0em', bodyLH: '1.2', gap: '0rem' },
+            'Minimalist': { bg: '#1a1a1a', text: '#a0a0a0', accent: '#ffffff', titleFont: "Inter", bodyFont: "Inter", buttonFont: "Inter", titleTracking: '0.05em', titleLH: '1.5', bodyTracking: '0.1em', bodyLH: '2', gap: '2rem' },
+            'Deep Ocean': { bg: '#001219', text: '#94d2bd', accent: '#ee9b00', titleFont: "Syne", bodyFont: "Inter", buttonFont: "Syne", titleTracking: '0em', titleLH: '1.1', bodyTracking: '0.4em', bodyLH: '1.6', gap: '1.5rem' }
         };
 
-        const state = { items: [], favicon: null, theme: { ...PRESETS['Noir'] }, settings: { downloadType: 'zip', externalUrl: '' } };
+        const state = { 
+            items: [], 
+            favicon: null, 
+            theme: { ...PRESETS['Noir'] }, 
+            externalUrl: '',
+            showDownloadBtn: true
+        };
 
         const els = {
             toggle: document.getElementById('toggle-settings'), sidebar: document.getElementById('settings-sidebar'), grid: document.getElementById('gallery-grid'),
@@ -169,49 +267,121 @@
             clientName: document.getElementById('client-name'), eventDate: document.getElementById('event-date'),
             tSearch: document.getElementById('title-font-search'), tRes: document.getElementById('title-font-results'),
             bSearch: document.getElementById('body-font-search'), bRes: document.getElementById('body-font-results'),
+            btnSearch: document.getElementById('button-font-search'), btnRes: document.getElementById('button-font-results'),
             faviconInput: document.getElementById('favicon-input'), favPreview: document.getElementById('favicon-preview-img'), 
-            tplList: document.getElementById('template-list'), saveTpl: document.getElementById('save-tpl-btn'), toolbar: document.getElementById('text-toolbar')
+            tplList: document.getElementById('template-list'), saveTpl: document.getElementById('save-tpl-btn'), toolbar: document.getElementById('text-toolbar'),
+            bgColor: document.getElementById('bg-color'), textColor: document.getElementById('text-color'), accentColor: document.getElementById('accent-color'),
+            tTracking: document.getElementById('title-tracking'), tLH: document.getElementById('title-lh'),
+            bTracking: document.getElementById('body-tracking'), bLH: document.getElementById('body-lh'),
+            galleryGap: document.getElementById('gallery-gap'), externalUrl: document.getElementById('external-url'),
+            showDlToggle: document.getElementById('show-download-toggle'),
+            importStatus: document.getElementById('import-status'),
+            importProgressText: document.getElementById('import-progress-text')
         };
 
         const applyTheme = () => {
             const r = document.documentElement;
-            r.style.setProperty('--bg', state.theme.bg); r.style.setProperty('--text', state.theme.text);
-            r.style.setProperty('--accent', state.theme.accent); r.style.setProperty('--item-gap', state.theme.gap);
-            r.style.setProperty('--title-font', state.theme.titleFont); r.style.setProperty('--body-font', state.theme.bodyFont);
-            [state.theme.titleFont, state.theme.bodyFont].forEach(f => {
-                if (!document.getElementById(`f-${f}`)) {
-                    const l = document.createElement('link'); l.id=`f-${f}`; l.rel='stylesheet';
-                    l.href=`https://fonts.googleapis.com/css2?family=${f.replace(/\s+/g,'+')}:wght@300;400;700;800&display=swap`;
+            r.style.setProperty('--bg', state.theme.bg); 
+            r.style.setProperty('--text', state.theme.text);
+            r.style.setProperty('--accent', state.theme.accent); 
+            r.style.setProperty('--item-gap', state.theme.gap);
+            r.style.setProperty('--title-font', state.theme.titleFont); 
+            r.style.setProperty('--body-font', state.theme.bodyFont);
+            r.style.setProperty('--button-font', state.theme.buttonFont || state.theme.bodyFont);
+            r.style.setProperty('--title-tracking', state.theme.titleTracking);
+            r.style.setProperty('--title-lh', state.theme.titleLH);
+            r.style.setProperty('--body-tracking', state.theme.bodyTracking);
+            r.style.setProperty('--body-lh', state.theme.bodyLH);
+
+            [state.theme.titleFont, state.theme.bodyFont, state.theme.buttonFont].filter(Boolean).forEach(f => {
+                const id = `f-${f.replace(/\s+/g,'-')}`;
+                if (!document.getElementById(id)) {
+                    const l = document.createElement('link'); l.id = id; l.rel = 'stylesheet';
+                    l.href = `https://fonts.googleapis.com/css2?family=${f.replace(/\s+/g,'+')}:wght@300;400;500;600;700;800&display=swap`;
                     document.head.appendChild(l);
                 }
             });
         };
 
-        const syncUI = () => { applyTheme(); };
+        const syncUI = () => { 
+            els.bgColor.value = state.theme.bg;
+            els.textColor.value = state.theme.text;
+            els.accentColor.value = state.theme.accent;
+            els.tTracking.value = parseFloat(state.theme.titleTracking);
+            els.tLH.value = state.theme.titleLH;
+            els.bTracking.value = parseFloat(state.theme.bodyTracking);
+            els.bLH.value = state.theme.bodyLH;
+            els.galleryGap.value = parseFloat(state.theme.gap);
+            els.showDlToggle.checked = state.showDownloadBtn;
+            els.tSearch.value = state.theme.titleFont;
+            els.bSearch.value = state.theme.bodyFont;
+            els.btnSearch.value = state.theme.buttonFont || state.theme.bodyFont;
+            applyTheme(); 
+        };
+
+        els.bgColor.oninput = (e) => { state.theme.bg = e.target.value; syncUI(); };
+        els.textColor.oninput = (e) => { state.theme.text = e.target.value; syncUI(); };
+        els.accentColor.oninput = (e) => { state.theme.accent = e.target.value; syncUI(); };
+        els.tTracking.oninput = (e) => { state.theme.titleTracking = e.target.value + 'em'; syncUI(); };
+        els.tLH.oninput = (e) => { state.theme.titleLH = e.target.value; syncUI(); };
+        els.bTracking.oninput = (e) => { state.theme.bodyTracking = e.target.value + 'em'; syncUI(); };
+        els.bLH.oninput = (e) => { state.theme.bodyLH = e.target.value; syncUI(); };
+        els.galleryGap.oninput = (e) => { state.theme.gap = e.target.value + 'rem'; syncUI(); };
+        els.externalUrl.oninput = (e) => { state.externalUrl = e.target.value; };
+        els.showDlToggle.onchange = (e) => { state.showDownloadBtn = e.target.checked; };
+
+        window.resetFontAdj = (prop) => {
+            const defaults = PRESETS['Noir'];
+            if (prop === 'gap') state.theme[prop] = defaults['gap'];
+            else state.theme[prop] = defaults[prop];
+            syncUI();
+        };
 
         const loadTpls = () => {
-            const custom = JSON.parse(localStorage.getItem('studio_templates_final_v2') || '{}');
+            const custom = JSON.parse(localStorage.getItem('studio_templates_final_v3') || '{}');
             const all = { ...PRESETS, ...custom };
             els.tplList.innerHTML = Object.entries(all).map(([name, t]) => `<button onclick="window.applyTpl('${name}')" class="w-full p-4 glass rounded-xl text-left hover:bg-white/10 flex justify-between items-center group transition-all"><span class="text-[10px] font-black uppercase tracking-[0.2em] text-white/60 group-hover:text-white">${name}</span><div class="flex gap-2"><div class="w-3 h-3 rounded-full" style="background:${t.bg}"></div><div class="w-3 h-3 rounded-full" style="background:${t.text}"></div></div></button>`).join('');
             window.applyTpl = (name) => { state.theme = { ...all[name] }; syncUI(); };
         };
 
-        const renderFonts = (t, res) => {
-            res.innerHTML = GOOGLE_FONTS.map(f => `<div onclick="window.setFont('${t}','${f}')" class="p-4 hover:bg-white/10 rounded-xl cursor-pointer text-[10px] font-bold uppercase tracking-widest flex justify-between items-center group">${f} <span style="font-family:'${f}'" class="normal-case opacity-40 group-hover:opacity-100 text-[16px]">Aa</span></div>`).join('');
+        const renderFontItem = (type, font) => `<div onclick="window.setFont('${type}','${font}')" class="p-4 hover:bg-white/10 rounded-xl cursor-pointer text-[10px] font-bold uppercase tracking-widest flex justify-between items-center group">${font} <span style="font-family:'${font}'" class="normal-case opacity-40 group-hover:opacity-100 text-[16px]">Aa</span></div>`;
+
+        const updateFontSearch = (type, term) => {
+            const res = els[type === 'button' ? 'btnRes' : type[0]+'Res'];
+            const filtered = POPULAR_FONTS.filter(f => f.toLowerCase().includes(term.toLowerCase())).slice(0, 15);
+            let html = filtered.map(f => renderFontItem(type, f)).join('');
+            
+            if (term && !POPULAR_FONTS.some(f => f.toLowerCase() === term.toLowerCase())) {
+                html = `<div onclick="window.setFont('${type}','${term}')" class="p-4 bg-white/5 hover:bg-white/10 rounded-xl cursor-pointer text-[10px] font-black uppercase tracking-widest flex justify-between items-center group border border-white/10 mb-2">Try Custom: ${term} <i data-lucide="arrow-right" class="w-3 h-3"></i></div>` + html;
+            }
+            
+            res.innerHTML = html || `<p class="p-4 text-[9px] uppercase tracking-widest opacity-20">No matching fonts...</p>`;
+            lucide.createIcons();
         };
 
-        ['title', 'body'].forEach(p => {
-            const s = els[p[0]+'Search']; const r = els[p[0]+'Res'];
-            s.onfocus = () => { r.classList.remove('hidden'); renderFonts(p, r); };
-            s.oninput = (e) => {
-                const term = e.target.value.toLowerCase(); const filtered = GOOGLE_FONTS.filter(f => f.toLowerCase().includes(term));
-                r.innerHTML = filtered.map(f => `<div onclick="window.setFont('${p}','${f}')" class="p-4 hover:bg-white/10 rounded-xl cursor-pointer text-[10px] font-bold uppercase tracking-widest flex justify-between items-center group">${f} <span style="font-family:'${f}'" class="normal-case opacity-40 group-hover:opacity-100 text-[16px]">Aa</span></div>`).join('');
-            };
+        ['title', 'body', 'button'].forEach(p => {
+            const s = els[p === 'button' ? 'btnSearch' : p[0]+'Search']; 
+            const r = els[p === 'button' ? 'btnRes' : p[0]+'Res'];
+            s.onfocus = () => { r.classList.remove('hidden'); updateFontSearch(p, s.value); };
+            s.oninput = (e) => updateFontSearch(p, e.target.value);
+            document.addEventListener('click', (e) => { if (!s.contains(e.target) && !r.contains(e.target)) r.classList.add('hidden'); });
         });
 
-        window.setFont = (t, f) => { state.theme[t+'Font'] = f; els[t[0]+'Res'].classList.add('hidden'); syncUI(); };
-        window.resetField = (f) => { state.theme[f] = PRESETS['Noir'][f]; syncUI(); };
-        window.formatText = (cmd) => { if (cmd === 'link') { const u = prompt("URL:"); if (u) document.execCommand('createLink', false, u); } else document.execCommand(cmd, false, null); };
+        window.setFont = (t, f) => { 
+            state.theme[t+'Font'] = f; 
+            els[t === 'button' ? 'btnRes' : t[0]+'Res'].classList.add('hidden'); 
+            els[t === 'button' ? 'btnSearch' : t[0]+'Search'].value = f;
+            syncUI(); 
+        };
+
+        window.formatText = (cmd) => { 
+            if (cmd === 'link') { 
+                const u = prompt("URL:"); 
+                if (u) document.execCommand('createLink', false, u); 
+            } else {
+                document.execCommand(cmd, false, null); 
+            }
+        };
 
         const updateToolbar = () => {
             const sel = window.getSelection(); if (!sel.rangeCount || sel.isCollapsed) { els.toolbar.style.display = 'none'; return; }
@@ -223,14 +393,21 @@
         document.addEventListener('selectionchange', updateToolbar);
 
         async function processFiles(files) {
-            const list = Array.from(files).filter(f => f.type.startsWith('image/')); if (!list.length) return;
-            for (const f of list) {
+            const list = Array.from(files).filter(f => f.type.startsWith('image/')); 
+            if (!list.length) return;
+            els.importStatus.classList.remove('hidden');
+            for (let i = 0; i < list.length; i++) {
+                const f = list[i];
+                els.importProgressText.innerText = `Preparing Assets (${i + 1}/${list.length})`;
                 try {
                     const url = URL.createObjectURL(f); const img = new Image(); img.src = url; await img.decode();
                     state.items.push({ id: Math.random().toString(36).substr(2,9), original: f, display: url, w: img.width, h: img.height, name: f.name });
                 } catch(e) {}
             }
-            render(); document.getElementById('setup-view').classList.add('hidden'); document.getElementById('gallery-view').classList.remove('hidden');
+            render(); 
+            document.getElementById('setup-view').classList.add('hidden'); 
+            document.getElementById('gallery-view').classList.remove('hidden');
+            els.importStatus.classList.add('hidden');
         }
 
         const render = () => {
@@ -249,7 +426,7 @@
         };
 
         els.saveTpl.onclick = () => {
-            const n = prompt("Name:"); if (n) { const s = JSON.parse(localStorage.getItem('studio_templates_final_v2') || '{}'); s[n] = { ...state.theme }; localStorage.setItem('studio_templates_final_v2', JSON.stringify(s)); loadTpls(); }
+            const n = prompt("Name:"); if (n) { const s = JSON.parse(localStorage.getItem('studio_templates_final_v3') || '{}'); s[n] = { ...state.theme }; localStorage.setItem('studio_templates_final_v3', JSON.stringify(s)); loadTpls(); }
         };
 
         async function compress(blob) {
@@ -273,12 +450,148 @@
                 }
                 let favData; try { favData = state.favicon || await (await fetch('favicon.png')).blob(); } catch(e) { favData = new Blob([], {type:'image/png'}); }
                 zip.file("favicon.png", favData);
-                const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="favicon.png"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe.min.css"><script src="https://cdn.tailwindcss.com"><\/script><style>:root { --bg: ${state.theme.bg}; --text: ${state.theme.text}; --accent: ${state.theme.accent}; } body { background: var(--bg); color: var(--text); font-family: sans-serif; overflow-x: hidden; text-align: center; } .masonry { column-gap: ${state.theme.gap}; columns: 1; padding: 2rem; max-width: 1600px; margin: 0 auto; } @media (min-width: 768px) { .masonry { columns: 3; padding: 8rem; } } .item { break-inside: avoid; margin-bottom: ${state.theme.gap}; border-radius: 8px; overflow: hidden; } .btn { background: var(--accent); color: var(--bg); text-decoration: none !important; font-weight:900; } .pswp__button--download { background: none !important; display: flex !important; align-items: center !important; justify-content: center !important; }</style></head><body><header style="padding: 12rem 2rem; max-width: 1600px; margin: 0 auto; text-align: center;"><h1 style="font-family: '${state.theme.titleFont}', sans-serif; font-size: clamp(3rem, 10vw, 9rem); font-weight: 300; letter-spacing: ${state.theme.titleTracking}; margin-bottom: 2rem; line-height: ${state.theme.titleLH}; text-align: center;">${client}</h1><div style="font-family: '${state.theme.bodyFont}', sans-serif; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: ${state.theme.bodyTracking}; line-height: ${state.theme.bodyLH}; opacity: 0.4;">${sub}</div></header><div id="gallery" class="masonry">${state.items.map((it, i) => `<div class="item"><a href="images/shot-${i+1}.jpg" data-pswp-width="${it.w}" data-pswp-height="${it.h}"><img src="images/shot-${i+1}.jpg" style="width: 100%; height: auto; display: block;" loading="lazy"></a></div>`).join('')}</div><script type="module">import PhotoSwipeLightbox from 'https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe-lightbox.esm.min.js'; const lb = new PhotoSwipeLightbox({ gallery: '#gallery', children: 'a', pswpModule: () => import('https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe.esm.min.js') }); lb.on('uiRegister', () => { lb.pswp.ui.registerElement({ name: 'download-button', order: 8, isButton: true, tagName: 'a', html: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>', onInit: (el, pswp) => { el.setAttribute('download', 'capture.jpg'); pswp.on('change', () => { el.href = pswp.currSlide.data.src; }); } }); }); lb.init();<\/script></body></html>`;
-                zip.file("index.html", html); const c = await zip.generateAsync({ type: "blob" }); const l = document.createElement('a'); l.href = URL.createObjectURL(c); l.download = "Seaside-Branding-Session.zip"; l.click();
-            } catch(e) {} finally { els.bake.innerText = "Bake Production Package"; }
+
+                const fontsToLoad = [...new Set([state.theme.titleFont, state.theme.bodyFont, state.theme.buttonFont])].filter(Boolean);
+                const fontLinks = fontsToLoad.map(f => `<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=${f.replace(/\s+/g,'+')}:wght@300;400;500;600;700;800&display=swap">`).join('\n');
+
+                const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${els.clientName.innerText || 'Gallery'}</title>
+    <link rel="icon" href="favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe.min.css">
+    ${fontLinks}
+    <script src="https://cdn.tailwindcss.com"><\/script>
+    <style>
+        :root { 
+            --bg: ${state.theme.bg}; 
+            --text: ${state.theme.text}; 
+            --accent: ${state.theme.accent}; 
+            --item-gap: ${state.theme.gap};
+            --title-font: '${state.theme.titleFont}', sans-serif;
+            --body-font: '${state.theme.bodyFont}', sans-serif;
+            --button-font: '${state.theme.buttonFont || state.theme.bodyFont}', sans-serif;
+        }
+        body { background: var(--bg); color: var(--text); font-family: var(--body-font); overflow-x: hidden; text-align: center; margin: 0; }
+        .masonry { column-gap: var(--item-gap); columns: 1; padding: 1.5rem; max-width: 1600px; margin: 0 auto; }
+        @media (min-width: 768px) { .masonry { columns: 3; padding: 4rem; } }
+        .item { break-inside: avoid; margin-bottom: var(--item-gap); border-radius: 8px; overflow: hidden; background: #111; }
+        .item img { width: 100%; height: auto; display: block; transition: transform 0.5s ease; }
+        .item:hover img { transform: scale(1.05); }
+        .btn-primary { 
+            background: var(--accent); 
+            color: var(--bg); 
+            text-decoration: none !important; 
+            font-weight: 900; 
+            border-radius: 12px; 
+            display: inline-block; 
+            transition: all 0.3s ease; 
+            cursor: pointer; 
+            border: none; 
+            font-family: var(--button-font);
+        }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-2px); }
+        .title-heading { 
+            font-family: var(--title-font) !important; 
+            font-size: clamp(4rem, 15vw, 11rem) !important; 
+            font-weight: 300 !important; 
+            letter-spacing: ${state.theme.titleTracking} !important; 
+            line-height: ${state.theme.titleLH} !important; 
+            margin: 0 0 2rem 0 !important; 
+            text-align: center !important;
+        }
+        .details { 
+            font-family: var(--body-font) !important; 
+            font-size: 13px !important; 
+            font-weight: 800 !important; 
+            text-transform: uppercase !important; 
+            letter-spacing: ${state.theme.bodyTracking} !important; 
+            line-height: ${state.theme.bodyLH} !important; 
+            opacity: 0.5 !important; 
+            text-align: center !important;
+        }
+        .details a { text-decoration: underline; color: inherit; }
+        header { padding: 10rem 2rem 6rem 2rem; max-width: 1400px; margin: 0 auto; text-align: center; }
+        footer { padding: 8rem 2rem; opacity: 0.3; font-size: 10px; letter-spacing: 0.2em; font-weight: 900; text-transform: uppercase; }
+        .pswp__button--download { background: none !important; display: flex !important; align-items: center !important; justify-content: center !important; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1 class="title-heading">${client}</h1>
+        <div class="details">${sub}</div>
+        ${(state.showDownloadBtn && state.externalUrl) ? `
+        <div style="margin-top: 4rem;">
+            <a href="${state.externalUrl}" target="_blank" class="btn-primary px-12 py-5 text-[11px] uppercase tracking-[0.3em]">Download All Photos</a>
+        </div>
+        ` : ''}
+    </header>
+
+    <div id="gallery" class="masonry">
+        ${state.items.map((it, i) => `
+        <div class="item">
+            <a href="images/shot-${i+1}.jpg" data-pswp-width="${it.w}" data-pswp-height="${it.h}" target="_blank">
+                <img src="images/shot-${i+1}.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>`).join('')}
+    </div>
+
+    <footer>Created by <a href="https://seasidebranding.com" target="_blank">Seaside Branding</a></footer>
+
+    <script type="module">
+        import PhotoSwipeLightbox from 'https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe-lightbox.esm.min.js';
+        const lightbox = new PhotoSwipeLightbox({
+            gallery: '#gallery',
+            children: 'a',
+            pswpModule: () => import('https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe.esm.min.js')
+        });
+        
+        lightbox.on('uiRegister', function() {
+            lightbox.pswp.ui.registerElement({
+                name: 'download-button',
+                order: 8,
+                isPrimary: true,
+                tagName: 'a',
+                html: '<svg aria-hidden="true" class="pswp__icn" viewBox="0 0 32 32" width="32" height="32"><path d="M20.5 14.3 17.1 18V10h-2.2v7.9l-3.4-3.6L10 15.8l6 6.2 6-6.2Z" fill="currentColor"/><path d="M24 24H8v-2h16Z" fill="currentColor"/></svg>',
+                onInit: (el, pswp) => {
+                    el.setAttribute('download', '');
+                    el.setAttribute('target', '_blank');
+                    pswp.on('change', () => {
+                        el.href = pswp.currSlide.data.src;
+                    });
+                }
+            });
+        });
+
+        lightbox.init();
+    <\/script>
+</body>
+</html>`;
+
+                zip.file("index.html", html);
+                const c = await zip.generateAsync({ type: "blob" });
+                const l = document.createElement('a');
+                l.href = URL.createObjectURL(c);
+                l.download = "Seaside-Branding-Session.zip";
+                l.click();
+            } catch(e) {
+                console.error(e);
+                alert("Baking failed. Check console.");
+            } finally {
+                els.bake.innerText = "Bake Production Package";
+            }
         };
 
-        function initPS() { const lb = new PhotoSwipeLightbox({ gallery: '#gallery-grid', children: 'a', pswpModule: () => import('https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe.esm.min.js') }); lb.init(); }
+        function initPS() { 
+            const lb = new PhotoSwipeLightbox({ 
+                gallery: '#gallery-grid', 
+                children: 'a', 
+                pswpModule: () => import('https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe.esm.min.js') 
+            }); 
+            lb.init(); 
+        }
         lucide.createIcons(); loadTpls(); syncUI();
     </script>
 </body>
