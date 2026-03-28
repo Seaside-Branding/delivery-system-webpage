@@ -10,7 +10,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@500;700;800&family=Bebas+Neue&display=swap');
         :root { 
             --accent: #ffffff; 
             --bg: #050505; 
@@ -53,9 +53,10 @@
             line-height: var(--button-lh);
             font-size: calc(11px * var(--button-size));
         }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.14); }
         #settings-sidebar, #nav-menu { transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; position: fixed; top: 0; right: 0; height: 100%; z-index: 60; background: #080808; }
-        @media (min-width: 640px) { #settings-sidebar, #nav-menu { width: 440px; } }
+        @media (min-width: 640px) { #settings-sidebar, #nav-menu { width: min(440px, 92vw); } }
+        @media (min-width: 768px) { #settings-sidebar, #nav-menu { width: min(460px, 84vw); } }
         body.sidebar-open #settings-sidebar { transform: translateX(0); }
         body.nav-open #nav-menu { transform: translateX(0); }
         #sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 55; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
@@ -65,7 +66,7 @@
         @media (min-width: 1024px) { .masonry { columns: 3; } }
         .item { break-inside: avoid; margin-bottom: var(--item-gap); border-radius: 12px; overflow: hidden; position: relative; background: #111; cursor: pointer; }
         .btn-primary { background-color: var(--accent); color: var(--bg); transition: all 0.3s ease; border-radius: 12px; font-weight: 900; }
-        input[type="color"] { -webkit-appearance: none; border: 2px solid rgba(255,255,255,0.1); width: 44px; height: 44px; border-radius: 12px; padding: 0; cursor: pointer; background: none; }
+        input[type="color"] { appearance: none; -webkit-appearance: none; border: 2px solid rgba(255,255,255,0.1); width: 44px; height: 44px; border-radius: 12px; padding: 0; cursor: pointer; background: none; }
         .custom-scrollbar::-webkit-scrollbar { width: 5px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
         .help-modal { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.95); align-items: center; justify-content: center; padding: 2rem; }
@@ -76,8 +77,10 @@
         .item:hover .delete-overlay { opacity: 1; }
         a { text-decoration: underline; text-underline-offset: 4px; color: inherit; }
         #text-toolbar { position: absolute; display: none; z-index: 100; pointer-events: auto; }
-        .range-input { width: 100%; height: 4px; background: #222; border-radius: 2px; -webkit-appearance: none; }
+        .range-input { appearance: none; width: 100%; height: 8px; background: #222; border-radius: 999px; -webkit-appearance: none; }
         .range-input::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: var(--accent); border-radius: 50%; cursor: pointer; }
+        .range-input::-moz-range-thumb { width: 16px; height: 16px; background: var(--accent); border: none; border-radius: 50%; cursor: pointer; }
+        .range-input::-moz-range-track { height: 8px; background: #222; border-radius: 999px; }
         .reset-btn { font-size: 8px; font-weight: 900; color: #444; text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.2s; }
         .reset-btn:hover { color: #888; }
         .toggle-switch { position: relative; display: inline-block; width: 34px; height: 20px; }
@@ -86,39 +89,63 @@
         .toggle-slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .toggle-slider { background-color: var(--accent); }
         input:checked + .toggle-slider:before { transform: translateX(14px); background-color: var(--bg); }
+        .import-gallery-title {
+            font-family: 'Montserrat', 'Bebas Neue', sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        .icon-btn { min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+        .toolbar-btn { min-width: 36px; min-height: 36px; display: inline-flex; align-items: center; justify-content: center; }
+        button:focus-visible,
+        a:focus-visible,
+        input:focus-visible,
+        [contenteditable="true"]:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+            border-radius: 12px;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
     </style>
 </head>
 <body class="min-h-screen overflow-x-hidden selection:bg-white selection:text-black">
 
-    <div id="sidebar-overlay" onclick="document.body.classList.remove('sidebar-open'); document.body.classList.remove('nav-open')"></div>
+    <div id="sidebar-overlay" onclick="closePanels()" aria-hidden="true"></div>
 
     <div id="text-toolbar" class="glass rounded-xl p-1 shadow-2xl flex gap-1 animate-in fade-in zoom-in duration-200">
-        <button onclick="formatText('bold')" class="p-2 hover:bg-white/10 rounded-lg text-white"><i data-lucide="bold" class="w-4 h-4"></i></button>
-        <button onclick="formatText('underline')" class="p-2 hover:bg-white/10 rounded-lg text-white"><i data-lucide="underline" class="w-4 h-4"></i></button>
-        <button onclick="formatText('link')" class="p-2 hover:bg-white/10 rounded-lg text-white"><i data-lucide="link" class="w-4 h-4"></i></button>
+        <button type="button" onclick="formatText('bold')" class="toolbar-btn p-2 hover:bg-white/10 rounded-lg text-white" aria-label="Bold selected text"><i data-lucide="bold" class="w-4 h-4" aria-hidden="true"></i></button>
+        <button type="button" onclick="formatText('underline')" class="toolbar-btn p-2 hover:bg-white/10 rounded-lg text-white" aria-label="Underline selected text"><i data-lucide="underline" class="w-4 h-4" aria-hidden="true"></i></button>
+        <button type="button" onclick="formatText('link')" class="toolbar-btn p-2 hover:bg-white/10 rounded-lg text-white" aria-label="Add link to selected text"><i data-lucide="link" class="w-4 h-4" aria-hidden="true"></i></button>
     </div>
 
-    <nav class="fixed top-0 left-0 w-full p-4 md:p-8 z-40 flex justify-between items-center bg-black/50 backdrop-blur-md">
-        <div class="flex items-center gap-8">
-            <button onclick="document.body.classList.add('nav-open')" class="flex items-center gap-3 group no-underline">
+    <nav class="fixed top-0 left-0 w-full p-3 sm:p-4 md:p-8 z-40 flex justify-between items-center bg-black/50 backdrop-blur-md">
+        <div class="flex items-center gap-2 sm:gap-4 md:gap-8">
+            <button id="open-nav-button" type="button" onclick="openNavMenu()" class="flex items-center gap-2 sm:gap-3 group no-underline" aria-label="Open navigation menu" aria-controls="nav-menu" aria-expanded="false">
                 <div class="w-10 h-10 bg-[#080808] border border-white/5 rounded-xl flex items-center justify-center overflow-hidden rotate-3 group-hover:rotate-0 transition-transform">
-                    <i data-lucide="menu" class="w-5 h-5 text-white"></i>
+                    <i data-lucide="menu" class="w-5 h-5 text-white" aria-hidden="true"></i>
                 </div>
-                <span class="text-[10px] font-black uppercase tracking-[0.5em] text-white no-underline">Menu</span>
+                <span class="hidden sm:inline text-[10px] font-black uppercase tracking-[0.5em] text-white no-underline">Menu</span>
             </button>
-            <a href="https://seasidebranding.com" target="_blank" class="text-[10px] font-black uppercase tracking-[0.5em] text-white/40 hover:text-white transition-colors no-underline hidden md:block">seasidebranding</a>
         </div>
-        <div class="flex gap-4">
-            <a href="https://seasidebranding.com" target="_blank" class="text-[10px] font-black uppercase tracking-[0.5em] text-white/40 hover:text-white transition-colors no-underline md:hidden flex items-center mr-2">seasidebranding</a>
-            <button onclick="document.getElementById('help-modal').classList.add('open')" class="p-3 md:p-4 glass rounded-xl hover:bg-white/20 active:scale-90"><i data-lucide="help-circle" class="w-5 h-5 text-white"></i></button>
-            <button id="toggle-settings" class="p-3 md:p-4 glass rounded-xl hover:bg-white/20 active:scale-90"><i data-lucide="layout-template" class="w-5 h-5 text-white"></i></button>
+        <div class="flex items-center gap-2 sm:gap-3 md:gap-4">
+            <a href="https://seasidebranding.com" target="_blank" aria-label="Visit Seaside Branding" class="no-underline flex items-center justify-center mx-1 sm:mx-2">
+                <img src="icon.png" alt="Seaside Branding" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl object-contain">
+            </a>
+            <button id="open-help-button" type="button" onclick="openHelpModal()" class="icon-btn p-3 md:p-4 glass rounded-xl hover:bg-white/20 active:scale-90" aria-label="Open help guide" aria-controls="help-modal" aria-expanded="false"><i data-lucide="help-circle" class="w-5 h-5 text-white" aria-hidden="true"></i></button>
+            <button id="toggle-settings" type="button" class="icon-btn p-3 md:p-4 glass rounded-xl hover:bg-white/20 active:scale-90" aria-label="Open studio settings" aria-controls="settings-sidebar" aria-expanded="false"><i data-lucide="layout-template" class="w-5 h-5 text-white" aria-hidden="true"></i></button>
         </div>
     </nav>
 
-    <aside id="nav-menu" class="p-6 md:p-12 flex flex-col shadow-2xl overflow-hidden">
+    <aside id="nav-menu" class="p-6 md:p-12 flex flex-col shadow-2xl overflow-hidden" aria-hidden="true">
         <div class="flex justify-between items-center mb-16">
-            <h2 class="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 text-left">Navigation</h2>
-            <button onclick="document.body.classList.remove('nav-open')" class="text-white/20 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
+            <h2 id="nav-menu-title" class="text-[10px] font-black uppercase tracking-[0.4em] text-white/60 text-left">Navigation</h2>
+            <button type="button" onclick="closeNavMenu()" class="icon-btn text-white/50 hover:text-white" aria-label="Close navigation menu"><i data-lucide="x" class="w-6 h-6" aria-hidden="true"></i></button>
         </div>
         <div class="flex-1 space-y-4">
             <a href="index.html" class="block p-6 glass rounded-2xl text-left no-underline group hover:bg-white/5 transition-all border-l-4 border-white">
@@ -134,16 +161,16 @@
                     <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors">
                         <i data-lucide="external-link" class="w-4 h-4 text-white/40"></i>
                     </div>
-                    <span class="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 group-hover:text-white transition-colors">Visit Seaside Branding</span>
+                    <span class="text-[10px] font-black uppercase tracking-[0.3em] text-white/60 group-hover:text-white transition-colors">Visit Seaside Branding</span>
                 </a>
             </div>
         </div>
     </aside>
 
-    <aside id="settings-sidebar" class="p-6 md:p-12 flex flex-col shadow-2xl overflow-hidden">
+    <aside id="settings-sidebar" class="p-6 md:p-12 flex flex-col shadow-2xl overflow-hidden" aria-hidden="true">
         <div class="flex justify-between items-center mb-16">
-            <h2 class="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 text-left">Studio Engine</h2>
-            <button onclick="document.body.classList.remove('sidebar-open')" class="text-white/20 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
+            <h2 id="settings-title" class="text-[10px] font-black uppercase tracking-[0.4em] text-white/60 text-left">Studio Engine</h2>
+            <button type="button" onclick="closeSettingsSidebar()" class="icon-btn text-white/50 hover:text-white" aria-label="Close studio settings"><i data-lucide="x" class="w-6 h-6" aria-hidden="true"></i></button>
         </div>
         <div class="flex-1 overflow-y-auto custom-scrollbar space-y-12 text-left pb-20">
             <section>
@@ -151,7 +178,7 @@
                 <div class="space-y-8">
                     <div>
                         <span class="text-[9px] font-bold text-neutral-500 uppercase block mb-4">Title Font</span>
-                        <input type="text" id="title-font-search" placeholder="Search Google Fonts..." class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white focus:outline-none">
+                        <input type="text" id="title-font-search" placeholder="Search Google Fonts..." aria-label="Search title font" class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white">
                         <div id="title-font-results" class="font-search-results mt-2 glass rounded-xl hidden p-2 border border-white/5"></div>
                         <div class="grid grid-cols-2 gap-4 mt-4">
                             <div>
@@ -179,7 +206,7 @@
                     </div>
                     <div>
                         <span class="text-[9px] font-bold text-neutral-500 uppercase block mb-4">Body Font</span>
-                        <input type="text" id="body-font-search" placeholder="Search Google Fonts..." class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white focus:outline-none">
+                        <input type="text" id="body-font-search" placeholder="Search Google Fonts..." aria-label="Search body font" class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white">
                         <div id="body-font-results" class="font-search-results mt-2 glass rounded-xl hidden p-2 border border-white/5"></div>
                         <div class="grid grid-cols-2 gap-4 mt-4">
                             <div>
@@ -207,7 +234,7 @@
                     </div>
                     <div>
                         <span class="text-[9px] font-bold text-neutral-500 uppercase block mb-4">Button Font</span>
-                        <input type="text" id="button-font-search" placeholder="Search Google Fonts..." class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white focus:outline-none">
+                        <input type="text" id="button-font-search" placeholder="Search Google Fonts..." aria-label="Search button font" class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white">
                         <div id="button-font-results" class="font-search-results mt-2 glass rounded-xl hidden p-2 border border-white/5"></div>
                         <div class="grid grid-cols-2 gap-4 mt-4">
                             <div>
@@ -239,7 +266,7 @@
             <section>
                 <label class="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-600 mb-8 block underline underline-offset-8">Presets</label>
                 <div id="template-list" class="grid grid-cols-1 gap-3"></div>
-                <button id="save-tpl-btn" class="mt-6 w-full py-4 border border-white/5 rounded-xl text-[10px] font-bold uppercase tracking-widest text-white/40 hover:text-white hover:bg-white/5 transition-all">Save Session Style</button>
+                <button id="save-tpl-btn" type="button" class="mt-6 w-full py-4 border border-white/5 rounded-xl text-[10px] font-bold uppercase tracking-widest text-white/60 hover:text-white hover:bg-white/5 transition-all">Save Session Style</button>
             </section>
 
             <section>
@@ -262,7 +289,7 @@
                     <div class="w-16 h-16 rounded-2xl bg-[#080808] border border-white/10 mx-auto mb-4 flex items-center justify-center overflow-hidden">
                         <img id="favicon-preview-img" src="favicon.png" class="w-full h-full object-cover">
                     </div>
-                    <span class="text-[10px] font-bold uppercase tracking-widest text-white/40 block">Change Favicon</span>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-white/60 block">Change Favicon</span>
                 </div>
             </section>
 
@@ -271,7 +298,7 @@
                 <div class="space-y-8">
                     <div>
                         <span class="text-[9px] font-bold text-neutral-500 uppercase block mb-4">External Download URL</span>
-                        <input type="text" id="external-url" placeholder="https://..." class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white focus:outline-none">
+                        <input type="text" id="external-url" placeholder="https://..." aria-label="External download URL" class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white">
                         <p class="text-[8px] text-neutral-600 uppercase mt-2">The "Download All" button will link here in production.</p>
                     </div>
                     <div class="flex justify-between items-center glass p-5 rounded-2xl">
@@ -284,21 +311,21 @@
                 </div>
             </section>
         </div>
-        <div class="pt-8 border-t border-white/10"><button id="bake-btn" class="w-full btn-primary py-6 text-[10px] font-black uppercase tracking-[0.5em]">Bake Production Package</button></div>
+        <div class="pt-8 border-t border-white/10"><button id="bake-btn" type="button" class="w-full btn-primary py-6 text-[10px] font-black uppercase tracking-[0.5em]">Bake Production Package</button></div>
     </aside>
 
     <main id="app">
-        <section id="setup-view" class="h-screen flex items-center justify-center p-8">
+        <section id="setup-view" class="min-h-screen flex items-start md:items-center justify-center p-6 md:p-8 pt-28 md:pt-32">
             <div id="drop-zone" class="max-w-2xl w-full aspect-square glass rounded-[60px] flex flex-col items-center justify-center cursor-pointer hover:scale-[1.02] transition-all group px-6 text-center relative overflow-hidden">
                 <div id="import-status" class="absolute inset-0 bg-black/90 flex flex-col items-center justify-center z-10 hidden animate-in fade-in duration-300">
                     <div class="w-16 h-16 border-4 border-white/10 border-t-white rounded-full animate-spin mb-8"></div>
                     <h3 class="text-2xl font-light text-white mb-2 tracking-tighter">Processing Session</h3>
                     <p id="import-progress-text" class="text-[10px] font-black uppercase tracking-[0.5em] text-neutral-500">Preparing Assets (0/0)</p>
                 </div>
-                <div class="w-20 h-20 bg-white rounded-3xl mb-8 flex items-center justify-center group-hover:rotate-12 transition-transform overflow-hidden p-4">
+                <div class="w-20 h-20 bg-[#080808]/90 border border-white/10 rounded-3xl mb-8 flex items-center justify-center group-hover:rotate-12 transition-transform overflow-hidden p-4">
                     <img src="favicon.png" class="w-full h-full object-contain">
                 </div>
-                <h2 class="text-5xl font-light text-white mb-4 tracking-tighter">Import Gallery</h2>
+                <h2 class="import-gallery-title text-5xl text-white mb-4 tracking-tighter">Import Gallery</h2>
                 <p class="text-[10px] font-black uppercase tracking-[0.5em] text-neutral-500">Drop High-Res Originals</p>
                 <input type="file" id="file-input" multiple accept="image/*" class="hidden">
             </div>
@@ -310,9 +337,9 @@
                     <div id="client-name" contenteditable="true" data-placeholder="Client Name" class="focus:outline-none mb-10 w-full text-center"></div>
                     <div id="event-date" contenteditable="true" data-placeholder="Links & Details" class="text-[12px] font-bold uppercase focus:outline-none text-neutral-500 w-full text-center"></div>
                     <div class="mt-16 flex flex-wrap gap-6 justify-center">
-                        <button id="download-full" class="btn-primary px-12 py-5 text-[11px] font-black uppercase tracking-[0.3em] shadow-2xl active:scale-95 transition-all">Download All</button>
-                        <button id="add-more-btn" class="p-5 glass rounded-2xl hover:bg-white/10 active:scale-90 transition-all">
-                            <i data-lucide="plus" class="w-6 h-6 opacity-40"></i>
+                        <button id="download-full" type="button" class="btn-primary px-12 py-5 text-[11px] font-black uppercase tracking-[0.3em] shadow-2xl active:scale-95 transition-all">Download All</button>
+                        <button id="add-more-btn" type="button" aria-label="Add more images" class="icon-btn p-5 glass rounded-2xl hover:bg-white/10 active:scale-90 transition-all">
+                            <i data-lucide="plus" class="w-6 h-6 opacity-40" aria-hidden="true"></i>
                         </button>
                     </div>
                 </header>
@@ -338,11 +365,11 @@
         </section>
     </main>
 
-    <div id="help-modal" class="help-modal" onclick="this.classList.remove('open')">
+    <div id="help-modal" class="help-modal" onclick="closeHelpModal()" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="help-modal-title">
         <div class="glass p-12 rounded-[40px] max-w-2xl text-center" onclick="event.stopPropagation()">
-            <h2 class="text-4xl font-light mb-8 text-white">Studio Protocol</h2>
+            <h2 id="help-modal-title" class="text-4xl font-light mb-8 text-white">Studio Protocol</h2>
             <p class="text-sm text-neutral-400 leading-relaxed mb-8">Baking generates high-performance 2048px production assets. Every baked gallery includes a built-in PhotoSwipe 5 lightbox with touch-gestures and individual download buttons.</p>
-            <button onclick="document.getElementById('help-modal').classList.remove('open')" class="btn-primary px-10 py-4 text-[10px] font-black uppercase tracking-widest">Close Guide</button>
+            <button id="close-help-button" type="button" onclick="closeHelpModal()" class="btn-primary px-10 py-4 text-[10px] font-black uppercase tracking-widest">Close Guide</button>
         </div>
     </div>
 
@@ -376,6 +403,8 @@
             toggle: document.getElementById('toggle-settings'), sidebar: document.getElementById('settings-sidebar'), grid: document.getElementById('gallery-grid'),
             drop: document.getElementById('drop-zone'), input: document.getElementById('file-input'), bake: document.getElementById('bake-btn'),
             dlFull: document.getElementById('download-full'), addMore: document.getElementById('add-more-btn'),
+            openNavButton: document.getElementById('open-nav-button'), navMenu: document.getElementById('nav-menu'),
+            openHelpButton: document.getElementById('open-help-button'), helpModal: document.getElementById('help-modal'), closeHelpButton: document.getElementById('close-help-button'),
             clientName: document.getElementById('client-name'), eventDate: document.getElementById('event-date'),
             tSearch: document.getElementById('title-font-search'), tRes: document.getElementById('title-font-results'),
             bSearch: document.getElementById('body-font-search'), bRes: document.getElementById('body-font-results'),
@@ -392,6 +421,62 @@
             importStatus: document.getElementById('import-status'),
             importProgressText: document.getElementById('import-progress-text')
         };
+
+        const openNavMenu = () => {
+            document.body.classList.add('nav-open');
+            document.body.classList.remove('sidebar-open');
+            els.openNavButton.setAttribute('aria-expanded', 'true');
+            els.toggle.setAttribute('aria-expanded', 'false');
+            els.navMenu.setAttribute('aria-hidden', 'false');
+            els.sidebar.setAttribute('aria-hidden', 'true');
+        };
+
+        const closeNavMenu = () => {
+            document.body.classList.remove('nav-open');
+            els.openNavButton.setAttribute('aria-expanded', 'false');
+            els.navMenu.setAttribute('aria-hidden', 'true');
+        };
+
+        const openSettingsSidebar = () => {
+            document.body.classList.add('sidebar-open');
+            document.body.classList.remove('nav-open');
+            els.toggle.setAttribute('aria-expanded', 'true');
+            els.openNavButton.setAttribute('aria-expanded', 'false');
+            els.sidebar.setAttribute('aria-hidden', 'false');
+            els.navMenu.setAttribute('aria-hidden', 'true');
+        };
+
+        const closeSettingsSidebar = () => {
+            document.body.classList.remove('sidebar-open');
+            els.toggle.setAttribute('aria-expanded', 'false');
+            els.sidebar.setAttribute('aria-hidden', 'true');
+        };
+
+        const openHelpModal = () => {
+            els.helpModal.classList.add('open');
+            els.helpModal.setAttribute('aria-hidden', 'false');
+            els.openHelpButton.setAttribute('aria-expanded', 'true');
+            els.closeHelpButton.focus();
+        };
+
+        const closeHelpModal = () => {
+            els.helpModal.classList.remove('open');
+            els.helpModal.setAttribute('aria-hidden', 'true');
+            els.openHelpButton.setAttribute('aria-expanded', 'false');
+            els.openHelpButton.focus();
+        };
+
+        const closePanels = () => {
+            closeNavMenu();
+            closeSettingsSidebar();
+        };
+
+        window.openNavMenu = openNavMenu;
+        window.closeNavMenu = closeNavMenu;
+        window.openHelpModal = openHelpModal;
+        window.closeHelpModal = closeHelpModal;
+        window.closePanels = closePanels;
+        window.closeSettingsSidebar = closeSettingsSidebar;
 
         const applyTheme = () => {
             const r = document.documentElement;
@@ -471,7 +556,7 @@
         const loadTpls = () => {
             const custom = JSON.parse(localStorage.getItem('studio_templates_final_v3') || '{}');
             const all = { ...PRESETS, ...custom };
-            els.tplList.innerHTML = Object.entries(all).map(([name, t]) => `<button onclick="window.applyTpl('${name}')" class="w-full p-4 glass rounded-xl text-left hover:bg-white/10 flex justify-between items-center group transition-all"><span class="text-[10px] font-black uppercase tracking-[0.2em] text-white/60 group-hover:text-white">${name}</span><div class="flex gap-2"><div class="w-3 h-3 rounded-full" style="background:${t.bg}"></div><div class="w-3 h-3 rounded-full" style="background:${t.text}"></div></div></button>`).join('');
+            els.tplList.innerHTML = Object.entries(all).map(([name, t]) => `<button type="button" onclick="window.applyTpl('${name}')" class="w-full p-4 glass rounded-xl text-left hover:bg-white/10 flex justify-between items-center group transition-all"><span class="text-[10px] font-black uppercase tracking-[0.2em] text-white/60 group-hover:text-white">${name}</span><div class="flex gap-2"><div class="w-3 h-3 rounded-full" style="background:${t.bg}"></div><div class="w-3 h-3 rounded-full" style="background:${t.text}"></div></div></button>`).join('');
             window.applyTpl = (name) => { state.theme = { ...all[name] }; syncUI(); };
         };
 
@@ -542,15 +627,32 @@
         }
 
         const render = () => {
-            els.grid.innerHTML = state.items.map(i => `<div class="item group"><a href="${i.display}" data-pswp-width="${i.w}" data-pswp-height="${i.h}"><img src="${i.display}" class="w-full h-auto block transition-transform duration-[2s] group-hover:scale-110"></a><button onclick="window.del('${i.id}')" class="delete-overlay glass p-3 rounded-xl text-white shadow-2xl active:scale-90 transition-all"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`).join('');
+            els.grid.innerHTML = state.items.map(i => `<div class="item group"><a href="${i.display}" data-pswp-width="${i.w}" data-pswp-height="${i.h}"><img src="${i.display}" class="w-full h-auto block transition-transform duration-[2s] group-hover:scale-110"></a><button type="button" onclick="window.del('${i.id}')" aria-label="Remove image ${i.name}" class="delete-overlay icon-btn glass p-3 rounded-xl text-white shadow-2xl active:scale-90 transition-all"><i data-lucide="trash-2" class="w-4 h-4" aria-hidden="true"></i></button></div>`).join('');
             lucide.createIcons(); initPS();
         };
 
         window.del = (id) => { if (confirm("Remove image?")) { state.items = state.items.filter(i => i.id !== id); render(); } };
-        els.toggle.onclick = () => document.body.classList.toggle('sidebar-open');
+        els.toggle.onclick = () => {
+            if (document.body.classList.contains('sidebar-open')) {
+                closeSettingsSidebar();
+            } else {
+                openSettingsSidebar();
+            }
+        };
         els.drop.onclick = () => els.input.click();
         els.addMore.onclick = () => els.input.click();
         els.input.onchange = (e) => processFiles(e.target.files);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key !== 'Escape') return;
+            if (els.helpModal.classList.contains('open')) {
+                closeHelpModal();
+                return;
+            }
+            if (document.body.classList.contains('nav-open') || document.body.classList.contains('sidebar-open')) {
+                closePanels();
+            }
+        });
 
         els.faviconInput.onchange = (e) => {
             const f = e.target.files[0]; if (f) { state.favicon = f; const u = URL.createObjectURL(f); els.favPreview.src = u; document.getElementById('app-favicon').href = u; }
