@@ -34,9 +34,18 @@
             font-family: var(--title-font), sans-serif; 
             letter-spacing: var(--title-tracking); 
             line-height: var(--title-lh); 
-            font-size: calc(clamp(3rem, 12vw, 9rem) * var(--title-size)); 
+            font-size: calc(clamp(2.75rem, 10vw, 8rem) * var(--title-size)); 
             text-align: center; 
-            width: 100%; 
+            width: min(100%, 16ch);
+            max-width: 100%;
+            margin-inline: auto;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            hyphens: auto;
+        }
+        #client-name b,
+        #client-name strong {
+            font-weight: 700;
         }
         #event-date { 
             font-family: var(--body-font), sans-serif; 
@@ -44,14 +53,36 @@
             line-height: var(--body-lh); 
             font-size: calc(clamp(0.8rem, 1.5vw, 1.2rem) * var(--body-size));
             text-align: center; 
-            width: 100%; 
+            width: min(100%, 42rem);
+            max-width: 100%;
+            margin-inline: auto;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            hyphens: auto;
             color: var(--subtitle);
+        }
+        #event-date b,
+        #event-date strong {
+            font-weight: 800;
         }
         #download-full { 
             font-family: var(--button-font), sans-serif; 
             letter-spacing: var(--button-tracking);
             line-height: var(--button-lh);
             font-size: calc(11px * var(--button-size));
+        }
+        #gallery-hero {
+            margin-bottom: clamp(5rem, 10vw, 9rem);
+            padding-inline: 1.5rem;
+        }
+        #gallery-hero .hero-actions {
+            margin-top: clamp(2rem, 5vw, 4rem);
+        }
+        @media (max-width: 640px) {
+            #gallery-view {
+                padding-top: 8.5rem;
+                padding-bottom: 5rem;
+            }
         }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.14); }
         #settings-sidebar, #nav-menu { transform: translateX(100%); transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); width: 100%; position: fixed; top: 0; right: 0; height: 100%; z-index: 60; background: #080808; }
@@ -333,10 +364,10 @@
 
         <section id="gallery-view" class="hidden min-h-screen pt-48 pb-32">
             <div class="max-w-[1600px] mx-auto">
-                <header class="mb-48 flex flex-col items-center px-8 text-center">
+                <header id="gallery-hero" class="flex flex-col items-center text-center">
                     <div id="client-name" contenteditable="true" data-placeholder="Client Name" class="focus:outline-none mb-10 w-full text-center"></div>
                     <div id="event-date" contenteditable="true" data-placeholder="Links & Details" class="text-[12px] font-bold uppercase focus:outline-none text-neutral-500 w-full text-center"></div>
-                    <div class="mt-16 flex flex-wrap gap-6 justify-center">
+                    <div class="hero-actions flex flex-wrap gap-6 justify-center">
                         <button id="download-full" type="button" class="btn-primary px-12 py-5 text-[11px] font-black uppercase tracking-[0.3em] shadow-2xl active:scale-95 transition-all">Download All</button>
                         <button id="add-more-btn" type="button" aria-label="Add more images" class="icon-btn p-5 glass rounded-2xl hover:bg-white/10 active:scale-90 transition-all">
                             <i data-lucide="plus" class="w-6 h-6 opacity-40" aria-hidden="true"></i>
@@ -777,12 +808,23 @@
         .btn-primary:hover { opacity: 0.9; transform: translateY(-2px); }
         .title-heading { 
             font-family: var(--title-font) !important; 
-            font-size: calc(clamp(4rem, 15vw, 11rem) * ${state.theme.titleSize}) !important; 
-            font-weight: 300 !important; 
+            font-size: calc(clamp(2.75rem, 10vw, 8rem) * ${state.theme.titleSize}) !important; 
+            font-weight: 400 !important; 
             letter-spacing: ${state.theme.titleTracking} !important; 
             line-height: ${state.theme.titleLH} !important; 
             margin: 0 0 2rem 0 !important; 
             text-align: center !important;
+            width: min(100%, 16ch) !important;
+            max-width: 100% !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            overflow-wrap: anywhere !important;
+            word-break: break-word !important;
+            hyphens: auto !important;
+        }
+        .title-heading b,
+        .title-heading strong {
+            font-weight: 700 !important;
         }
         .details { 
             font-family: var(--body-font) !important; 
@@ -793,9 +835,20 @@
             line-height: ${state.theme.bodyLH} !important; 
             color: var(--subtitle) !important;
             text-align: center !important;
+            width: min(100%, 42rem) !important;
+            max-width: 100% !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            overflow-wrap: anywhere !important;
+            word-break: break-word !important;
+            hyphens: auto !important;
+        }
+        .details b,
+        .details strong {
+            font-weight: 800 !important;
         }
         .details a { text-decoration: underline; color: inherit; }
-        header { padding: 10rem 2rem 6rem 2rem; max-width: 1400px; margin: 0 auto; text-align: center; }
+        header { padding: clamp(4.5rem, 10vw, 8rem) 1.5rem clamp(3rem, 7vw, 5rem) 1.5rem; max-width: 1400px; margin: 0 auto; text-align: center; }
         footer { padding: 8rem 2rem; }
         .pswp__button--download { background: none !important; display: flex !important; align-items: center !important; justify-content: center !important; }
         footer a { text-decoration: none; color: inherit; }
