@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AOC</title>
+    <link rel="icon" href="favicon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root { 
+            --bg: #050505; 
+            --text: #ffffff; 
+            --subtitle: #888888;
+            --accent: #ffffff; 
+            --item-gap: 1.5rem;
+        }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; overflow-x: hidden; text-align: center; }
+        .masonry { column-gap: var(--item-gap); columns: 1; padding: 1.5rem; max-width: 1600px; margin: 0 auto; }
+        @media (min-width: 768px) { .masonry { columns: 3; padding: 4rem; } }
+        .item { break-inside: avoid; margin-bottom: var(--item-gap); border-radius: 12px; overflow: hidden; background: #111; position: relative; cursor: pointer; }
+        .btn-primary { 
+            background: var(--accent); color: var(--bg); text-decoration: none !important; font-weight: 900; border-radius: 12px; 
+            letter-spacing: 0.3em; line-height: 1; font-size: calc(11px * 1);
+        }
+        .v-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; display: none; align-items: center; justify-content: center; }
+        .v-overlay.active { display: flex; }
+        header { padding: 10rem 2rem 6rem 2rem; max-width: 1400px; margin: 0 auto; }
+        .title-heading { 
+            font-family: 'Inter', sans-serif; font-size: calc(clamp(3rem, 10vw, 9rem) * 1); 
+            letter-spacing: -0.05em; line-height: 1; margin-bottom: 2rem; 
+        }
+        .details { 
+            font-family: 'Inter', sans-serif; font-size: calc(clamp(10px, 2vw, 13px) * 1); 
+            letter-spacing: 0.2em; line-height: 1.5; color: var(--subtitle) !important;
+        }
+        footer a { text-decoration: none; color: inherit; }
+        footer a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div id="v-player" class="v-overlay" onclick="this.classList.remove('active'); document.querySelector('video').pause();"><video controls style="max-width: 90%; max-height: 90%;"></video></div>
+    <div id="i-player" class="v-overlay" onclick="this.classList.remove('active');"><img style="max-width: 90%; max-height: 90%;"></div>
+    
+    <header>
+        <h1 class="title-heading">AOC</h1>
+        <div class="details"></div>
+        <div style="margin-top: 5rem;"><a href="https://workdrive.zohopublic.eu/external/70be85ff105ea3fad3a711f838d3296313545b446a1a9a96f7f59dabe6098a83/download" target="_blank" class="btn-primary px-12 py-5 text-[11px] uppercase tracking-[0.3em] inline-block shadow-2xl">Download Session</a></div>
+    </header>
+
+    <div class="masonry">
+        <div class="item" onclick="if('video'==='image'){const pl=document.getElementById('i-player');pl.querySelector('img').src='media/asset-1.mp4';pl.classList.add('active');}else{const pl=document.getElementById('v-player');pl.querySelector('video').src='media/asset-1.mp4';pl.classList.add('active');pl.querySelector('video').play();}"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.2);z-index:10;"><svg width="40" height="40" viewBox="0 0 24 24" fill="white"><path d="M5 3l14 9-14 9V3z"/></svg></div><img src="media/asset-1-thumb.jpg" style="width: 100%; height: auto; display: block;" loading="lazy"></div>
+    </div>
+
+    <footer style="margin-top: 10rem; padding-bottom: 5rem; display: flex; flex-direction: column; align-items: center; gap: 3rem; opacity: 0.5;">
+        <a href="https://seasidebranding.com" target="_blank" style="display: flex; flex-direction: column; align-items: center; gap: 1rem; color: var(--text); text-decoration: none;">
+            <div style="width: 3rem; height: 3rem; background: rgba(255,255,255,0.05); border-radius: 1rem; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                <img src="icon.png" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <span style="font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5em;">Seaside Branding</span>
+        </a>
+        <div style="display: flex; gap: 2rem; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.2em; color: var(--text);">
+            <a href="https://seasidebranding.com/terms" target="_blank" style="opacity: 0.6; color: inherit;">Terms</a>
+            <a href="https://seasidebranding.com/privacy" target="_blank" style="opacity: 0.6; color: inherit;">Privacy</a>
+        </div>
+        <a href="https://seasidebranding.com/contact" target="_blank" class="btn-primary" style="padding: 1rem 2.5rem; font-size: 9px; letter-spacing: 0.1em;">Contact Us</a>
+    </footer>
+</body>
+</html>
