@@ -339,6 +339,13 @@
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
+                    <div class="flex justify-between items-center glass p-5 rounded-2xl">
+                        <span class="text-[10px] font-bold text-white/60 uppercase tracking-widest">Scramble Images</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="scramble-images-toggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
                 </div>
             </section>
         </div>
@@ -427,7 +434,8 @@
             favicon: null, 
             theme: { ...PRESETS['Noir'] }, 
             externalUrl: '',
-            showDownloadBtn: true
+            showDownloadBtn: true,
+            scrambleImages: false
         };
 
         const els = {
@@ -449,6 +457,7 @@
             btnTracking: document.getElementById('button-tracking'), btnLH: document.getElementById('button-lh'), btnSize: document.getElementById('button-size'),
             galleryGap: document.getElementById('gallery-gap'), externalUrl: document.getElementById('external-url'),
             showDlToggle: document.getElementById('show-download-toggle'),
+            scrambleToggle: document.getElementById('scramble-images-toggle'),
             importStatus: document.getElementById('import-status'),
             importProgressText: document.getElementById('import-progress-text')
         };
@@ -555,6 +564,7 @@
             els.btnSize.value = state.theme.buttonSize;
             els.galleryGap.value = parseFloat(state.theme.gap);
             els.showDlToggle.checked = state.showDownloadBtn;
+            els.scrambleToggle.checked = state.scrambleImages;
             els.tSearch.value = state.theme.titleFont;
             els.bSearch.value = state.theme.bodyFont;
             els.btnSearch.value = state.theme.buttonFont || state.theme.bodyFont;
@@ -577,6 +587,7 @@
         els.galleryGap.oninput = (e) => { state.theme.gap = e.target.value + 'rem'; syncUI(); };
         els.externalUrl.oninput = (e) => { state.externalUrl = e.target.value; };
         els.showDlToggle.onchange = (e) => { state.showDownloadBtn = e.target.checked; };
+        els.scrambleToggle.onchange = (e) => { state.scrambleImages = e.target.checked; render(); };
 
         window.resetFontAdj = (prop) => {
             const defaults = PRESETS['Noir'];
@@ -621,6 +632,15 @@
             syncUI(); 
         };
 
+        const shuffledItems = (items) => {
+            const result = items.slice();
+            for (let i = result.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [result[i], result[j]] = [result[j], result[i]];
+            }
+            return result;
+        };
+
         window.formatText = (cmd) => { 
             if (cmd === 'link') { 
                 const u = prompt("URL:"); 
@@ -658,7 +678,8 @@
         }
 
         const render = () => {
-            els.grid.innerHTML = state.items.map(i => `<div class="item group"><a href="${i.display}" data-pswp-width="${i.w}" data-pswp-height="${i.h}"><img src="${i.display}" class="w-full h-auto block transition-transform duration-[2s] group-hover:scale-110"></a><button type="button" onclick="window.del('${i.id}')" aria-label="Remove image ${i.name}" class="delete-overlay icon-btn glass p-3 rounded-xl text-white shadow-2xl active:scale-90 transition-all"><i data-lucide="trash-2" class="w-4 h-4" aria-hidden="true"></i></button></div>`).join('');
+            const itemsToRender = state.scrambleImages ? shuffledItems(state.items) : state.items;
+            els.grid.innerHTML = itemsToRender.map(i => `<div class="item group"><a href="${i.display}" data-pswp-width="${i.w}" data-pswp-height="${i.h}"><img src="${i.display}" class="w-full h-auto block transition-transform duration-[2s] group-hover:scale-110"></a><button type="button" onclick="window.del('${i.id}')" aria-label="Remove image ${i.name}" class="delete-overlay icon-btn glass p-3 rounded-xl text-white shadow-2xl active:scale-90 transition-all"><i data-lucide="trash-2" class="w-4 h-4" aria-hidden="true"></i></button></div>`).join('');
             lucide.createIcons(); initPS();
         };
 
