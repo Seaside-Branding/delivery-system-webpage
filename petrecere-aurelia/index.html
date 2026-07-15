@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ziua Mea!</title>
+    <link rel="icon" href="favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ingrid+Darling:wght@300;400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root { 
+            --bg: #050505; 
+            --text: #ffffff; 
+            --subtitle: #888888;
+            --accent: #ffffff; 
+            --item-gap: 1.5rem;
+            --title-font: 'Ingrid Darling', sans-serif;
+            --body-font: 'Montserrat', sans-serif;
+            --button-font: 'Inter', sans-serif;
+        }
+        body { background: var(--bg); color: var(--text); font-family: var(--body-font); overflow-x: hidden; text-align: center; margin: 0; }
+        .masonry { column-gap: var(--item-gap); columns: 1; padding: 1.5rem; max-width: 1600px; margin: 0 auto; }
+        @media (min-width: 768px) { .masonry { columns: 3; padding: 4rem; } }
+        .item { break-inside: avoid; margin-bottom: var(--item-gap); border-radius: 8px; overflow: hidden; background: #111; }
+        .item img { width: 100%; height: auto; display: block; transition: transform 0.5s ease; }
+        .item:hover img { transform: scale(1.05); }
+        .btn-primary { 
+            background: var(--accent); 
+            color: var(--bg); 
+            text-decoration: none !important; 
+            font-weight: 900; 
+            border-radius: 12px; 
+            display: inline-block; 
+            transition: all 0.3s ease; 
+            cursor: pointer; 
+            border: none; 
+            font-family: var(--button-font);
+            letter-spacing: 0.3em;
+            line-height: 1;
+            font-size: calc(11px * 1);
+        }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-2px); }
+        .title-heading { 
+            font-family: var(--title-font) !important; 
+            font-size: calc(clamp(2.75rem, 10vw, 8rem) * 1.25) !important; 
+            font-weight: 400 !important; 
+            letter-spacing: -0.02em !important; 
+            line-height: 1 !important; 
+            margin: 0 0 2rem 0 !important; 
+            text-align: center !important;
+            width: min(100%, 16ch) !important;
+            max-width: 100% !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            overflow-wrap: anywhere !important;
+            word-break: break-word !important;
+            hyphens: auto !important;
+        }
+        .title-heading b,
+        .title-heading strong {
+            font-weight: 700 !important;
+        }
+        .details { 
+            font-family: var(--body-font) !important; 
+            font-size: calc(clamp(10px, 2vw, 13px) * 1) !important; 
+            font-weight: 800 !important; 
+            text-transform: uppercase !important; 
+            letter-spacing: 0.2em !important; 
+            line-height: 1.5 !important; 
+            color: var(--subtitle) !important;
+            text-align: center !important;
+            width: min(100%, 42rem) !important;
+            max-width: 100% !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            overflow-wrap: anywhere !important;
+            word-break: break-word !important;
+            hyphens: auto !important;
+        }
+        .details b,
+        .details strong {
+            font-weight: 800 !important;
+        }
+        .details a { text-decoration: underline; color: inherit; }
+        header { padding: clamp(4.5rem, 10vw, 8rem) 1.5rem clamp(3rem, 7vw, 5rem) 1.5rem; max-width: 1400px; margin: 0 auto; text-align: center; }
+        footer { padding: 8rem 2rem; }
+        .pswp__button--download { background: none !important; display: flex !important; align-items: center !important; justify-content: center !important; }
+        footer a { text-decoration: none; color: inherit; }
+        footer a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1 class="title-heading">Ziua Mea!</h1>
+        <div class="details">SHOT BY <a href="https://marcparaschiv.com">MARC PARASCHIV</a> &amp; MIRCEA DUMITRESCU</div>
+        
+        <div style="margin-top: 4rem;">
+            <a href="https://workdrive.zohopublic.eu/external/ca0c1f73ab9864a52cce722e73c66058d008d6d260b719287ff170e0a145f1d1/download" target="_blank" class="btn-primary px-12 py-5 text-[11px] uppercase tracking-[0.3em]">Download All Photos</a>
+        </div>
+        
+    </header>
+
+    <div id="gallery" class="masonry">
+        
+        <div class="item">
+            <a href="images/shot-1.jpg" data-pswp-width="1633" data-pswp-height="2449" target="_blank">
+                <img src="images/shot-1.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-2.jpg" data-pswp-width="1633" data-pswp-height="2449" target="_blank">
+                <img src="images/shot-2.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-3.jpg" data-pswp-width="1633" data-pswp-height="2449" target="_blank">
+                <img src="images/shot-3.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-4.jpg" data-pswp-width="1633" data-pswp-height="2449" target="_blank">
+                <img src="images/shot-4.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-5.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-5.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-6.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-6.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-7.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-7.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-8.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-8.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-9.jpg" data-pswp-width="1633" data-pswp-height="2449" target="_blank">
+                <img src="images/shot-9.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-10.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-10.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-11.jpg" data-pswp-width="1633" data-pswp-height="2449" target="_blank">
+                <img src="images/shot-11.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-12.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-12.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-13.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-13.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-14.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-14.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-15.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-15.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-16.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-16.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-17.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-17.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-18.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-18.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-19.jpg" data-pswp-width="1633" data-pswp-height="2449" target="_blank">
+                <img src="images/shot-19.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-20.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-20.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-21.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-21.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-22.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-22.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-23.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-23.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-24.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-24.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-25.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-25.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-26.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-26.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-27.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-27.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-28.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-28.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-29.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-29.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-30.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-30.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-31.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-31.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-32.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-32.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-33.jpg" data-pswp-width="1633" data-pswp-height="2449" target="_blank">
+                <img src="images/shot-33.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-34.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-34.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-35.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-35.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-36.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-36.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-37.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-37.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-38.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-38.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-39.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-39.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-40.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-40.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-41.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-41.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-42.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-42.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-43.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-43.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-44.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-44.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-45.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-45.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-46.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-46.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-47.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-47.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-48.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-48.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-49.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-49.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-50.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-50.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-51.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-51.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-52.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-52.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-53.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-53.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-54.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-54.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-55.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-55.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-56.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-56.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-57.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-57.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-58.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-58.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-59.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-59.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-60.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-60.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-61.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-61.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-62.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-62.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-63.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-63.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-64.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-64.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-65.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-65.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-66.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-66.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-67.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-67.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-68.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-68.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-69.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-69.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-70.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-70.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-71.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-71.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-72.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-72.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-73.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-73.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-74.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-74.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-75.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-75.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-76.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-76.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-77.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-77.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-78.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-78.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-79.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-79.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-80.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-80.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-81.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-81.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-82.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-82.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-83.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-83.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-84.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-84.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-85.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-85.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-86.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-86.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-87.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-87.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-88.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-88.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-89.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-89.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-90.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-90.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-91.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-91.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-92.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-92.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-93.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-93.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-94.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-94.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-95.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-95.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-96.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-96.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-97.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-97.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-98.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-98.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-99.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-99.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-100.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-100.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-101.jpg" data-pswp-width="1633" data-pswp-height="2449" target="_blank">
+                <img src="images/shot-101.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-102.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-102.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-103.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-103.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-104.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-104.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-105.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-105.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-106.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-106.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-107.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-107.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-108.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-108.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-109.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-109.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-110.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-110.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-111.jpg" data-pswp-width="1633" data-pswp-height="2449" target="_blank">
+                <img src="images/shot-111.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-112.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-112.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-113.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-113.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-114.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-114.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-115.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-115.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-116.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-116.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-117.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-117.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-118.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-118.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-119.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-119.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-120.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-120.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-121.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-121.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-122.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-122.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-123.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-123.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-124.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-124.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-125.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-125.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-126.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-126.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-127.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-127.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-128.jpg" data-pswp-width="1633" data-pswp-height="2449" target="_blank">
+                <img src="images/shot-128.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-129.jpg" data-pswp-width="1633" data-pswp-height="2449" target="_blank">
+                <img src="images/shot-129.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-130.jpg" data-pswp-width="1633" data-pswp-height="2449" target="_blank">
+                <img src="images/shot-130.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-131.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-131.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-132.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-132.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-133.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-133.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-134.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-134.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-135.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-135.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-136.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-136.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-137.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-137.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-138.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-138.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-139.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-139.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-140.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-140.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-141.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-141.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-142.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-142.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-143.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-143.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-144.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-144.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-145.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-145.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-146.jpg" data-pswp-width="2449" data-pswp-height="1633" target="_blank">
+                <img src="images/shot-146.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+    </div>
+
+    <footer style="margin-top: 10rem; padding-bottom: 5rem; display: flex; flex-direction: column; align-items: center; gap: 3rem;">
+        <a href="https://seasidebranding.com" target="_blank" style="display: flex; flex-direction: column; align-items: center; gap: 1rem; color: var(--text); text-decoration: none;">
+            <div style="width: 3rem; height: 3rem; background: rgba(255,255,255,0.05); border-radius: 1rem; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                <img src="icon.png" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <span style="font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5em;">Seaside Branding</span>
+        </a>
+        <div style="display: flex; gap: 3rem; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.2em; color: var(--text);">
+            <a href="https://seasidebranding.com/terms" target="_blank" style="opacity: 0.6; color: inherit;">Terms</a>
+            <a href="https://seasidebranding.com/privacy" target="_blank" style="opacity: 0.6; color: inherit;">Privacy</a>
+        </div>
+        <a href="https://seasidebranding.com/contact" target="_blank" class="btn-primary" style="padding: 1rem 2.5rem; font-size: 9px; letter-spacing: 0.1em;">Contact Us</a>
+    </footer>
+
+    <script type="module">
+        import PhotoSwipeLightbox from 'https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe-lightbox.esm.min.js';
+        const lightbox = new PhotoSwipeLightbox({
+            gallery: '#gallery',
+            children: 'a',
+            pswpModule: () => import('https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe.esm.min.js')
+        });
+        
+        lightbox.on('uiRegister', function() {
+            lightbox.pswp.ui.registerElement({
+                name: 'download-button',
+                order: 8,
+                isPrimary: true,
+                tagName: 'a',
+                html: '<svg aria-hidden="true" class="pswp__icn" viewBox="0 0 32 32" width="32" height="32"><path d="M20.5 14.3 17.1 18V10h-2.2v7.9l-3.4-3.6L10 15.8l6 6.2 6-6.2Z" fill="currentColor"/><path d="M24 24H8v-2h16Z" fill="currentColor"/></svg>',
+                onInit: (el, pswp) => {
+                    el.setAttribute('download', '');
+                    el.setAttribute('target', '_blank');
+                    pswp.on('change', () => {
+                        el.href = pswp.currSlide.data.src;
+                    });
+                }
+            });
+        });
+
+        lightbox.init();
+    </script>
+</body>
+</html>
