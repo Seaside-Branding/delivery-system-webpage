@@ -1055,9 +1055,10 @@
         els.bake.onclick = async () => {
             try {
                 const zip = new JSZip(); const client = els.clientName.innerHTML; const sub = els.eventDate.innerHTML;
+                const bakeItems = state.scrambleImages ? shuffledItems(state.items, state.scrambleSeed) : state.items;
                 els.bake.innerText = "Processing Assets..."; const folder = zip.folder("images");
-                for (let i = 0; i < state.items.length; i++) {
-                    try { els.bake.innerText = `Processing (${i+1}/${state.items.length})...`; const b = await compress(state.items[i].original); folder.file(`shot-${i+1}.jpg`, b); } catch(err) {}
+                for (let i = 0; i < bakeItems.length; i++) {
+                    try { els.bake.innerText = `Processing (${i+1}/${bakeItems.length})...`; const b = await compress(bakeItems[i].original); folder.file(`shot-${i+1}.jpg`, b); } catch(err) {}
                 }
                 
         // Fail-proof embedded icon data
@@ -1109,7 +1110,6 @@
 
                 const fontsToLoad = [...new Set([state.theme.titleFont, state.theme.bodyFont, state.theme.buttonFont])].filter(Boolean);
                 const fontLinks = fontsToLoad.map(f => `<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=${f.replace(/\s+/g,'+')}:wght@300;400;500;600;700;800&display=swap">`).join('\n');
-                const bakeItems = state.scrambleImages ? shuffledItems(state.items, state.scrambleSeed) : state.items;
                 const bakedDownloadLabel = escapeHTML(getDownloadLabel());
 
                 const html = `<!DOCTYPE html>
