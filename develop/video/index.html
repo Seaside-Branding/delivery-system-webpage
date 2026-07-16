@@ -136,9 +136,140 @@
                 scroll-behavior: auto !important;
             }
         }
+        .cookie-banner {
+            position: fixed;
+            inset: auto 0 0;
+            z-index: 1200;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            background: rgba(4, 4, 4, 0.95);
+            color: #f8fafc;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 -16px 40px rgba(0, 0, 0, 0.45);
+        }
+        .cookie-banner.hidden {
+            display: none;
+        }
+        .cookie-banner p {
+            margin: 0;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            max-width: 75rem;
+        }
+        .cookie-banner-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        .cookie-banner-actions button,
+        .cookie-banner-actions a {
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 0.85rem 1.25rem;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.08);
+            color: inherit;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+        .cookie-banner-actions button:hover,
+        .cookie-banner-actions a:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
+        }
+        @media (max-width: 640px) {
+            .cookie-banner {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: left;
+                padding: 1rem;
+            }
+            .cookie-banner-actions {
+                justify-content: stretch;
+            }
+            .cookie-banner-actions button,
+            .cookie-banner-actions a {
+                width: 100%;
+            }
+        }
     </style>
+    <script>
+        const analyticsCookieKey = 'seaside_analytics_consent';
+        const analyticsMeasurementId = 'G-JHWR7XVT1R';
+
+        function getAnalyticsConsent() {
+            return localStorage.getItem(analyticsCookieKey);
+        }
+
+        function saveAnalyticsConsent(value) {
+            localStorage.setItem(analyticsCookieKey, value);
+            if (value === 'accepted') {
+                enableAnalytics();
+            }
+        }
+
+        function enableAnalytics() {
+            if (window.analyticsEnabled) return;
+            window.analyticsEnabled = true;
+            window.dataLayer = window.dataLayer || [];
+            function gtag() { dataLayer.push(arguments); }
+            window.gtag = gtag;
+            gtag('js', new Date());
+            gtag('config', analyticsMeasurementId);
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=' + analyticsMeasurementId;
+            document.head.appendChild(script);
+        }
+
+        function updateAnalyticsBanner() {
+            const banner = document.getElementById('cookie-consent-banner');
+            if (!banner) return;
+            const consent = getAnalyticsConsent();
+            banner.classList.toggle('hidden', consent === 'accepted' || consent === 'declined');
+        }
+
+        function handleAnalyticsAccept() {
+            saveAnalyticsConsent('accepted');
+            updateAnalyticsBanner();
+        }
+
+        function handleAnalyticsDecline() {
+            saveAnalyticsConsent('declined');
+            updateAnalyticsBanner();
+        }
+
+        function applyAnalyticsConsent() {
+            const consent = getAnalyticsConsent();
+            if (consent === 'accepted') {
+                enableAnalytics();
+            }
+            updateAnalyticsBanner();
+        }
+
+        document.addEventListener('DOMContentLoaded', applyAnalyticsConsent);
+    </script>
 </head>
 <body class="min-h-screen overflow-x-hidden selection:bg-white selection:text-black">
+
+    <div id="cookie-consent-banner" class="cookie-banner hidden" role="dialog" aria-live="polite" aria-label="Analytics consent banner">
+        <div>
+            <p><strong>Analytics consent</strong> — Accept to enable Google Analytics tracking on this page. Declining keeps analytics off while you continue using the app.</p>
+        </div>
+        <div class="cookie-banner-actions">
+            <button type="button" onclick="handleAnalyticsDecline()">Decline</button>
+            <button type="button" onclick="handleAnalyticsAccept()" class="btn-primary">Accept</button>
+        </div>
+    </div>
 
     <div id="sidebar-overlay" onclick="closePanels()" aria-hidden="true"></div>
 
@@ -991,28 +1122,139 @@
             margin: 0 0 2rem 0 !important; 
             text-align: center !important;
         }
-        .details { 
-            font-family: var(--body-font) !important; 
-            font-size: calc(clamp(10px, 2vw, 13px) * ${state.theme.bodySize}) !important; 
-            font-weight: 800 !important; 
-            text-transform: uppercase !important; 
-            letter-spacing: ${state.theme.bodyTracking} !important; 
-            line-height: ${state.theme.bodyLH} !important; 
-            color: var(--subtitle) !important;
-            text-align: center !important;
+        .cookie-banner {
+            position: fixed;
+            inset: auto 0 0;
+            z-index: 1200;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            background: rgba(4, 4, 4, 0.95);
+            color: #f8fafc;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 -16px 40px rgba(0, 0, 0, 0.45);
         }
-        .details a { text-decoration: underline; color: inherit; }
-        .video-play-hint { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: linear-gradient(180deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.35)); pointer-events: none; }
-        .pswp__video-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .pswp__video-container video { max-width: 100%; max-height: 100%; border-radius: 12px; background: #000; }
-        header { padding: 10rem 2rem 6rem 2rem; max-width: 1400px; margin: 0 auto; text-align: center; }
-        footer { padding: 8rem 2rem; }
-        .pswp__button--download { background: none !important; display: flex !important; align-items: center !important; justify-content: center !important; }
-        footer a { text-decoration: none; color: inherit; }
-        footer a:hover { text-decoration: underline; }
+        .cookie-banner.hidden {
+            display: none;
+        }
+        .cookie-banner p {
+            margin: 0;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            max-width: 75rem;
+        }
+        .cookie-banner-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        .cookie-banner-actions button,
+        .cookie-banner-actions a {
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 0.85rem 1.25rem;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.08);
+            color: inherit;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+        .cookie-banner-actions button:hover,
+        .cookie-banner-actions a:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
+        }
+        @media (max-width: 640px) {
+            .cookie-banner {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: left;
+                padding: 1rem;
+            }
+            .cookie-banner-actions {
+                justify-content: stretch;
+            }
+            .cookie-banner-actions button,
+            .cookie-banner-actions a {
+                width: 100%;
+            }
+        }
     </style>
+    <script>
+        const analyticsCookieKey = 'seaside_analytics_consent';
+        const analyticsMeasurementId = 'G-JHWR7XVT1R';
+
+        function getAnalyticsConsent() {
+            return localStorage.getItem(analyticsCookieKey);
+        }
+
+        function saveAnalyticsConsent(value) {
+            localStorage.setItem(analyticsCookieKey, value);
+            if (value === 'accepted') {
+                enableAnalytics();
+            }
+        }
+
+        function enableAnalytics() {
+            if (window.analyticsEnabled) return;
+            window.analyticsEnabled = true;
+            window.dataLayer = window.dataLayer || [];
+            function gtag() { dataLayer.push(arguments); }
+            window.gtag = gtag;
+            gtag('js', new Date());
+            gtag('config', analyticsMeasurementId);
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=' + analyticsMeasurementId;
+            document.head.appendChild(script);
+        }
+
+        function updateAnalyticsBanner() {
+            const banner = document.getElementById('cookie-consent-banner');
+            if (!banner) return;
+            const consent = getAnalyticsConsent();
+            banner.classList.toggle('hidden', consent === 'accepted' || consent === 'declined');
+        }
+
+        function handleAnalyticsAccept() {
+            saveAnalyticsConsent('accepted');
+            updateAnalyticsBanner();
+        }
+
+        function handleAnalyticsDecline() {
+            saveAnalyticsConsent('declined');
+            updateAnalyticsBanner();
+        }
+
+        function applyAnalyticsConsent() {
+            const consent = getAnalyticsConsent();
+            if (consent === 'accepted') {
+                enableAnalytics();
+            }
+            updateAnalyticsBanner();
+        }
+
+        document.addEventListener('DOMContentLoaded', applyAnalyticsConsent);
+    <\/script>
 </head>
 <body>
+    <div id="cookie-consent-banner" class="cookie-banner hidden" role="dialog" aria-live="polite" aria-label="Analytics consent banner">
+        <div>
+            <p><strong>Analytics consent</strong> — Accept to enable Google Analytics tracking on this page. Declining keeps analytics off while you continue using the app.</p>
+        </div>
+        <div class="cookie-banner-actions">
+            <button type="button" onclick="handleAnalyticsDecline()">Decline</button>
+            <button type="button" onclick="handleAnalyticsAccept()" class="btn-primary">Accept</button>
+        </div>
+    </div>
     <header>
         <h1 class="title-heading">${client}</h1>
         <div class="details">${sub}</div>

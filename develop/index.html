@@ -15,6 +15,7 @@
             --accent: #ffffff; 
             --bg: #050505; 
             --text: #ffffff; 
+            --subtitle: #888888;
             --button-text: #050505; 
             --item-gap: 1.5rem; 
             --title-font: 'Inter'; 
@@ -29,13 +30,15 @@
             --button-tracking: 0.3em;
             --button-lh: 1;
             --button-size: 1;
+            --button-pad-x: 3rem;
+            --button-pad-y: 1.25rem;
         }
         body { background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; transition: background-color 0.4s ease, color 0.4s ease; text-align: center; }
         #client-name { 
             font-family: var(--title-font), sans-serif; 
             letter-spacing: var(--title-tracking); 
             line-height: var(--title-lh); 
-            font-size: calc(clamp(2.75rem, 10vw, 8rem) * var(--title-size)); 
+            font-size: calc(clamp(2.6rem, 11vw, 7rem) * var(--title-size)); 
             text-align: center; 
             width: min(100%, 16ch);
             max-width: 100%;
@@ -52,7 +55,7 @@
             font-family: var(--body-font), sans-serif; 
             letter-spacing: var(--body-tracking); 
             line-height: var(--body-lh); 
-            font-size: calc(clamp(0.8rem, 1.5vw, 1.2rem) * var(--body-size));
+            font-size: calc(clamp(0.72rem, 1.55vw, 1.05rem) * var(--body-size));
             text-align: center; 
             width: min(100%, 42rem);
             max-width: 100%;
@@ -66,11 +69,15 @@
         #event-date strong {
             font-weight: 800;
         }
-        #download-full { 
+        #download-full,
+        .download-cta { 
             font-family: var(--button-font), sans-serif; 
             letter-spacing: var(--button-tracking);
             line-height: var(--button-lh);
-            font-size: calc(11px * var(--button-size));
+            font-size: calc(clamp(0.7rem, 1.8vw, 0.95rem) * var(--button-size));
+            padding-inline: var(--button-pad-x);
+            padding-block: var(--button-pad-y);
+            text-transform: none;
         }
         #gallery-hero {
             margin-bottom: clamp(5rem, 10vw, 9rem);
@@ -83,6 +90,24 @@
             #gallery-view {
                 padding-top: 8.5rem;
                 padding-bottom: 5rem;
+            }
+            #gallery-hero {
+                margin-bottom: clamp(4rem, 9vw, 6rem);
+                padding-inline: 1rem;
+            }
+            #gallery-hero .hero-actions {
+                gap: 0.75rem;
+            }
+            #client-name {
+                font-size: calc(clamp(2.4rem, 12vw, 4.8rem) * var(--title-size));
+            }
+            #event-date {
+                font-size: calc(clamp(0.7rem, 2.6vw, 0.95rem) * var(--body-size));
+            }
+            #download-full,
+            .download-cta {
+                padding-inline: calc(var(--button-pad-x) * 0.7);
+                padding-block: calc(var(--button-pad-y) * 0.8);
             }
         }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.14); }
@@ -144,9 +169,141 @@
                 scroll-behavior: auto !important;
             }
         }
+
+        .cookie-banner {
+            position: fixed;
+            inset: auto 0 0;
+            z-index: 1200;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            background: rgba(4, 4, 4, 0.95);
+            color: #f8fafc;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 -16px 40px rgba(0, 0, 0, 0.45);
+        }
+        .cookie-banner.hidden {
+            display: none;
+        }
+        .cookie-banner p {
+            margin: 0;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            max-width: 75rem;
+        }
+        .cookie-banner-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        .cookie-banner-actions button,
+        .cookie-banner-actions a {
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 0.85rem 1.25rem;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.08);
+            color: inherit;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+        .cookie-banner-actions button:hover,
+        .cookie-banner-actions a:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
+        }
+        @media (max-width: 640px) {
+            .cookie-banner {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: left;
+                padding: 1rem;
+            }
+            .cookie-banner-actions {
+                justify-content: stretch;
+            }
+            .cookie-banner-actions button,
+            .cookie-banner-actions a {
+                width: 100%;
+            }
+        }
     </style>
+    <script>
+        const analyticsCookieKey = 'seaside_analytics_consent';
+        const analyticsMeasurementId = 'G-JHWR7XVT1R';
+
+        function getAnalyticsConsent() {
+            return localStorage.getItem(analyticsCookieKey);
+        }
+
+        function saveAnalyticsConsent(value) {
+            localStorage.setItem(analyticsCookieKey, value);
+            if (value === 'accepted') {
+                enableAnalytics();
+            }
+        }
+
+        function enableAnalytics() {
+            if (window.analyticsEnabled) return;
+            window.analyticsEnabled = true;
+            window.dataLayer = window.dataLayer || [];
+            function gtag() { dataLayer.push(arguments); }
+            window.gtag = gtag;
+            gtag('js', new Date());
+            gtag('config', analyticsMeasurementId);
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=' + analyticsMeasurementId;
+            document.head.appendChild(script);
+        }
+
+        function updateAnalyticsBanner() {
+            const banner = document.getElementById('cookie-consent-banner');
+            if (!banner) return;
+            const consent = getAnalyticsConsent();
+            banner.classList.toggle('hidden', consent === 'accepted' || consent === 'declined');
+        }
+
+        function handleAnalyticsAccept() {
+            saveAnalyticsConsent('accepted');
+            updateAnalyticsBanner();
+        }
+
+        function handleAnalyticsDecline() {
+            saveAnalyticsConsent('declined');
+            updateAnalyticsBanner();
+        }
+
+        function applyAnalyticsConsent() {
+            const consent = getAnalyticsConsent();
+            if (consent === 'accepted') {
+                enableAnalytics();
+            }
+            updateAnalyticsBanner();
+        }
+
+        document.addEventListener('DOMContentLoaded', applyAnalyticsConsent);
+    </script>
 </head>
 <body class="min-h-screen overflow-x-hidden selection:bg-white selection:text-black">
+
+    <div id="cookie-consent-banner" class="cookie-banner hidden" role="dialog" aria-live="polite" aria-label="Analytics consent banner">
+        <div>
+            <p><strong>Analytics consent</strong> — Accept to enable Google Analytics tracking on this page. Declining keeps analytics off while you continue using the app.</p>
+        </div>
+        <div class="cookie-banner-actions">
+            <button type="button" onclick="handleAnalyticsDecline()">Decline</button>
+            <button type="button" onclick="handleAnalyticsAccept()" class="btn-primary">Accept</button>
+        </div>
+    </div>
 
     <div id="sidebar-overlay" onclick="closePanels()" aria-hidden="true"></div>
 
@@ -326,6 +483,28 @@
                                 </div>
                                 <input type="range" id="button-size" min="0.5" max="2" step="0.05" value="1" class="range-input">
                             </div>
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-[8px] text-neutral-600 uppercase block">Padding X</span>
+                                    <div class="flex items-center gap-2">
+                                        <input type="number" id="button-pad-x-value" step="0.1" min="1" max="6" value="3" class="w-16 bg-neutral-900 border border-white/5 rounded-lg px-2 py-2 text-[10px] text-white text-right">
+                                        <span class="text-[8px] text-neutral-600 uppercase">rem</span>
+                                        <button onclick="resetFontAdj('buttonPadX')" class="reset-btn">Reset</button>
+                                    </div>
+                                </div>
+                                <input type="range" id="button-pad-x" min="1" max="6" step="0.1" value="3" class="range-input">
+                            </div>
+                            <div>
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-[8px] text-neutral-600 uppercase block">Padding Y</span>
+                                    <div class="flex items-center gap-2">
+                                        <input type="number" id="button-pad-y-value" step="0.05" min="0.4" max="3" value="1.25" class="w-16 bg-neutral-900 border border-white/5 rounded-lg px-2 py-2 text-[10px] text-white text-right">
+                                        <span class="text-[8px] text-neutral-600 uppercase">rem</span>
+                                        <button onclick="resetFontAdj('buttonPadY')" class="reset-btn">Reset</button>
+                                    </div>
+                                </div>
+                                <input type="range" id="button-pad-y" min="0.4" max="3" step="0.05" value="1.25" class="range-input">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -374,6 +553,11 @@
                         <input type="text" id="external-url" placeholder="https://..." aria-label="External download URL" class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white">
                         <p class="text-[8px] text-neutral-600 uppercase mt-2">The "Download All" button will link here in production.</p>
                     </div>
+                    <div>
+                        <span class="text-[9px] font-bold text-neutral-500 uppercase block mb-4">Download Button Text</span>
+                        <input type="text" id="download-label" placeholder="Download All" aria-label="Download button text" class="w-full bg-neutral-900 border border-white/5 rounded-xl px-5 py-4 text-xs text-white">
+                        <p class="text-[8px] text-neutral-600 uppercase mt-2">Shown exactly as typed in preview and baked output.</p>
+                    </div>
                     <div class="flex justify-between items-center glass p-5 rounded-2xl">
                         <span class="text-[10px] font-bold text-white/60 uppercase tracking-widest">Show Download All Button</span>
                         <label class="toggle-switch">
@@ -381,12 +565,20 @@
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
-                    <div class="flex justify-between items-center glass p-5 rounded-2xl">
-                        <span class="text-[10px] font-bold text-white/60 uppercase tracking-widest">Scramble Images</span>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="scramble-images-toggle">
-                            <span class="toggle-slider"></span>
-                        </label>
+                    <div class="space-y-4 glass p-5 rounded-2xl">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] font-bold text-white/60 uppercase tracking-widest">Scramble Images</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="scramble-images-toggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="grid grid-cols-[1fr_auto_auto] gap-3 items-center">
+                            <input type="range" id="scramble-seed" min="1" max="9999" step="1" value="420" class="range-input">
+                            <input type="number" id="scramble-seed-value" min="1" max="9999" step="1" value="420" class="w-16 bg-neutral-900 border border-white/5 rounded-lg px-2 py-2 text-[10px] text-white text-right">
+                            <span class="text-[8px] text-neutral-600 uppercase">Seed</span>
+                        </div>
+                        <p class="text-[8px] text-neutral-500 uppercase tracking-[0.2em]">Change the seed to lock a repeatable scramble order.</p>
                     </div>
                 </div>
             </section>
@@ -415,9 +607,9 @@
             <div class="max-w-[1600px] mx-auto">
                 <header id="gallery-hero" class="flex flex-col items-center text-center">
                     <div id="client-name" contenteditable="true" data-placeholder="Client Name" class="focus:outline-none mb-10 w-full text-center"></div>
-                    <div id="event-date" contenteditable="true" data-placeholder="Links & Details" class="text-[12px] font-bold uppercase focus:outline-none text-neutral-500 w-full text-center"></div>
+                    <div id="event-date" contenteditable="true" data-placeholder="Links & Details" class="font-bold uppercase focus:outline-none text-neutral-500 w-full text-center"></div>
                     <div class="hero-actions flex flex-wrap gap-6 justify-center">
-                        <button id="download-full" type="button" class="btn-primary px-12 py-5 text-[11px] font-black uppercase tracking-[0.3em] shadow-2xl active:scale-95 transition-all">Download All</button>
+                        <button id="download-full" type="button" class="download-cta btn-primary font-black shadow-2xl active:scale-95 transition-all">Download All</button>
                         <button id="add-more-btn" type="button" aria-label="Add more images" class="icon-btn p-5 glass rounded-2xl hover:bg-white/10 active:scale-90 transition-all">
                             <i data-lucide="plus" class="w-6 h-6 opacity-40" aria-hidden="true"></i>
                         </button>
@@ -459,16 +651,16 @@
         const POPULAR_FONTS = ["Inter", "Playfair Display", "Montserrat", "Lora", "Oswald", "Roboto", "Prata", "Space Grotesk", "Syne", "Poppins", "Outfit", "Archivo", "Cormorant Garamond", "Cinzel", "Bodoni Moda", "Quicksand", "Work Sans", "Bebas Neue", "Fira Sans", "Spectral", "Arvo", "Cardo", "Chivo", "Crimson Text", "DM Sans", "Domine", "Eczar", "Fraunces", "Heebo", "IBM Plex Sans", "Inconsolata", "Josefin Sans", "Kanit", "Karla", "Libre Baskerville", "Libre Franklin", "Manrope", "Merriweather", "Mukta", "Nanum Myeongjo", "Newsreader", "Noto Sans", "Nunito", "Open Sans", "PT Sans", "PT Serif", "Public Sans", "Raleway", "Rubik", "Sarabun", "Source Sans Pro", "Source Serif Pro", "Space Mono", "Ubuntu", "Vollkorn", "Zilla Slab"];
         
         const PRESETS = {
-            'Noir': { bg: '#050505', text: '#ffffff', subtitle: '#888888', accent: '#ffffff', titleFont: "Inter", bodyFont: "Inter", buttonFont: "Inter", titleTracking: '-0.05em', titleLH: '1', titleSize: '1', bodyTracking: '0.2em', bodyLH: '1.5', bodySize: '1', buttonTracking: '0.3em', buttonLH: '1', buttonSize: '1', gap: '1.5rem' },
-            'Nordic': { bg: '#f0f0f0', text: '#222222', subtitle: '#666666', accent: '#000000', titleFont: "Montserrat", bodyFont: "Montserrat", buttonFont: "Montserrat", titleTracking: '0.1em', titleLH: '1.2', titleSize: '1', bodyTracking: '0.15em', bodyLH: '1.8', bodySize: '1', buttonTracking: '0.3em', buttonLH: '1', buttonSize: '1', gap: '2rem' },
-            'Solaris': { bg: '#fffaf0', text: '#4a3728', subtitle: '#c0a080', accent: '#c0a080', titleFont: "Playfair Display", bodyFont: "Lora", buttonFont: "Lora", titleTracking: '0em', titleLH: '1.1', titleSize: '1', bodyTracking: '0.1em', bodyLH: '1.6', bodySize: '1', buttonTracking: '0.1em', buttonLH: '1', buttonSize: '1', gap: '3rem' },
-            'Cyber': { bg: '#0a0a0f', text: '#e0e0ff', subtitle: '#7070a0', accent: '#00f2ff', titleFont: "Space Grotesk", bodyFont: "Space Mono", buttonFont: "Space Grotesk", titleTracking: '-0.02em', titleLH: '0.9', titleSize: '1.1', bodyTracking: '0.05em', bodyLH: '1.4', bodySize: '0.9', buttonTracking: '0.4em', buttonLH: '1', buttonSize: '1', gap: '1rem' },
-            'Earth': { bg: '#1c1917', text: '#f5f5f4', subtitle: '#a8a29e', accent: '#d97706', titleFont: "Prata", bodyFont: "Inter", buttonFont: "Inter", titleTracking: '0.02em', titleLH: '1.3', titleSize: '1', bodyTracking: '0.1em', bodyLH: '1.7', bodySize: '1', buttonTracking: '0.2em', buttonLH: '1', buttonSize: '1', gap: '2.5rem' },
-            'Mono': { bg: '#ffffff', text: '#000000', subtitle: '#666666', accent: '#000000', titleFont: "Archivo", bodyFont: "Archivo", buttonFont: "Archivo", titleTracking: '-0.04em', titleLH: '1', titleSize: '1.2', bodyTracking: '0em', bodyLH: '1.5', bodySize: '1', buttonTracking: '0em', buttonLH: '1', buttonSize: '1.1', gap: '0rem' },
-            'Royal': { bg: '#0f172a', text: '#f8fafc', subtitle: '#94a3b8', accent: '#facc15', titleFont: "Cinzel", bodyFont: "Lora", buttonFont: "Lora", titleTracking: '0.05em', titleLH: '1.2', titleSize: '0.9', bodyTracking: '0.2em', bodyLH: '1.6', bodySize: '1', buttonTracking: '0.3em', buttonLH: '1', buttonSize: '1', gap: '2rem' },
-            'Minimal': { bg: '#fafafa', text: '#171717', subtitle: '#737373', accent: '#171717', titleFont: "Outfit", bodyFont: "Outfit", buttonFont: "Outfit", titleTracking: '-0.03em', titleLH: '1.1', titleSize: '0.8', bodyTracking: '0.1em', bodyLH: '1.5', bodySize: '1', buttonTracking: '0.2em', buttonLH: '1', buttonSize: '0.9', gap: '4rem' },
-            'Vogue': { bg: '#ffffff', text: '#111111', subtitle: '#999999', accent: '#000000', titleFont: "Bodoni Moda", bodyFont: "Playfair Display", buttonFont: "Bodoni Moda", titleTracking: '-0.01em', titleLH: '1', titleSize: '1.3', bodyTracking: '0.05em', bodyLH: '1.4', bodySize: '1', buttonTracking: '0.1em', buttonLH: '1', buttonSize: '1', gap: '2rem' },
-            'Brutal': { bg: '#000000', text: '#ffffff', subtitle: '#888888', accent: '#ef4444', titleFont: "Syne", bodyFont: "Syne", buttonFont: "Syne", titleTracking: '-0.07em', titleLH: '0.8', titleSize: '1.5', bodyTracking: '0.1em', bodyLH: '1.2', bodySize: '1.1', buttonTracking: '0.4em', buttonLH: '1', buttonSize: '1.2', gap: '0.5rem' }
+            'Noir': { bg: '#050505', text: '#ffffff', subtitle: '#888888', accent: '#ffffff', titleFont: "Inter", bodyFont: "Inter", buttonFont: "Inter", titleTracking: '-0.05em', titleLH: '1', titleSize: '1', bodyTracking: '0.2em', bodyLH: '1.5', bodySize: '1', buttonTracking: '0.3em', buttonLH: '1', buttonSize: '1', buttonPadX: '3rem', buttonPadY: '1.25rem', gap: '1.5rem' },
+            'Nordic': { bg: '#f0f0f0', text: '#222222', subtitle: '#666666', accent: '#000000', titleFont: "Montserrat", bodyFont: "Montserrat", buttonFont: "Montserrat", titleTracking: '0.1em', titleLH: '1.2', titleSize: '1', bodyTracking: '0.15em', bodyLH: '1.8', bodySize: '1', buttonTracking: '0.3em', buttonLH: '1', buttonSize: '1', buttonPadX: '3rem', buttonPadY: '1.25rem', gap: '2rem' },
+            'Solaris': { bg: '#fffaf0', text: '#4a3728', subtitle: '#c0a080', accent: '#c0a080', titleFont: "Playfair Display", bodyFont: "Lora", buttonFont: "Lora", titleTracking: '0em', titleLH: '1.1', titleSize: '1', bodyTracking: '0.1em', bodyLH: '1.6', bodySize: '1', buttonTracking: '0.1em', buttonLH: '1', buttonSize: '1', buttonPadX: '3rem', buttonPadY: '1.25rem', gap: '3rem' },
+            'Cyber': { bg: '#0a0a0f', text: '#e0e0ff', subtitle: '#7070a0', accent: '#00f2ff', titleFont: "Space Grotesk", bodyFont: "Space Mono", buttonFont: "Space Grotesk", titleTracking: '-0.02em', titleLH: '0.9', titleSize: '1.1', bodyTracking: '0.05em', bodyLH: '1.4', bodySize: '0.9', buttonTracking: '0.4em', buttonLH: '1', buttonSize: '1', buttonPadX: '3rem', buttonPadY: '1.25rem', gap: '1rem' },
+            'Earth': { bg: '#1c1917', text: '#f5f5f4', subtitle: '#a8a29e', accent: '#d97706', titleFont: "Prata", bodyFont: "Inter", buttonFont: "Inter", titleTracking: '0.02em', titleLH: '1.3', titleSize: '1', bodyTracking: '0.1em', bodyLH: '1.7', bodySize: '1', buttonTracking: '0.2em', buttonLH: '1', buttonSize: '1', buttonPadX: '3rem', buttonPadY: '1.25rem', gap: '2.5rem' },
+            'Mono': { bg: '#ffffff', text: '#000000', subtitle: '#666666', accent: '#000000', titleFont: "Archivo", bodyFont: "Archivo", buttonFont: "Archivo", titleTracking: '-0.04em', titleLH: '1', titleSize: '1.2', bodyTracking: '0em', bodyLH: '1.5', bodySize: '1', buttonTracking: '0em', buttonLH: '1', buttonSize: '1.1', buttonPadX: '3rem', buttonPadY: '1.25rem', gap: '0rem' },
+            'Royal': { bg: '#0f172a', text: '#f8fafc', subtitle: '#94a3b8', accent: '#facc15', titleFont: "Cinzel", bodyFont: "Lora", buttonFont: "Lora", titleTracking: '0.05em', titleLH: '1.2', titleSize: '0.9', bodyTracking: '0.2em', bodyLH: '1.6', bodySize: '1', buttonTracking: '0.3em', buttonLH: '1', buttonSize: '1', buttonPadX: '3rem', buttonPadY: '1.25rem', gap: '2rem' },
+            'Minimal': { bg: '#fafafa', text: '#171717', subtitle: '#737373', accent: '#171717', titleFont: "Outfit", bodyFont: "Outfit", buttonFont: "Outfit", titleTracking: '-0.03em', titleLH: '1.1', titleSize: '0.8', bodyTracking: '0.1em', bodyLH: '1.5', bodySize: '1', buttonTracking: '0.2em', buttonLH: '1', buttonSize: '0.9', buttonPadX: '3rem', buttonPadY: '1.25rem', gap: '4rem' },
+            'Vogue': { bg: '#ffffff', text: '#111111', subtitle: '#999999', accent: '#000000', titleFont: "Bodoni Moda", bodyFont: "Playfair Display", buttonFont: "Bodoni Moda", titleTracking: '-0.01em', titleLH: '1', titleSize: '1.3', bodyTracking: '0.05em', bodyLH: '1.4', bodySize: '1', buttonTracking: '0.1em', buttonLH: '1', buttonSize: '1', buttonPadX: '3rem', buttonPadY: '1.25rem', gap: '2rem' },
+            'Brutal': { bg: '#000000', text: '#ffffff', subtitle: '#888888', accent: '#ef4444', titleFont: "Syne", bodyFont: "Syne", buttonFont: "Syne", titleTracking: '-0.07em', titleLH: '0.8', titleSize: '1.5', bodyTracking: '0.1em', bodyLH: '1.2', bodySize: '1.1', buttonTracking: '0.4em', buttonLH: '1', buttonSize: '1.2', buttonPadX: '3rem', buttonPadY: '1.25rem', gap: '0.5rem' }
         };
 
         const state = { 
@@ -476,8 +668,10 @@
             favicon: null, 
             theme: { ...PRESETS['Noir'], buttonText: '#050505' }, 
             externalUrl: '',
+            downloadLabel: 'Download All',
             showDownloadBtn: true,
-            scrambleImages: false
+            scrambleImages: false,
+            scrambleSeed: 420
         };
 
         const els = {
@@ -496,16 +690,31 @@
             subtitleColor: document.getElementById('subtitle-color'), accentColor: document.getElementById('accent-color'), buttonTextColor: document.getElementById('button-text-color'),
             tTracking: document.getElementById('title-tracking'), tLH: document.getElementById('title-lh'), tSize: document.getElementById('title-size'),
             bTracking: document.getElementById('body-tracking'), bLH: document.getElementById('body-lh'), bSize: document.getElementById('body-size'),
-            btnTracking: document.getElementById('button-tracking'), btnLH: document.getElementById('button-lh'), btnSize: document.getElementById('button-size'),
+            btnTracking: document.getElementById('button-tracking'), btnLH: document.getElementById('button-lh'), btnSize: document.getElementById('button-size'), btnPadX: document.getElementById('button-pad-x'), btnPadY: document.getElementById('button-pad-y'),
             tTrackingValue: document.getElementById('title-tracking-value'), tLHValue: document.getElementById('title-lh-value'), tSizeValue: document.getElementById('title-size-value'),
             bTrackingValue: document.getElementById('body-tracking-value'), bLHValue: document.getElementById('body-lh-value'), bSizeValue: document.getElementById('body-size-value'),
-            btnTrackingValue: document.getElementById('button-tracking-value'), btnLHValue: document.getElementById('button-lh-value'), btnSizeValue: document.getElementById('button-size-value'),
-            galleryGap: document.getElementById('gallery-gap'), galleryGapValue: document.getElementById('gallery-gap-value'), externalUrl: document.getElementById('external-url'),
+            btnTrackingValue: document.getElementById('button-tracking-value'), btnLHValue: document.getElementById('button-lh-value'), btnSizeValue: document.getElementById('button-size-value'), btnPadXValue: document.getElementById('button-pad-x-value'), btnPadYValue: document.getElementById('button-pad-y-value'),
+            galleryGap: document.getElementById('gallery-gap'), galleryGapValue: document.getElementById('gallery-gap-value'), externalUrl: document.getElementById('external-url'), downloadLabel: document.getElementById('download-label'),
             showDlToggle: document.getElementById('show-download-toggle'),
             scrambleToggle: document.getElementById('scramble-images-toggle'),
+            scrambleSeed: document.getElementById('scramble-seed'),
+            scrambleSeedValue: document.getElementById('scramble-seed-value'),
             importStatus: document.getElementById('import-status'),
             importProgressText: document.getElementById('import-progress-text')
         };
+
+        const defaultDownloadLabel = 'Download All';
+        const getDownloadLabel = () => {
+            const label = (state.downloadLabel || '').trim();
+            return label || defaultDownloadLabel;
+        };
+
+        const escapeHTML = (value) => value
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
 
         const openNavMenu = () => {
             document.body.classList.add('nav-open');
@@ -583,6 +792,8 @@
             r.style.setProperty('--button-tracking', state.theme.buttonTracking);
             r.style.setProperty('--button-lh', state.theme.buttonLH);
             r.style.setProperty('--button-size', state.theme.buttonSize);
+            r.style.setProperty('--button-pad-x', state.theme.buttonPadX || '3rem');
+            r.style.setProperty('--button-pad-y', state.theme.buttonPadY || '1.25rem');
 
             [state.theme.titleFont, state.theme.bodyFont, state.theme.buttonFont].filter(Boolean).forEach(f => {
                 const id = `f-${f.replace(/\s+/g,'-')}`;
@@ -618,13 +829,21 @@
             els.btnLHValue.value = state.theme.buttonLH;
             els.btnSize.value = state.theme.buttonSize;
             els.btnSizeValue.value = state.theme.buttonSize;
+            els.btnPadX.value = parseFloat(state.theme.buttonPadX || '3rem');
+            els.btnPadXValue.value = parseFloat(state.theme.buttonPadX || '3rem');
+            els.btnPadY.value = parseFloat(state.theme.buttonPadY || '1.25rem');
+            els.btnPadYValue.value = parseFloat(state.theme.buttonPadY || '1.25rem');
             els.galleryGap.value = parseFloat(state.theme.gap);
             els.galleryGapValue.value = parseFloat(state.theme.gap);
             els.showDlToggle.checked = state.showDownloadBtn;
             els.scrambleToggle.checked = state.scrambleImages;
+            els.scrambleSeed.value = state.scrambleSeed;
+            els.scrambleSeedValue.value = state.scrambleSeed;
             els.tSearch.value = state.theme.titleFont;
             els.bSearch.value = state.theme.bodyFont;
             els.btnSearch.value = state.theme.buttonFont || state.theme.bodyFont;
+            els.downloadLabel.value = state.downloadLabel;
+            els.dlFull.textContent = getDownloadLabel();
             applyTheme(); 
         };
 
@@ -651,15 +870,42 @@
         els.btnLHValue.oninput = (e) => { state.theme.buttonLH = e.target.value; els.btnLH.value = e.target.value; syncUI(); };
         els.btnSize.oninput = (e) => { state.theme.buttonSize = e.target.value; els.btnSizeValue.value = e.target.value; syncUI(); };
         els.btnSizeValue.oninput = (e) => { state.theme.buttonSize = e.target.value; els.btnSize.value = e.target.value; syncUI(); };
+        els.btnPadX.oninput = (e) => { state.theme.buttonPadX = `${e.target.value}rem`; els.btnPadXValue.value = e.target.value; syncUI(); };
+        els.btnPadXValue.oninput = (e) => { state.theme.buttonPadX = `${e.target.value}rem`; els.btnPadX.value = e.target.value; syncUI(); };
+        els.btnPadY.oninput = (e) => { state.theme.buttonPadY = `${e.target.value}rem`; els.btnPadYValue.value = e.target.value; syncUI(); };
+        els.btnPadYValue.oninput = (e) => { state.theme.buttonPadY = `${e.target.value}rem`; els.btnPadY.value = e.target.value; syncUI(); };
         els.galleryGap.oninput = (e) => { state.theme.gap = e.target.value + 'rem'; els.galleryGapValue.value = e.target.value; syncUI(); };
         els.galleryGapValue.oninput = (e) => { state.theme.gap = `${e.target.value}rem`; els.galleryGap.value = e.target.value; syncUI(); };
         els.externalUrl.oninput = (e) => { state.externalUrl = e.target.value; };
+        els.downloadLabel.oninput = (e) => {
+            state.downloadLabel = e.target.value;
+            els.dlFull.textContent = getDownloadLabel();
+        };
+        const normalizeSeed = (value) => {
+            const num = Number(value);
+            return Number.isFinite(num) ? Math.max(1, Math.min(9999, Math.round(num))) : 420;
+        };
+
         els.showDlToggle.onchange = (e) => { state.showDownloadBtn = e.target.checked; };
+        els.dlFull.onclick = () => {
+            if (!state.externalUrl) return;
+            window.open(state.externalUrl, '_blank', 'noopener,noreferrer');
+        };
         els.scrambleToggle.onchange = (e) => { state.scrambleImages = e.target.checked; render(); };
+        els.scrambleSeed.oninput = (e) => {
+            state.scrambleSeed = normalizeSeed(e.target.value);
+            els.scrambleSeedValue.value = state.scrambleSeed;
+            if (state.scrambleImages) render();
+        };
+        els.scrambleSeedValue.oninput = (e) => {
+            state.scrambleSeed = normalizeSeed(e.target.value);
+            els.scrambleSeed.value = state.scrambleSeed;
+            if (state.scrambleImages) render();
+        };
 
         window.resetFontAdj = (prop) => {
             const defaults = PRESETS['Noir'];
-            state.theme[prop] = defaults[prop] || (prop.includes('Size') ? '1' : prop === 'gap' ? '1.5rem' : '0');
+            state.theme[prop] = defaults[prop] || (prop.includes('Size') ? '1' : prop.includes('Pad') ? (prop === 'buttonPadX' ? '3rem' : '1.25rem') : prop === 'gap' ? '1.5rem' : '0');
             syncUI();
         };
 
@@ -700,10 +946,22 @@
             syncUI(); 
         };
 
-        const shuffledItems = (items) => {
+        const seededRandom = (seed) => {
+            let value = seed >>> 0;
+            return () => {
+                value = Math.imul(value ^ (value << 13), 0x5f24f3d5) >>> 0;
+                value = (value ^ (value >>> 16)) >>> 0;
+                return value / 0x100000000;
+            };
+        };
+
+        const shuffledItems = (items, seed = 420) => {
             const result = items.slice();
+            if (!result.length) return result;
+            const random = seededRandom(normalizeSeed(seed));
             for (let i = result.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
+                const rawIndex = Math.floor(random() * (i + 1));
+                const j = Number.isFinite(rawIndex) ? Math.max(0, Math.min(i, rawIndex)) : 0;
                 [result[i], result[j]] = [result[j], result[i]];
             }
             return result;
@@ -746,7 +1004,7 @@
         }
 
         const render = () => {
-            const itemsToRender = state.scrambleImages ? shuffledItems(state.items) : state.items;
+            const itemsToRender = state.scrambleImages ? shuffledItems(state.items, state.scrambleSeed) : state.items;
             els.grid.innerHTML = itemsToRender.map(i => `<div class="item group"><a href="${i.display}" data-pswp-width="${i.w}" data-pswp-height="${i.h}"><img src="${i.display}" class="w-full h-auto block transition-transform duration-[2s] group-hover:scale-110"></a><button type="button" onclick="window.del('${i.id}')" aria-label="Remove image ${i.name}" class="delete-overlay icon-btn glass p-3 rounded-xl text-white shadow-2xl active:scale-90 transition-all"><i data-lucide="trash-2" class="w-4 h-4" aria-hidden="true"></i></button></div>`).join('');
             lucide.createIcons(); initPS();
         };
@@ -851,6 +1109,8 @@
 
                 const fontsToLoad = [...new Set([state.theme.titleFont, state.theme.bodyFont, state.theme.buttonFont])].filter(Boolean);
                 const fontLinks = fontsToLoad.map(f => `<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=${f.replace(/\s+/g,'+')}:wght@300;400;500;600;700;800&display=swap">`).join('\n');
+                const bakeItems = state.scrambleImages ? shuffledItems(state.items, state.scrambleSeed) : state.items;
+                const bakedDownloadLabel = escapeHTML(getDownloadLabel());
 
                 const html = `<!DOCTYPE html>
 <html lang="en">
@@ -873,6 +1133,17 @@
             --title-font: '${state.theme.titleFont}', sans-serif;
             --body-font: '${state.theme.bodyFont}', sans-serif;
             --button-font: '${state.theme.buttonFont || state.theme.bodyFont}', sans-serif;
+            --title-tracking: ${state.theme.titleTracking};
+            --title-lh: ${state.theme.titleLH};
+            --title-size: ${state.theme.titleSize};
+            --body-tracking: ${state.theme.bodyTracking};
+            --body-lh: ${state.theme.bodyLH};
+            --body-size: ${state.theme.bodySize};
+            --button-tracking: ${state.theme.buttonTracking};
+            --button-lh: ${state.theme.buttonLH};
+            --button-size: ${state.theme.buttonSize};
+            --button-pad-x: ${state.theme.buttonPadX || '3rem'};
+            --button-pad-y: ${state.theme.buttonPadY || '1.25rem'};
         }
         body { background: var(--bg); color: var(--text); font-family: var(--body-font); overflow-x: hidden; text-align: center; margin: 0; }
         .masonry { column-gap: var(--item-gap); columns: 1; padding: 1.5rem; max-width: 1600px; margin: 0 auto; }
@@ -891,17 +1162,22 @@
             cursor: pointer; 
             border: none; 
             font-family: var(--button-font);
-            letter-spacing: ${state.theme.buttonTracking};
-            line-height: ${state.theme.buttonLH};
-            font-size: calc(11px * ${state.theme.buttonSize});
         }
         .btn-primary:hover { opacity: 0.9; transform: translateY(-2px); }
+        .download-cta {
+            letter-spacing: var(--button-tracking);
+            line-height: var(--button-lh);
+            font-size: calc(clamp(0.7rem, 1.8vw, 0.95rem) * var(--button-size));
+            padding-inline: var(--button-pad-x);
+            padding-block: var(--button-pad-y);
+            text-transform: none;
+        }
         .title-heading { 
             font-family: var(--title-font) !important; 
-            font-size: calc(clamp(2.75rem, 10vw, 8rem) * ${state.theme.titleSize}) !important; 
+            font-size: calc(clamp(2.6rem, 11vw, 7rem) * var(--title-size)) !important; 
             font-weight: 400 !important; 
-            letter-spacing: ${state.theme.titleTracking} !important; 
-            line-height: ${state.theme.titleLH} !important; 
+            letter-spacing: var(--title-tracking) !important; 
+            line-height: var(--title-lh) !important; 
             margin: 0 0 2rem 0 !important; 
             text-align: center !important;
             width: min(100%, 16ch) !important;
@@ -918,11 +1194,11 @@
         }
         .details { 
             font-family: var(--body-font) !important; 
-            font-size: calc(clamp(10px, 2vw, 13px) * ${state.theme.bodySize}) !important; 
+            font-size: calc(clamp(0.72rem, 1.55vw, 1.05rem) * var(--body-size)) !important; 
             font-weight: 800 !important; 
             text-transform: uppercase !important; 
-            letter-spacing: ${state.theme.bodyTracking} !important; 
-            line-height: ${state.theme.bodyLH} !important; 
+            letter-spacing: var(--body-tracking) !important; 
+            line-height: var(--body-lh) !important; 
             color: var(--subtitle) !important;
             text-align: center !important;
             width: min(100%, 42rem) !important;
@@ -943,21 +1219,165 @@
         .pswp__button--download { background: none !important; display: flex !important; align-items: center !important; justify-content: center !important; }
         footer a { text-decoration: none; color: inherit; }
         footer a:hover { text-decoration: underline; }
+
+        .cookie-banner {
+            position: fixed;
+            inset: auto 0 0;
+            z-index: 1200;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            background: rgba(4, 4, 4, 0.95);
+            color: #f8fafc;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 -16px 40px rgba(0, 0, 0, 0.45);
+        }
+        .cookie-banner.hidden {
+            display: none;
+        }
+        .cookie-banner p {
+            margin: 0;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            max-width: 75rem;
+        }
+        .cookie-banner-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        .cookie-banner-actions button,
+        .cookie-banner-actions a {
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 0.85rem 1.25rem;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.08);
+            color: inherit;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+        .cookie-banner-actions button:hover,
+        .cookie-banner-actions a:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
+        }
+        @media (max-width: 640px) {
+            header {
+                padding: clamp(4rem, 9vw, 5.5rem) 1rem clamp(2.5rem, 6vw, 4rem) 1rem;
+            }
+            .title-heading {
+                font-size: calc(clamp(2.4rem, 12vw, 4.8rem) * var(--title-size)) !important;
+            }
+            .details {
+                font-size: calc(clamp(0.7rem, 2.6vw, 0.95rem) * var(--body-size)) !important;
+            }
+            .download-cta {
+                padding-inline: calc(var(--button-pad-x) * 0.7);
+                padding-block: calc(var(--button-pad-y) * 0.8);
+            }
+            .cookie-banner {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: left;
+                padding: 1rem;
+            }
+            .cookie-banner-actions {
+                justify-content: stretch;
+            }
+            .cookie-banner-actions button,
+            .cookie-banner-actions a {
+                width: 100%;
+            }
+        }
     </style>
+    <script>
+        const analyticsCookieKey = 'seaside_analytics_consent';
+        const analyticsMeasurementId = 'G-JHWR7XVT1R';
+
+        function getAnalyticsConsent() {
+            return localStorage.getItem(analyticsCookieKey);
+        }
+
+        function saveAnalyticsConsent(value) {
+            localStorage.setItem(analyticsCookieKey, value);
+            if (value === 'accepted') {
+                enableAnalytics();
+            }
+        }
+
+        function enableAnalytics() {
+            if (window.analyticsEnabled) return;
+            window.analyticsEnabled = true;
+            window.dataLayer = window.dataLayer || [];
+            function gtag() { dataLayer.push(arguments); }
+            window.gtag = gtag;
+            gtag('js', new Date());
+            gtag('config', analyticsMeasurementId);
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=' + analyticsMeasurementId;
+            document.head.appendChild(script);
+        }
+
+        function updateAnalyticsBanner() {
+            const banner = document.getElementById('cookie-consent-banner');
+            if (!banner) return;
+            const consent = getAnalyticsConsent();
+            banner.classList.toggle('hidden', consent === 'accepted' || consent === 'declined');
+        }
+
+        function handleAnalyticsAccept() {
+            saveAnalyticsConsent('accepted');
+            updateAnalyticsBanner();
+        }
+
+        function handleAnalyticsDecline() {
+            saveAnalyticsConsent('declined');
+            updateAnalyticsBanner();
+        }
+
+        function applyAnalyticsConsent() {
+            const consent = getAnalyticsConsent();
+            if (consent === 'accepted') {
+                enableAnalytics();
+            }
+            updateAnalyticsBanner();
+        }
+
+        document.addEventListener('DOMContentLoaded', applyAnalyticsConsent);
+    <\/script>
 </head>
 <body>
+    <div id="cookie-consent-banner" class="cookie-banner hidden" role="dialog" aria-live="polite" aria-label="Analytics consent banner">
+        <div>
+            <p><strong>Analytics consent</strong> — Accept to enable Google Analytics tracking on this page. Declining keeps analytics off while you continue using the app.</p>
+        </div>
+        <div class="cookie-banner-actions">
+            <button type="button" onclick="handleAnalyticsDecline()">Decline</button>
+            <button type="button" onclick="handleAnalyticsAccept()" class="btn-primary">Accept</button>
+        </div>
+    </div>
     <header>
         <h1 class="title-heading">${client}</h1>
         <div class="details">${sub}</div>
         ${(state.showDownloadBtn && state.externalUrl) ? `
         <div style="margin-top: 4rem;">
-            <a href="${state.externalUrl}" target="_blank" class="btn-primary px-12 py-5 text-[11px] uppercase tracking-[0.3em]">Download All Photos</a>
+            <a href="${state.externalUrl}" target="_blank" class="download-cta btn-primary">${bakedDownloadLabel}</a>
         </div>
         ` : ''}
     </header>
 
     <div id="gallery" class="masonry">
-        ${state.items.map((it, i) => `
+        ${bakeItems.map((it, i) => `
         <div class="item">
             <a href="images/shot-${i+1}.jpg" data-pswp-width="${it.w}" data-pswp-height="${it.h}" target="_blank">
                 <img src="images/shot-${i+1}.jpg" alt="Gallery Image" loading="lazy">
