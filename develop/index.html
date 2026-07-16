@@ -15,6 +15,7 @@
             --accent: #ffffff; 
             --bg: #050505; 
             --text: #ffffff; 
+            --button-text: #050505; 
             --item-gap: 1.5rem; 
             --title-font: 'Inter'; 
             --body-font: 'Inter'; 
@@ -96,7 +97,7 @@
         @media (min-width: 640px) { .masonry { columns: 2; } }
         @media (min-width: 1024px) { .masonry { columns: 3; } }
         .item { break-inside: avoid; margin-bottom: var(--item-gap); border-radius: 12px; overflow: hidden; position: relative; background: #111; cursor: pointer; }
-        .btn-primary { background-color: var(--accent); color: var(--bg); transition: all 0.3s ease; border-radius: 12px; font-weight: 900; }
+        .btn-primary { background-color: var(--accent); color: var(--button-text); transition: all 0.3s ease; border-radius: 12px; font-weight: 900; }
         input[type="color"] { appearance: none; -webkit-appearance: none; border: 2px solid rgba(255,255,255,0.1); width: 44px; height: 44px; border-radius: 12px; padding: 0; cursor: pointer; background: none; }
         .custom-scrollbar::-webkit-scrollbar { width: 5px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
@@ -215,21 +216,33 @@
                             <div>
                                 <div class="flex justify-between items-center mb-2">
                                     <span class="text-[8px] text-neutral-600 uppercase block">Tracking</span>
-                                    <button onclick="resetFontAdj('titleTracking')" class="reset-btn">Reset</button>
+                                    <div class="flex items-center gap-2">
+                                        <input type="number" id="title-tracking-value" step="0.01" min="-0.2" max="0.5" value="-0.05" class="w-16 bg-neutral-900 border border-white/5 rounded-lg px-2 py-2 text-[10px] text-white text-right">
+                                        <span class="text-[8px] text-neutral-600 uppercase">em</span>
+                                        <button onclick="resetFontAdj('titleTracking')" class="reset-btn">Reset</button>
+                                    </div>
                                 </div>
                                 <input type="range" id="title-tracking" min="-0.2" max="0.5" step="0.01" value="-0.05" class="range-input">
                             </div>
                             <div>
                                 <div class="flex justify-between items-center mb-2">
                                     <span class="text-[8px] text-neutral-600 uppercase block">Line Height</span>
-                                    <button onclick="resetFontAdj('titleLH')" class="reset-btn">Reset</button>
+                                    <div class="flex items-center gap-2">
+                                        <input type="number" id="title-lh-value" step="0.1" min="0.5" max="2" value="1" class="w-16 bg-neutral-900 border border-white/5 rounded-lg px-2 py-2 text-[10px] text-white text-right">
+                                        <span class="text-[8px] text-neutral-600 uppercase">×</span>
+                                        <button onclick="resetFontAdj('titleLH')" class="reset-btn">Reset</button>
+                                    </div>
                                 </div>
                                 <input type="range" id="title-lh" min="0.5" max="2" step="0.1" value="1" class="range-input">
                             </div>
                             <div class="col-span-2">
                                 <div class="flex justify-between items-center mb-2">
                                     <span class="text-[8px] text-neutral-600 uppercase block">Size Scale</span>
-                                    <button onclick="resetFontAdj('titleSize')" class="reset-btn">Reset</button>
+                                    <div class="flex items-center gap-2">
+                                        <input type="number" id="title-size-value" step="0.05" min="0.5" max="2" value="1" class="w-16 bg-neutral-900 border border-white/5 rounded-lg px-2 py-2 text-[10px] text-white text-right">
+                                        <span class="text-[8px] text-neutral-600 uppercase">×</span>
+                                        <button onclick="resetFontAdj('titleSize')" class="reset-btn">Reset</button>
+                                    </div>
                                 </div>
                                 <input type="range" id="title-size" min="0.5" max="2" step="0.05" value="1" class="range-input">
                             </div>
@@ -243,21 +256,33 @@
                             <div>
                                 <div class="flex justify-between items-center mb-2">
                                     <span class="text-[8px] text-neutral-600 uppercase block">Tracking</span>
-                                    <button onclick="resetFontAdj('bodyTracking')" class="reset-btn">Reset</button>
+                                    <div class="flex items-center gap-2">
+                                        <input type="number" id="body-tracking-value" step="0.01" min="0" max="1" value="0.2" class="w-16 bg-neutral-900 border border-white/5 rounded-lg px-2 py-2 text-[10px] text-white text-right">
+                                        <span class="text-[8px] text-neutral-600 uppercase">em</span>
+                                        <button onclick="resetFontAdj('bodyTracking')" class="reset-btn">Reset</button>
+                                    </div>
                                 </div>
                                 <input type="range" id="body-tracking" min="0" max="1" step="0.01" value="0.2" class="range-input">
                             </div>
                             <div>
                                 <div class="flex justify-between items-center mb-2">
                                     <span class="text-[8px] text-neutral-600 uppercase block">Line Height</span>
-                                    <button onclick="resetFontAdj('bodyLH')" class="reset-btn">Reset</button>
+                                    <div class="flex items-center gap-2">
+                                        <input type="number" id="body-lh-value" step="0.1" min="1" max="3" value="1.5" class="w-16 bg-neutral-900 border border-white/5 rounded-lg px-2 py-2 text-[10px] text-white text-right">
+                                        <span class="text-[8px] text-neutral-600 uppercase">×</span>
+                                        <button onclick="resetFontAdj('bodyLH')" class="reset-btn">Reset</button>
+                                    </div>
                                 </div>
                                 <input type="range" id="body-lh" min="1" max="3" step="0.1" value="1.5" class="range-input">
                             </div>
                             <div class="col-span-2">
                                 <div class="flex justify-between items-center mb-2">
                                     <span class="text-[8px] text-neutral-600 uppercase block">Size Scale</span>
-                                    <button onclick="resetFontAdj('bodySize')" class="reset-btn">Reset</button>
+                                    <div class="flex items-center gap-2">
+                                        <input type="number" id="body-size-value" step="0.05" min="0.5" max="2" value="1" class="w-16 bg-neutral-900 border border-white/5 rounded-lg px-2 py-2 text-[10px] text-white text-right">
+                                        <span class="text-[8px] text-neutral-600 uppercase">×</span>
+                                        <button onclick="resetFontAdj('bodySize')" class="reset-btn">Reset</button>
+                                    </div>
                                 </div>
                                 <input type="range" id="body-size" min="0.5" max="2" step="0.05" value="1" class="range-input">
                             </div>
@@ -271,21 +296,33 @@
                             <div>
                                 <div class="flex justify-between items-center mb-2">
                                     <span class="text-[8px] text-neutral-600 uppercase block">Tracking</span>
-                                    <button onclick="resetFontAdj('buttonTracking')" class="reset-btn">Reset</button>
+                                    <div class="flex items-center gap-2">
+                                        <input type="number" id="button-tracking-value" step="0.01" min="0" max="1" value="0.3" class="w-16 bg-neutral-900 border border-white/5 rounded-lg px-2 py-2 text-[10px] text-white text-right">
+                                        <span class="text-[8px] text-neutral-600 uppercase">em</span>
+                                        <button onclick="resetFontAdj('buttonTracking')" class="reset-btn">Reset</button>
+                                    </div>
                                 </div>
                                 <input type="range" id="button-tracking" min="0" max="1" step="0.01" value="0.3" class="range-input">
                             </div>
                             <div>
                                 <div class="flex justify-between items-center mb-2">
                                     <span class="text-[8px] text-neutral-600 uppercase block">Line Height</span>
-                                    <button onclick="resetFontAdj('buttonLH')" class="reset-btn">Reset</button>
+                                    <div class="flex items-center gap-2">
+                                        <input type="number" id="button-lh-value" step="0.1" min="0.5" max="2" value="1" class="w-16 bg-neutral-900 border border-white/5 rounded-lg px-2 py-2 text-[10px] text-white text-right">
+                                        <span class="text-[8px] text-neutral-600 uppercase">×</span>
+                                        <button onclick="resetFontAdj('buttonLH')" class="reset-btn">Reset</button>
+                                    </div>
                                 </div>
                                 <input type="range" id="button-lh" min="0.5" max="2" step="0.1" value="1" class="range-input">
                             </div>
                             <div class="col-span-2">
                                 <div class="flex justify-between items-center mb-2">
                                     <span class="text-[8px] text-neutral-600 uppercase block">Size Scale</span>
-                                    <button onclick="resetFontAdj('buttonSize')" class="reset-btn">Reset</button>
+                                    <div class="flex items-center gap-2">
+                                        <input type="number" id="button-size-value" step="0.05" min="0.5" max="2" value="1" class="w-16 bg-neutral-900 border border-white/5 rounded-lg px-2 py-2 text-[10px] text-white text-right">
+                                        <span class="text-[8px] text-neutral-600 uppercase">×</span>
+                                        <button onclick="resetFontAdj('buttonSize')" class="reset-btn">Reset</button>
+                                    </div>
                                 </div>
                                 <input type="range" id="button-size" min="0.5" max="2" step="0.05" value="1" class="range-input">
                             </div>
@@ -306,12 +343,17 @@
                     <div class="space-y-3 text-center"><span class="text-[9px] font-bold text-neutral-500 uppercase">Base</span><input type="color" id="bg-color" value="#050505" class="mx-auto block"></div>
                     <div class="space-y-3 text-center"><span class="text-[9px] font-bold text-neutral-500 uppercase">Text</span><input type="color" id="text-color" value="#ffffff" class="mx-auto block"></div>
                     <div class="space-y-3 text-center"><span class="text-[9px] font-bold text-neutral-500 uppercase">Accent</span><input type="color" id="accent-color" value="#ffffff" class="mx-auto block"></div>
+                    <div class="space-y-3 text-center"><span class="text-[9px] font-bold text-neutral-500 uppercase">Button Text</span><input type="color" id="button-text-color" value="#050505" class="mx-auto block"></div>
                     <div class="space-y-3 text-center"><span class="text-[9px] font-bold text-neutral-500 uppercase">Subtitle</span><input type="color" id="subtitle-color" value="#888888" class="mx-auto block"></div>
                 </div>
                 <div class="mb-8">
                     <div class="flex justify-between items-center mb-4">
                         <span class="text-[9px] font-bold text-neutral-500 uppercase block">Gallery Gap</span>
-                        <button onclick="resetFontAdj('gap')" class="reset-btn">Reset</button>
+                        <div class="flex items-center gap-2">
+                            <input type="number" id="gallery-gap-value" step="0.5" min="0" max="5" value="1.5" class="w-16 bg-neutral-900 border border-white/5 rounded-lg px-2 py-2 text-[10px] text-white text-right">
+                            <span class="text-[8px] text-neutral-600 uppercase">rem</span>
+                            <button onclick="resetFontAdj('gap')" class="reset-btn">Reset</button>
+                        </div>
                     </div>
                     <input type="range" id="gallery-gap" min="0" max="5" step="0.5" value="1.5" class="range-input">
                 </div>
@@ -432,7 +474,7 @@
         const state = { 
             items: [], 
             favicon: null, 
-            theme: { ...PRESETS['Noir'] }, 
+            theme: { ...PRESETS['Noir'], buttonText: '#050505' }, 
             externalUrl: '',
             showDownloadBtn: true,
             scrambleImages: false
@@ -451,11 +493,14 @@
             faviconInput: document.getElementById('favicon-input'), favPreview: document.getElementById('favicon-preview-img'), 
             tplList: document.getElementById('template-list'), saveTpl: document.getElementById('save-tpl-btn'), toolbar: document.getElementById('text-toolbar'),
             bgColor: document.getElementById('bg-color'), textColor: document.getElementById('text-color'), 
-            subtitleColor: document.getElementById('subtitle-color'), accentColor: document.getElementById('accent-color'),
+            subtitleColor: document.getElementById('subtitle-color'), accentColor: document.getElementById('accent-color'), buttonTextColor: document.getElementById('button-text-color'),
             tTracking: document.getElementById('title-tracking'), tLH: document.getElementById('title-lh'), tSize: document.getElementById('title-size'),
             bTracking: document.getElementById('body-tracking'), bLH: document.getElementById('body-lh'), bSize: document.getElementById('body-size'),
             btnTracking: document.getElementById('button-tracking'), btnLH: document.getElementById('button-lh'), btnSize: document.getElementById('button-size'),
-            galleryGap: document.getElementById('gallery-gap'), externalUrl: document.getElementById('external-url'),
+            tTrackingValue: document.getElementById('title-tracking-value'), tLHValue: document.getElementById('title-lh-value'), tSizeValue: document.getElementById('title-size-value'),
+            bTrackingValue: document.getElementById('body-tracking-value'), bLHValue: document.getElementById('body-lh-value'), bSizeValue: document.getElementById('body-size-value'),
+            btnTrackingValue: document.getElementById('button-tracking-value'), btnLHValue: document.getElementById('button-lh-value'), btnSizeValue: document.getElementById('button-size-value'),
+            galleryGap: document.getElementById('gallery-gap'), galleryGapValue: document.getElementById('gallery-gap-value'), externalUrl: document.getElementById('external-url'),
             showDlToggle: document.getElementById('show-download-toggle'),
             scrambleToggle: document.getElementById('scramble-images-toggle'),
             importStatus: document.getElementById('import-status'),
@@ -524,6 +569,7 @@
             r.style.setProperty('--text', state.theme.text);
             r.style.setProperty('--subtitle', state.theme.subtitle);
             r.style.setProperty('--accent', state.theme.accent); 
+            r.style.setProperty('--button-text', state.theme.buttonText || '#050505');
             r.style.setProperty('--item-gap', state.theme.gap);
             r.style.setProperty('--title-font', state.theme.titleFont); 
             r.style.setProperty('--body-font', state.theme.bodyFont);
@@ -553,16 +599,27 @@
             els.textColor.value = state.theme.text;
             els.subtitleColor.value = state.theme.subtitle;
             els.accentColor.value = state.theme.accent;
+            els.buttonTextColor.value = state.theme.buttonText || '#050505';
             els.tTracking.value = parseFloat(state.theme.titleTracking);
+            els.tTrackingValue.value = parseFloat(state.theme.titleTracking);
             els.tLH.value = state.theme.titleLH;
+            els.tLHValue.value = state.theme.titleLH;
             els.tSize.value = state.theme.titleSize;
+            els.tSizeValue.value = state.theme.titleSize;
             els.bTracking.value = parseFloat(state.theme.bodyTracking);
+            els.bTrackingValue.value = parseFloat(state.theme.bodyTracking);
             els.bLH.value = state.theme.bodyLH;
+            els.bLHValue.value = state.theme.bodyLH;
             els.bSize.value = state.theme.bodySize;
+            els.bSizeValue.value = state.theme.bodySize;
             els.btnTracking.value = parseFloat(state.theme.buttonTracking);
+            els.btnTrackingValue.value = parseFloat(state.theme.buttonTracking);
             els.btnLH.value = state.theme.buttonLH;
+            els.btnLHValue.value = state.theme.buttonLH;
             els.btnSize.value = state.theme.buttonSize;
+            els.btnSizeValue.value = state.theme.buttonSize;
             els.galleryGap.value = parseFloat(state.theme.gap);
+            els.galleryGapValue.value = parseFloat(state.theme.gap);
             els.showDlToggle.checked = state.showDownloadBtn;
             els.scrambleToggle.checked = state.scrambleImages;
             els.tSearch.value = state.theme.titleFont;
@@ -575,23 +632,34 @@
         els.textColor.oninput = (e) => { state.theme.text = e.target.value; syncUI(); };
         els.subtitleColor.oninput = (e) => { state.theme.subtitle = e.target.value; syncUI(); };
         els.accentColor.oninput = (e) => { state.theme.accent = e.target.value; syncUI(); };
-        els.tTracking.oninput = (e) => { state.theme.titleTracking = e.target.value + 'em'; syncUI(); };
-        els.tLH.oninput = (e) => { state.theme.titleLH = e.target.value; syncUI(); };
-        els.tSize.oninput = (e) => { state.theme.titleSize = e.target.value; syncUI(); };
-        els.bTracking.oninput = (e) => { state.theme.bodyTracking = e.target.value + 'em'; syncUI(); };
-        els.bLH.oninput = (e) => { state.theme.bodyLH = e.target.value; syncUI(); };
-        els.bSize.oninput = (e) => { state.theme.bodySize = e.target.value; syncUI(); };
-        els.btnTracking.oninput = (e) => { state.theme.buttonTracking = e.target.value + 'em'; syncUI(); };
-        els.btnLH.oninput = (e) => { state.theme.buttonLH = e.target.value; syncUI(); };
-        els.btnSize.oninput = (e) => { state.theme.buttonSize = e.target.value; syncUI(); };
-        els.galleryGap.oninput = (e) => { state.theme.gap = e.target.value + 'rem'; syncUI(); };
+        els.buttonTextColor.oninput = (e) => { state.theme.buttonText = e.target.value; syncUI(); };
+        els.tTracking.oninput = (e) => { state.theme.titleTracking = e.target.value + 'em'; els.tTrackingValue.value = e.target.value; syncUI(); };
+        els.tTrackingValue.oninput = (e) => { state.theme.titleTracking = `${e.target.value}em`; els.tTracking.value = e.target.value; syncUI(); };
+        els.tLH.oninput = (e) => { state.theme.titleLH = e.target.value; els.tLHValue.value = e.target.value; syncUI(); };
+        els.tLHValue.oninput = (e) => { state.theme.titleLH = e.target.value; els.tLH.value = e.target.value; syncUI(); };
+        els.tSize.oninput = (e) => { state.theme.titleSize = e.target.value; els.tSizeValue.value = e.target.value; syncUI(); };
+        els.tSizeValue.oninput = (e) => { state.theme.titleSize = e.target.value; els.tSize.value = e.target.value; syncUI(); };
+        els.bTracking.oninput = (e) => { state.theme.bodyTracking = e.target.value + 'em'; els.bTrackingValue.value = e.target.value; syncUI(); };
+        els.bTrackingValue.oninput = (e) => { state.theme.bodyTracking = `${e.target.value}em`; els.bTracking.value = e.target.value; syncUI(); };
+        els.bLH.oninput = (e) => { state.theme.bodyLH = e.target.value; els.bLHValue.value = e.target.value; syncUI(); };
+        els.bLHValue.oninput = (e) => { state.theme.bodyLH = e.target.value; els.bLH.value = e.target.value; syncUI(); };
+        els.bSize.oninput = (e) => { state.theme.bodySize = e.target.value; els.bSizeValue.value = e.target.value; syncUI(); };
+        els.bSizeValue.oninput = (e) => { state.theme.bodySize = e.target.value; els.bSize.value = e.target.value; syncUI(); };
+        els.btnTracking.oninput = (e) => { state.theme.buttonTracking = e.target.value + 'em'; els.btnTrackingValue.value = e.target.value; syncUI(); };
+        els.btnTrackingValue.oninput = (e) => { state.theme.buttonTracking = `${e.target.value}em`; els.btnTracking.value = e.target.value; syncUI(); };
+        els.btnLH.oninput = (e) => { state.theme.buttonLH = e.target.value; els.btnLHValue.value = e.target.value; syncUI(); };
+        els.btnLHValue.oninput = (e) => { state.theme.buttonLH = e.target.value; els.btnLH.value = e.target.value; syncUI(); };
+        els.btnSize.oninput = (e) => { state.theme.buttonSize = e.target.value; els.btnSizeValue.value = e.target.value; syncUI(); };
+        els.btnSizeValue.oninput = (e) => { state.theme.buttonSize = e.target.value; els.btnSize.value = e.target.value; syncUI(); };
+        els.galleryGap.oninput = (e) => { state.theme.gap = e.target.value + 'rem'; els.galleryGapValue.value = e.target.value; syncUI(); };
+        els.galleryGapValue.oninput = (e) => { state.theme.gap = `${e.target.value}rem`; els.galleryGap.value = e.target.value; syncUI(); };
         els.externalUrl.oninput = (e) => { state.externalUrl = e.target.value; };
         els.showDlToggle.onchange = (e) => { state.showDownloadBtn = e.target.checked; };
         els.scrambleToggle.onchange = (e) => { state.scrambleImages = e.target.checked; render(); };
 
         window.resetFontAdj = (prop) => {
             const defaults = PRESETS['Noir'];
-            state.theme[prop] = defaults[prop] || (prop.includes('Size') ? '1' : '0');
+            state.theme[prop] = defaults[prop] || (prop.includes('Size') ? '1' : prop === 'gap' ? '1.5rem' : '0');
             syncUI();
         };
 
@@ -800,6 +868,7 @@
             --text: ${state.theme.text}; 
             --subtitle: ${state.theme.subtitle};
             --accent: ${state.theme.accent}; 
+            --button-text: ${state.theme.buttonText || '#050505'};
             --item-gap: ${state.theme.gap};
             --title-font: '${state.theme.titleFont}', sans-serif;
             --body-font: '${state.theme.bodyFont}', sans-serif;
@@ -813,7 +882,7 @@
         .item:hover img { transform: scale(1.05); }
         .btn-primary { 
             background: var(--accent); 
-            color: var(--bg); 
+            color: var(--button-text); 
             text-decoration: none !important; 
             font-weight: 900; 
             border-radius: 12px; 
