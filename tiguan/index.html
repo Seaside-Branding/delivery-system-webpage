@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tiguanu</title>
+    <link rel="icon" href="favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@300;400;500;600;700;800&display=swap">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root { 
+            --bg: #0a0a0f; 
+            --text: #e0e0ff; 
+            --subtitle: #7070a0;
+            --accent: #b46146; 
+            --button-text: #050505;
+            --item-gap: 1rem;
+            --title-font: 'Space Grotesk', sans-serif;
+            --body-font: 'Space Mono', sans-serif;
+            --button-font: 'Space Grotesk', sans-serif;
+            --title-tracking: -0.02em;
+            --title-lh: 0.9;
+            --title-size: 1.1;
+            --body-tracking: 0.05em;
+            --body-lh: 1.4;
+            --body-size: 0.9;
+            --button-tracking: 0.4em;
+            --button-lh: 1;
+            --button-size: 1;
+            --button-pad-x: 3rem;
+            --button-pad-y: 1.25rem;
+        }
+        body { background: var(--bg); color: var(--text); font-family: var(--body-font); overflow-x: hidden; text-align: center; margin: 0; }
+        .masonry { column-gap: var(--item-gap); columns: 1; padding: 1.5rem; max-width: 1600px; margin: 0 auto; }
+        @media (min-width: 768px) { .masonry { columns: 3; padding: 4rem; } }
+        .item { break-inside: avoid; margin-bottom: var(--item-gap); border-radius: 8px; overflow: hidden; background: #111; }
+        .item img { width: 100%; height: auto; display: block; transition: transform 0.5s ease; }
+        .item:hover img { transform: scale(1.05); }
+        .btn-primary { 
+            background: var(--accent); 
+            color: var(--button-text); 
+            text-decoration: none !important; 
+            font-weight: 900; 
+            border-radius: 12px; 
+            display: inline-block; 
+            transition: all 0.3s ease; 
+            cursor: pointer; 
+            border: none; 
+            font-family: var(--button-font);
+        }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-2px); }
+        .download-cta {
+            letter-spacing: var(--button-tracking);
+            line-height: var(--button-lh);
+            font-size: calc(clamp(0.7rem, 1.8vw, 0.95rem) * var(--button-size));
+            padding-inline: var(--button-pad-x);
+            padding-block: var(--button-pad-y);
+            text-transform: none;
+        }
+        .title-heading { 
+            font-family: var(--title-font) !important; 
+            font-size: calc(clamp(2.6rem, 11vw, 7rem) * var(--title-size)) !important; 
+            font-weight: 400 !important; 
+            letter-spacing: var(--title-tracking) !important; 
+            line-height: var(--title-lh) !important; 
+            margin: 0 0 2rem 0 !important; 
+            text-align: center !important;
+            width: min(100%, 16ch) !important;
+            max-width: 100% !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            overflow-wrap: anywhere !important;
+            word-break: break-word !important;
+            hyphens: auto !important;
+        }
+        .title-heading b,
+        .title-heading strong {
+            font-weight: 700 !important;
+        }
+        .details { 
+            font-family: var(--body-font) !important; 
+            font-size: calc(clamp(0.72rem, 1.55vw, 1.05rem) * var(--body-size)) !important; 
+            font-weight: 800 !important; 
+            text-transform: uppercase !important; 
+            letter-spacing: var(--body-tracking) !important; 
+            line-height: var(--body-lh) !important; 
+            color: var(--subtitle) !important;
+            text-align: center !important;
+            width: min(100%, 42rem) !important;
+            max-width: 100% !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            overflow-wrap: anywhere !important;
+            word-break: break-word !important;
+            hyphens: auto !important;
+        }
+        .details b,
+        .details strong {
+            font-weight: 800 !important;
+        }
+        .details a { text-decoration: underline; color: inherit; }
+        header { padding: clamp(4.5rem, 10vw, 8rem) 1.5rem clamp(3rem, 7vw, 5rem) 1.5rem; max-width: 1400px; margin: 0 auto; text-align: center; }
+        footer { padding: 8rem 2rem; }
+        .pswp__button--download { background: none !important; display: flex !important; align-items: center !important; justify-content: center !important; }
+        footer a { text-decoration: none; color: inherit; }
+        footer a:hover { text-decoration: underline; }
+
+        .cookie-banner {
+            position: fixed;
+            inset: auto 0 0;
+            z-index: 1200;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            background: rgba(4, 4, 4, 0.95);
+            color: #f8fafc;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 -16px 40px rgba(0, 0, 0, 0.45);
+        }
+        .cookie-banner.hidden {
+            display: none;
+        }
+        .cookie-banner p {
+            margin: 0;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            max-width: 75rem;
+        }
+        .cookie-banner-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        .cookie-banner-actions button,
+        .cookie-banner-actions a {
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 0.85rem 1.25rem;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.08);
+            color: inherit;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+        .cookie-banner-actions button:hover,
+        .cookie-banner-actions a:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
+        }
+        @media (max-width: 640px) {
+            header {
+                padding: clamp(4rem, 9vw, 5.5rem) 1rem clamp(2.5rem, 6vw, 4rem) 1rem;
+            }
+            .title-heading {
+                font-size: calc(clamp(2.4rem, 12vw, 4.8rem) * var(--title-size)) !important;
+            }
+            .details {
+                font-size: calc(clamp(0.7rem, 2.6vw, 0.95rem) * var(--body-size)) !important;
+            }
+            .download-cta {
+                padding-inline: calc(var(--button-pad-x) * 0.7);
+                padding-block: calc(var(--button-pad-y) * 0.8);
+            }
+            .cookie-banner {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: left;
+                padding: 1rem;
+            }
+            .cookie-banner-actions {
+                justify-content: stretch;
+            }
+            .cookie-banner-actions button,
+            .cookie-banner-actions a {
+                width: 100%;
+            }
+        }
+    </style>
+    <script>
+        const analyticsCookieKey = 'seaside_analytics_consent';
+        const analyticsMeasurementId = 'G-JHWR7XVT1R';
+
+        function getAnalyticsConsent() {
+            return localStorage.getItem(analyticsCookieKey);
+        }
+
+        function saveAnalyticsConsent(value) {
+            localStorage.setItem(analyticsCookieKey, value);
+            if (value === 'accepted') {
+                enableAnalytics();
+            }
+        }
+
+        function enableAnalytics() {
+            if (window.analyticsEnabled) return;
+            window.analyticsEnabled = true;
+            window.dataLayer = window.dataLayer || [];
+            function gtag() { dataLayer.push(arguments); }
+            window.gtag = gtag;
+            gtag('js', new Date());
+            gtag('config', analyticsMeasurementId);
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=' + analyticsMeasurementId;
+            document.head.appendChild(script);
+        }
+
+        function updateAnalyticsBanner() {
+            const banner = document.getElementById('cookie-consent-banner');
+            if (!banner) return;
+            const consent = getAnalyticsConsent();
+            banner.classList.toggle('hidden', consent === 'accepted' || consent === 'declined');
+        }
+
+        function handleAnalyticsAccept() {
+            saveAnalyticsConsent('accepted');
+            updateAnalyticsBanner();
+        }
+
+        function handleAnalyticsDecline() {
+            saveAnalyticsConsent('declined');
+            updateAnalyticsBanner();
+        }
+
+        function applyAnalyticsConsent() {
+            const consent = getAnalyticsConsent();
+            if (consent === 'accepted') {
+                enableAnalytics();
+            }
+            updateAnalyticsBanner();
+        }
+
+        document.addEventListener('DOMContentLoaded', applyAnalyticsConsent);
+    </script>
+</head>
+<body>
+    <div id="cookie-consent-banner" class="cookie-banner hidden" role="dialog" aria-live="polite" aria-label="Analytics consent banner">
+        <div>
+            <p><strong>Analytics consent</strong> — Accept to enable Google Analytics tracking on this page. Declining keeps analytics off while you continue using the app.</p>
+        </div>
+        <div class="cookie-banner-actions">
+            <button type="button" onclick="handleAnalyticsDecline()">Decline</button>
+            <button type="button" onclick="handleAnalyticsAccept()" class="btn-primary">Accept</button>
+        </div>
+    </div>
+    <header>
+        <h1 class="title-heading">Tiguanu</h1>
+        <div class="details"></div>
+        
+        <div style="margin-top: 4rem;">
+            <a href="https://link.seasidebranding.com/tiguan" target="_blank" class="download-cta btn-primary">Download All</a>
+        </div>
+        
+    </header>
+
+    <div id="gallery" class="masonry">
+        
+        <div class="item">
+            <a href="images/shot-1.jpg" data-pswp-width="5952" data-pswp-height="3968" target="_blank">
+                <img src="images/shot-1.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-2.jpg" data-pswp-width="6000" data-pswp-height="4000" target="_blank">
+                <img src="images/shot-2.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-3.jpg" data-pswp-width="6000" data-pswp-height="4000" target="_blank">
+                <img src="images/shot-3.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-4.jpg" data-pswp-width="5751" data-pswp-height="3834" target="_blank">
+                <img src="images/shot-4.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-5.jpg" data-pswp-width="6000" data-pswp-height="4000" target="_blank">
+                <img src="images/shot-5.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-6.jpg" data-pswp-width="5244" data-pswp-height="3496" target="_blank">
+                <img src="images/shot-6.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-7.jpg" data-pswp-width="6000" data-pswp-height="4000" target="_blank">
+                <img src="images/shot-7.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-8.jpg" data-pswp-width="6000" data-pswp-height="4000" target="_blank">
+                <img src="images/shot-8.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-9.jpg" data-pswp-width="5489" data-pswp-height="3659" target="_blank">
+                <img src="images/shot-9.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-10.jpg" data-pswp-width="5663" data-pswp-height="3775" target="_blank">
+                <img src="images/shot-10.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-11.jpg" data-pswp-width="6000" data-pswp-height="4000" target="_blank">
+                <img src="images/shot-11.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-12.jpg" data-pswp-width="6000" data-pswp-height="4000" target="_blank">
+                <img src="images/shot-12.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-13.jpg" data-pswp-width="6000" data-pswp-height="4000" target="_blank">
+                <img src="images/shot-13.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-14.jpg" data-pswp-width="6000" data-pswp-height="4000" target="_blank">
+                <img src="images/shot-14.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-15.jpg" data-pswp-width="6000" data-pswp-height="4000" target="_blank">
+                <img src="images/shot-15.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-16.jpg" data-pswp-width="6000" data-pswp-height="4000" target="_blank">
+                <img src="images/shot-16.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-17.jpg" data-pswp-width="6000" data-pswp-height="4000" target="_blank">
+                <img src="images/shot-17.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-18.jpg" data-pswp-width="6000" data-pswp-height="4000" target="_blank">
+                <img src="images/shot-18.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-19.jpg" data-pswp-width="5697" data-pswp-height="3798" target="_blank">
+                <img src="images/shot-19.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-20.jpg" data-pswp-width="5751" data-pswp-height="3834" target="_blank">
+                <img src="images/shot-20.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-21.jpg" data-pswp-width="6000" data-pswp-height="4000" target="_blank">
+                <img src="images/shot-21.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-22.jpg" data-pswp-width="6000" data-pswp-height="4000" target="_blank">
+                <img src="images/shot-22.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-23.jpg" data-pswp-width="6000" data-pswp-height="4000" target="_blank">
+                <img src="images/shot-23.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-24.jpg" data-pswp-width="5217" data-pswp-height="3478" target="_blank">
+                <img src="images/shot-24.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-25.jpg" data-pswp-width="5590" data-pswp-height="3727" target="_blank">
+                <img src="images/shot-25.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-26.jpg" data-pswp-width="6000" data-pswp-height="4000" target="_blank">
+                <img src="images/shot-26.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-27.jpg" data-pswp-width="6000" data-pswp-height="4000" target="_blank">
+                <img src="images/shot-27.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-28.jpg" data-pswp-width="6000" data-pswp-height="4000" target="_blank">
+                <img src="images/shot-28.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-29.jpg" data-pswp-width="5601" data-pswp-height="3734" target="_blank">
+                <img src="images/shot-29.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-30.jpg" data-pswp-width="6000" data-pswp-height="4000" target="_blank">
+                <img src="images/shot-30.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-31.jpg" data-pswp-width="6000" data-pswp-height="4000" target="_blank">
+                <img src="images/shot-31.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+        <div class="item">
+            <a href="images/shot-32.jpg" data-pswp-width="5751" data-pswp-height="3834" target="_blank">
+                <img src="images/shot-32.jpg" alt="Gallery Image" loading="lazy">
+            </a>
+        </div>
+    </div>
+
+    <footer style="margin-top: 10rem; padding-bottom: 5rem; display: flex; flex-direction: column; align-items: center; gap: 3rem;">
+        <a href="https://seasidebranding.com" target="_blank" style="display: flex; flex-direction: column; align-items: center; gap: 1rem; color: var(--text); text-decoration: none;">
+            <div style="width: 3rem; height: 3rem; background: rgba(255,255,255,0.05); border-radius: 1rem; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                <img src="icon.png" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <span style="font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5em;">Seaside Branding</span>
+        </a>
+        <div style="display: flex; gap: 3rem; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.2em; color: var(--text);">
+            <a href="https://seasidebranding.com/terms" target="_blank" style="opacity: 0.6; color: inherit;">Terms</a>
+            <a href="https://seasidebranding.com/privacy" target="_blank" style="opacity: 0.6; color: inherit;">Privacy</a>
+        </div>
+        <a href="https://seasidebranding.com/contact" target="_blank" class="btn-primary" style="padding: 1rem 2.5rem; font-size: 9px; letter-spacing: 0.1em;">Contact Us</a>
+    </footer>
+
+    <script type="module">
+        import PhotoSwipeLightbox from 'https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe-lightbox.esm.min.js';
+        const lightbox = new PhotoSwipeLightbox({
+            gallery: '#gallery',
+            children: 'a',
+            pswpModule: () => import('https://cdnjs.cloudflare.com/ajax/libs/photoswipe/5.4.2/photoswipe.esm.min.js')
+        });
+        
+        lightbox.on('uiRegister', function() {
+            lightbox.pswp.ui.registerElement({
+                name: 'download-button',
+                order: 8,
+                isPrimary: true,
+                tagName: 'a',
+                html: '<svg aria-hidden="true" class="pswp__icn" viewBox="0 0 32 32" width="32" height="32"><path d="M20.5 14.3 17.1 18V10h-2.2v7.9l-3.4-3.6L10 15.8l6 6.2 6-6.2Z" fill="currentColor"/><path d="M24 24H8v-2h16Z" fill="currentColor"/></svg>',
+                onInit: (el, pswp) => {
+                    el.setAttribute('download', '');
+                    el.setAttribute('target', '_blank');
+                    pswp.on('change', () => {
+                        el.href = pswp.currSlide.data.src;
+                    });
+                }
+            });
+        });
+
+        lightbox.init();
+    </script>
+</body>
+</html>
